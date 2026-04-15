@@ -1,13 +1,18 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+
+import { LanguageService } from '../../core/services/language.service';
 
 @Component({
   selector: 'app-movies',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="page">
-      <h1>Phim CineGo</h1>
-      <p>Danh sách phim đang chiếu và sắp chiếu.</p>
+      <h1>{{ t('movies.title') }}</h1>
+      <p>{{ t('movies.description') }}</p>
     </section>
   `
 })
-export class MoviesComponent {}
+export class MoviesComponent {
+  protected readonly language = inject(LanguageService);
+  protected readonly t = this.language.t.bind(this.language);
+}

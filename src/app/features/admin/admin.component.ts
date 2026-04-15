@@ -1,13 +1,18 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+
+import { LanguageService } from '../../core/services/language.service';
 
 @Component({
   selector: 'app-admin',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="page">
-      <h1>Quản trị CineGo</h1>
-      <p>Cấu hình rạp, phim, khuyến mãi và báo cáo.</p>
+      <h1>{{ t('admin.title') }}</h1>
+      <p>{{ t('admin.description') }}</p>
     </section>
   `
 })
-export class AdminComponent {}
+export class AdminComponent {
+  protected readonly language = inject(LanguageService);
+  protected readonly t = this.language.t.bind(this.language);
+}

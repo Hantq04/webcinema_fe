@@ -11,6 +11,10 @@ export const routes: Routes = [
 				loadChildren: () => import('./features/home/home.routes').then((m) => m.homeRoutes)
 			},
 			{
+				path: 'home',
+				loadChildren: () => import('./features/home/home.routes').then((m) => m.homeRoutes)
+			},
+			{
 				path: 'movies',
 				loadChildren: () => import('./features/movies/movies.routes').then((m) => m.moviesRoutes)
 			},

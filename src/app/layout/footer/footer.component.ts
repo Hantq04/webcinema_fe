@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+
+import { LanguageService } from '../../core/services/language.service';
 
 @Component({
   selector: 'app-footer',
@@ -8,31 +10,31 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
       <div class="border-y border-[rgba(54,54,54,0.65)] px-6 py-5">
         <div class="mx-auto grid max-w-7xl gap-10 md:grid-cols-4">
           <section>
-            <h3 class="mb-3 text-lg font-bold text-[#5e5a53]">CineGo Việt Nam</h3>
+            <h3 class="mb-3 text-lg font-bold text-[#5e5a53]">{{ t('footer.companyName') }}</h3>
             <ul class="space-y-2 text-[0.95rem] leading-6">
-              <li>Giới thiệu</li>
-              <li>Tiện ích Online</li>
-              <li>Thẻ Quà Tặng</li>
-              <li>Tuyển Dụng</li>
-              <li>Liên Hệ Quảng Cáo CineGo</li>
-              <li>Dành cho đối tác</li>
+              <li>{{ t('footer.intro') }}</li>
+              <li>{{ t('footer.onlineUtilities') }}</li>
+              <li>{{ t('footer.giftCard') }}</li>
+              <li>{{ t('footer.careers') }}</li>
+              <li>{{ t('footer.advertisingContact') }}</li>
+              <li>{{ t('footer.partners') }}</li>
             </ul>
           </section>
 
           <section>
-            <h3 class="mb-3 text-lg font-bold text-[#5e5a53]">Điều khoản sử dụng</h3>
+            <h3 class="mb-3 text-lg font-bold text-[#5e5a53]">{{ t('footer.termsOfUse') }}</h3>
             <ul class="space-y-2 text-[0.95rem] leading-6">
-              <li>Điều Khoản Chung</li>
-              <li>Điều Khoản Giao Dịch</li>
-              <li>Chính Sách Thanh Toán</li>
-              <li>Chính Sách Bảo Mật</li>
-              <li>Những Quy Định Tại Rạp Phim</li>
-              <li>Câu Hỏi Thường Gặp</li>
+              <li>{{ t('footer.generalTerms') }}</li>
+              <li>{{ t('footer.transactionTerms') }}</li>
+              <li>{{ t('footer.paymentPolicy') }}</li>
+              <li>{{ t('footer.privacyPolicy') }}</li>
+              <li>{{ t('footer.cinemaRules') }}</li>
+              <li>{{ t('footer.faq') }}</li>
             </ul>
           </section>
 
           <section>
-            <h3 class="mb-3 text-lg font-bold text-[#5e5a53]">Kết nối với chúng tôi</h3>
+            <h3 class="mb-3 text-lg font-bold text-[#5e5a53]">{{ t('footer.connectWithUs') }}</h3>
             <div class="flex flex-wrap gap-1.5 text-sm font-bold">
               <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" class="social-link">
                 <img src="/social/facebook.png" alt="Facebook" class="social-icon" />
@@ -55,11 +57,11 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
           </section>
 
           <section>
-            <h3 class="mb-3 text-lg font-bold text-[#5e5a53]">Chăm sóc khách hàng</h3>
+            <h3 class="mb-3 text-lg font-bold text-[#5e5a53]">{{ t('footer.customerCare') }}</h3>
             <div class="space-y-2 text-[0.95rem] leading-6">
-              <p>Hotline: 1900 0240</p>
-              <p>Giờ làm việc: 8:00 - 22:00 (Tất cả các ngày bao gồm cả Lễ Tết)</p>
-              <p>Email hỗ trợ: hoidap@cinego.vn</p>
+              <p>{{ t('footer.hotlineLabel') }}</p>
+              <p>{{ t('footer.workingHours') }}</p>
+              <p>{{ t('footer.supportEmail') }}</p>
             </div>
           </section>
         </div>
@@ -69,11 +71,11 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
         <div class="mx-auto grid max-w-7xl gap-4 md:grid-cols-[auto_1fr] md:items-start">
           <div class="text-3xl font-black uppercase tracking-[-0.08em] text-[#808080]">CG</div>
           <div class="space-y-1 text-[0.95rem] leading-6">
-            <h4 class="text-base font-bold uppercase text-[#5e5a53]">CÔNG TY TNHH CJ CINEGO VIỆT NAM</h4>
-            <p>Giấy Chứng nhận đăng ký doanh nghiệp: 0979389909 đăng ký lần đầu ngày 15/04/2026, được cấp bởi Sở Kế hoạch và Đầu tư Thành phố Hà Nội</p>
-            <p>Địa chỉ: Số 4, đường Quang Trung, phường Hà Đông, Thành phố Hà Nội, Việt Nam</p>
-            <p>Đường dây nóng (Hotline): 1900 0240</p>
-            <p>COPYRIGHT 2026 CJ CINEGO VIETNAM CO., LTD. ALL RIGHTS RESERVED</p>
+            <h4 class="text-base font-bold uppercase text-[#5e5a53]">{{ t('footer.legalName') }}</h4>
+            <p>{{ t('footer.businessCertificate') }}</p>
+            <p>{{ t('footer.address') }}</p>
+            <p>{{ t('footer.hotline') }}</p>
+            <p>{{ t('footer.copyright') }}</p>
           </div>
         </div>
       </div>
@@ -130,4 +132,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     }
   `
 })
-export class FooterComponent {}
+export class FooterComponent {
+  protected readonly language = inject(LanguageService);
+  protected readonly t = this.language.t.bind(this.language);
+}

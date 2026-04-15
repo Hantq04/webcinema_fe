@@ -1,10 +1,12 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+
+import { LanguageService } from '../../../core/services/language.service';
 
 @Component({
   selector: 'app-loading-spinner',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="spinner" aria-label="Loading" role="status"></div>
+    <div class="spinner" [attr.aria-label]="t('shared.loading')" role="status"></div>
   `,
   styles: `
     .spinner {
@@ -16,4 +18,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     }
   `
 })
-export class LoadingSpinnerComponent {}
+  export class LoadingSpinnerComponent {
+    protected readonly language = inject(LanguageService);
+    protected readonly t = this.language.t.bind(this.language);
+  }

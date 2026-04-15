@@ -11,7 +11,10 @@ body {
 	margin: 0;
 	background: #f6f0df;
 	color: #201b16;
-	font-family: 'Arial Narrow', 'Trebuchet MS', 'Segoe UI', sans-serif;
+	font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+	font-synthesis: none;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 a {
