@@ -1,0 +1,22 @@
+<svg width="640" height="380" viewBox="0 0 640 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="380" fill="#121824"/>
+  <text x="26" y="228" fill="#EDF0F4" font-family="Arial, Helvetica, sans-serif" font-size="126" font-weight="800" letter-spacing="-10">CINE</text>
+
+  <circle cx="390" cy="128" r="40" stroke="#E33A2F" stroke-width="18"/>
+  <circle cx="468" cy="132" r="22" stroke="#E33A2F" stroke-width="16"/>
+
+  <path d="M376 170H535C549.359 170 561 181.641 561 196V266C561 280.359 549.359 292 535 292H402C387.641 292 376 280.359 376 266V170Z" stroke="url(#paint0_linear_1_1)" stroke-width="18" stroke-linejoin="round"/>
+  <path d="M464 228H520" stroke="#E33A2F" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="567" cy="235" r="42" stroke="url(#paint1_linear_1_1)" stroke-width="18"/>
+
+  <defs>
+    <linearGradient id="paint0_linear_1_1" x1="376" y1="170" x2="561" y2="292" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E33A2F"/>
+      <stop offset="1" stop-color="#E24C2A"/>
+    </linearGradient>
+    <linearGradient id="paint1_linear_1_1" x1="525" y1="193" x2="609" y2="277" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E33A2F"/>
+      <stop offset="1" stop-color="#D91C66"/>
+    </linearGradient>
+  </defs>
+</svg>
