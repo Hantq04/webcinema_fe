@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -62,11 +63,30 @@ import { LanguageService } from '../../core/services/language.service';
                   <div class="poster-card__poster">
                     <img class="poster-card__image" [src]="movieImage(movie)" [alt]="movie.title" loading="lazy" />
                     <div class="poster-card__shade"></div>
-                    <span class="poster-card__rating">{{ movieRating(movie) }}</span>
+                    <span
+                      class="poster-card__rate"
+                      [class.poster-card__rate--g]="movieRateCode(movie) === 'G'"
+                      [class.poster-card__rate--pg]="movieRateCode(movie) === 'PG'"
+                      [class.poster-card__rate--pg13]="movieRateCode(movie) === 'PG-13'"
+                      [class.poster-card__rate--r]="movieRateCode(movie) === 'R'"
+                      [class.poster-card__rate--nc17]="movieRateCode(movie) === 'NC-17'"
+                    >
+                      {{ movieRate(movie) }}
+                    </span>
+                    @if (movieTrailer(movie)) {
+                      <button
+                        type="button"
+                        class="poster-card__trailer-center"
+                        (click)="openTrailer(movie)"
+                      >
+                        {{ t('home.movieActionTrailer') }}
+                      </button>
+                    } @else {
+                      <a routerLink="/movies" class="poster-card__trailer-center">{{ t('home.movieActionTrailer') }}</a>
+                    }
                   </div>
 
                   <div class="poster-card__overlay">
-                    <span class="poster-card__genre">{{ movieGenre(movie) }}</span>
                     <h3 class="poster-card__title">{{ movie.title }}</h3>
                     <p class="poster-card__description">{{ movie.description }}</p>
 
@@ -85,7 +105,6 @@ import { LanguageService } from '../../core/services/language.service';
                     <div class="poster-card__actions">
                       <a routerLink="/movies" class="poster-card__button poster-card__button--solid">{{ t('home.movieActionDetails') }}</a>
                       <a routerLink="/booking" class="poster-card__button poster-card__button--solid">{{ t('home.movieActionBook') }}</a>
-                      <a routerLink="/movies" class="poster-card__button">{{ t('home.movieActionTrailer') }}</a>
                     </div>
                   </div>
                 </article>
@@ -98,6 +117,34 @@ import { LanguageService } from '../../core/services/language.service';
             </div>
           }
         </section>
+
+        @if (trailerPreview()) {
+          <div class="trailer-modal" role="dialog" aria-modal="true" aria-labelledby="trailer-modal-title" (click)="closeTrailer()" (keydown.escape)="closeTrailer()" tabindex="-1">
+            <div class="trailer-modal__panel" (click)="$event.stopPropagation()">
+              <div class="trailer-modal__header">
+                <div class="trailer-modal__title-wrap">
+                  <h3 id="trailer-modal-title" class="trailer-modal__title">{{ trailerPreview()?.title }}</h3>
+                  <span class="trailer-modal__subtitle">{{ t('home.movieActionTrailer') }}</span>
+                </div>
+
+                <button type="button" class="trailer-modal__close" (click)="closeTrailer()" aria-label="Close trailer preview">
+                  ×
+                </button>
+              </div>
+
+              <div class="trailer-modal__frame-shell">
+                <iframe
+                  class="trailer-modal__frame"
+                  [src]="trailerPreview()?.embedUrl"
+                  title="Trailer preview"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen
+                ></iframe>
+              </div>
+            </div>
+          </div>
+        }
 
         <section class="category-grid" aria-label="{{ t('home.categoriesTitle') }}">
           <div class="category-grid__header">
@@ -294,6 +341,8 @@ import { LanguageService } from '../../core/services/language.service';
 
     .poster-card {
       border-radius: 1.1rem;
+      display: flex;
+      flex-direction: column;
       overflow: hidden;
       position: relative;
       min-height: 27rem;
@@ -310,7 +359,8 @@ import { LanguageService } from '../../core/services/language.service';
     }
 
     .poster-card__poster {
-      aspect-ratio: 2 / 3;
+      flex: 1;
+      min-height: 0;
       overflow: hidden;
       position: relative;
       width: 100%;
@@ -339,19 +389,165 @@ import { LanguageService } from '../../core/services/language.service';
       position: absolute;
     }
 
-    .poster-card__rating {
+    .poster-card__trailer-center {
+      align-items: center;
+      background: rgba(37, 28, 24, 0.7);
+      border: 1px solid rgba(255, 248, 239, 0.28);
+      border-radius: 999px;
+      cursor: pointer;
+      color: #fff8ef;
+      display: inline-flex;
+      font-size: 0.82rem;
+      font-weight: 900;
+      justify-content: center;
+      left: 50%;
+      letter-spacing: 0.08em;
+      min-height: 3rem;
+      min-width: 8.75rem;
+      opacity: 0;
+      padding: 0.55rem 1rem;
+      position: absolute;
+      text-decoration: none;
+      text-transform: uppercase;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      transition: opacity 180ms ease, transform 180ms ease, background 180ms ease, border-color 180ms ease;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .poster-card__trailer-center:hover {
+      background: rgba(37, 28, 24, 0.82);
+      border-color: rgba(255, 248, 239, 0.45);
+    }
+
+    .poster-card:hover .poster-card__trailer-center {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .trailer-modal {
+      align-items: center;
+      background: rgba(10, 8, 7, 0.9);
+      bottom: 0;
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      left: 0;
+      padding: 1.5rem;
+      position: fixed;
+      right: 0;
+      top: 0;
+      z-index: 60;
+    }
+
+    .trailer-modal__panel {
+      background: rgba(14, 12, 10, 0.98);
+      border: 4px solid #f4efe3;
+      box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.5);
+      max-width: 72rem;
+      padding: 0.75rem;
+      width: min(100%, 62rem);
+    }
+
+    .trailer-modal__header {
+      align-items: flex-start;
+      display: flex;
+      gap: 1rem;
+      justify-content: space-between;
+      margin-bottom: 0.65rem;
+    }
+
+    .trailer-modal__title-wrap {
+      min-width: 0;
+    }
+
+    .trailer-modal__title {
+      color: #fff8ef;
+      font-size: clamp(1.15rem, 2vw, 1.85rem);
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      line-height: 1.15;
+      margin: 0;
+      text-transform: uppercase;
+    }
+
+    .trailer-modal__subtitle {
+      color: rgba(255, 248, 239, 0.72);
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-top: 0.2rem;
+    }
+
+    .trailer-modal__close {
+      align-items: center;
+      background: transparent;
+      border: 2px solid rgba(255, 248, 239, 0.7);
+      border-radius: 999px;
+      color: #fff8ef;
+      cursor: pointer;
+      display: inline-flex;
+      flex: 0 0 auto;
+      font-size: 1.35rem;
+      height: 2.4rem;
+      justify-content: center;
+      line-height: 1;
+      width: 2.4rem;
+    }
+
+    .trailer-modal__close:hover {
+      background: rgba(255, 248, 239, 0.12);
+    }
+
+    .trailer-modal__frame-shell {
+      background: #000;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .trailer-modal__frame {
+      border: 0;
+      display: block;
+      height: 100%;
+      width: 100%;
+    }
+
+    .poster-card__rate {
       background: #f2b11d;
-      border-radius: 0.35rem;
+      border-radius: 999px;
       color: #fffaf1;
       font-size: 0.72rem;
       font-weight: 900;
-      left: 0.85rem;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.08em;
       line-height: 1;
-      padding: 0.35rem 0.45rem;
+      pointer-events: none;
+      padding: 0.4rem 0.65rem;
       position: absolute;
+      right: 0.85rem;
       top: 0.85rem;
-      z-index: 1;
+      z-index: 3;
+    }
+
+    .poster-card__rate--g {
+      background: #2f9d44;
+    }
+
+    .poster-card__rate--pg {
+      background: #f39c12;
+    }
+
+    .poster-card__rate--pg13 {
+      background: #6d5bd0;
+    }
+
+    .poster-card__rate--r {
+      background: #e03a2f;
+    }
+
+    .poster-card__rate--nc17 {
+      background: #1f8bd6;
     }
 
     .poster-card__overlay {
@@ -360,31 +556,23 @@ import { LanguageService } from '../../core/services/language.service';
       color: #fff8ef;
       display: flex;
       flex-direction: column;
+      justify-content: flex-end;
       gap: 0.7rem;
       left: 0;
       opacity: 0;
-      padding: 1rem;
+      padding: 0.95rem;
       position: absolute;
       right: 0;
       top: 0;
       transform: translateY(12px);
       transition: opacity 200ms ease, transform 200ms ease;
+      z-index: 1;
     }
 
     .poster-card:hover .poster-card__overlay,
-    .poster-card:focus-within .poster-card__overlay,
     .poster-card__overlay--visible {
       opacity: 1;
       transform: translateY(0);
-    }
-
-    .poster-card__genre {
-      align-self: flex-start;
-      color: #ffb748;
-      font-size: 0.72rem;
-      font-weight: 900;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
     }
 
     .poster-card__title {
@@ -394,6 +582,8 @@ import { LanguageService } from '../../core/services/language.service';
       letter-spacing: 0.02em;
       line-height: 1.02;
       margin: 0;
+      min-width: 0;
+      max-width: calc(100% - 4.8rem);
       text-transform: uppercase;
     }
 
@@ -419,11 +609,9 @@ import { LanguageService } from '../../core/services/language.service';
       color: #fff8ef;
       display: inline-flex;
       font-size: 0.72rem;
+      flex: 0 0 auto;
+      margin-top: 0.1rem;
       font-weight: 800;
-      letter-spacing: 0.08em;
-      min-height: 1.9rem;
-      padding: 0.35rem 0.7rem;
-      text-transform: uppercase;
     }
 
     .poster-card__chip--ghost {
@@ -450,14 +638,15 @@ import { LanguageService } from '../../core/services/language.service';
     .poster-card__actions {
       display: grid;
       gap: 0.45rem;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       margin-top: auto;
+      align-items: end;
     }
 
     .poster-card__button {
       align-items: center;
       border: 1px solid rgba(255, 248, 239, 0.42);
-      border-radius: 0.72rem;
+      border-radius: 1.25rem;
       color: #fff8ef;
       display: inline-flex;
       font-size: 0.76rem;
@@ -480,6 +669,8 @@ import { LanguageService } from '../../core/services/language.service';
       background: #ea2e1e;
       border-color: #ea2e1e;
       box-shadow: 0 0.55rem 1rem rgba(214, 47, 31, 0.18);
+      border-radius: 1.25rem;
+      width: 100%;
     }
 
     .poster-card__button--solid:hover {
@@ -609,11 +800,28 @@ import { LanguageService } from '../../core/services/language.service';
         transform: none;
       }
 
+      .poster-card__trailer-center {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
       .poster-card__description {
         display: -webkit-box;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 3;
         overflow: hidden;
+      }
+
+      .trailer-modal {
+        padding: 0.75rem;
+      }
+
+      .trailer-modal__panel {
+        padding: 0.6rem;
+      }
+
+      .trailer-modal__header {
+        align-items: center;
       }
     }
 
@@ -645,10 +853,12 @@ import { LanguageService } from '../../core/services/language.service';
 export class HomeComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly movieService = inject(MovieService);
+  private readonly sanitizer = inject(DomSanitizer);
   protected readonly language = inject(LanguageService);
   protected readonly t = this.language.t.bind(this.language);
   protected readonly movieCards = signal<Movie[]>([]);
   protected readonly loadingMovies = signal(true);
+  protected readonly trailerPreview = signal<{ title: string; embedUrl: SafeResourceUrl } | null>(null);
   protected readonly loadingSlots = Array.from({ length: 8 }, (_, index) => index);
 
   protected readonly quickLinks = [
@@ -660,7 +870,7 @@ export class HomeComponent {
 
   constructor() {
     this.movieService
-      .getHomeMovies()
+      .getNowShowingMovies()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((movies) => {
         this.movieCards.set(movies);
@@ -678,6 +888,64 @@ export class HomeComponent {
 
   protected movieRating(movie: Movie): string {
     return movie.ageRating?.trim() || 'P';
+  }
+
+  protected movieRate(movie: Movie): string {
+    return this.movieRateCode(movie) || this.movieRating(movie);
+  }
+
+  protected movieRateCode(movie: Movie): string {
+    return (movie.rate?.trim() || movie.ageRating?.trim() || '').toUpperCase();
+  }
+
+  protected movieTrailer(movie: Movie): string {
+    return movie.trailerUrl?.trim() || '';
+  }
+
+  protected openTrailer(movie: Movie): void {
+    const trailerUrl = this.movieTrailer(movie);
+
+    if (!trailerUrl) {
+      return;
+    }
+
+    const embedUrl = this.toYoutubeEmbedUrl(trailerUrl);
+
+    if (!embedUrl) {
+      window.open(trailerUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    this.trailerPreview.set({
+      title: movie.title,
+      embedUrl: this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl)
+    });
+  }
+
+  protected closeTrailer(): void {
+    this.trailerPreview.set(null);
+  }
+
+  private toYoutubeEmbedUrl(value: string): string {
+    try {
+      const parsedUrl = new URL(value);
+      const host = parsedUrl.hostname.replace(/^www\./, '');
+      let videoId = '';
+
+      if (host === 'youtu.be') {
+        videoId = parsedUrl.pathname.split('/').filter(Boolean)[0] ?? '';
+      } else if (host.endsWith('youtube.com')) {
+        videoId = parsedUrl.searchParams.get('v') ?? '';
+
+        if (!videoId && parsedUrl.pathname.startsWith('/shorts/')) {
+          videoId = parsedUrl.pathname.split('/')[2] ?? '';
+        }
+      }
+
+      return videoId ? `https://www.youtube.com/embed/${videoId}?rel=0` : '';
+    } catch {
+      return '';
+    }
   }
 
   private buildFallbackPoster(title: string): string {

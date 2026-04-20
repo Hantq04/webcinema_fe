@@ -21,6 +21,9 @@ interface MovieApiItem {
   thumbnail?: string;
   backdropUrl?: string;
   backdropPath?: string;
+  trailerUrl?: string;
+  trailer?: string;
+  rate?: string;
   description?: string;
   ageRating?: string;
   releaseDate?: string;
@@ -34,8 +37,8 @@ export class MovieService {
   private readonly http = inject(HttpClient);
   private readonly apiService = inject(ApiService);
 
-  getHomeMovies(): Observable<Movie[]> {
-    return this.http.get<unknown>(this.apiService.apiUrl('/api/v1/movies')).pipe(
+  getNowShowingMovies(): Observable<Movie[]> {
+    return this.http.get<unknown>(this.apiService.apiUrl('/api/v1/movie/get-now-showing-movie')).pipe(
       map((response) => this.normalizeMovieList(response)),
       catchError(() => of([]))
     );
@@ -92,6 +95,8 @@ export class MovieService {
       durationMinutes: this.toNumberValue(item.durationMinutes ?? item.duration),
       posterUrl: this.resolveMediaUrl(item.posterUrl ?? item.posterPath ?? item.poster ?? item.imageUrl ?? item.image ?? item.thumbnailUrl ?? item.thumbnail),
       backdropUrl: this.resolveMediaUrl(item.backdropUrl ?? item.backdropPath),
+      trailerUrl: this.resolveMediaUrl(item.trailerUrl ?? item.trailer),
+      rate: this.toStringValue(item.rate),
       description: this.toStringValue(item.description),
       ageRating: this.toStringValue(item.ageRating),
       releaseDate: this.toStringValue(item.releaseDate),
@@ -114,7 +119,15 @@ export class MovieService {
   }
 
   private toStringValue(value: unknown): string {
-    return typeof value === 'string' ? value.trim() : '';
+    if (typeof value === 'string') {
+      return value.trim();
+    }
+
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return String(value);
+    }
+
+    return '';
   }
 
   private toNumberValue(value: unknown): number {

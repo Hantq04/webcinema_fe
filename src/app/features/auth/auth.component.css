@@ -125,20 +125,28 @@
 
 .captcha-row {
   display: grid;
-  gap: 1rem;
-  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 0.35rem;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
 }
 
 .captcha-input {
   min-width: 0;
+  max-width: 20rem;
+}
+
+.auth-form-register .captcha-row > input[type='text'] {
+  justify-self: start;
+  min-width: 0;
+  width: min(20rem, 100%);
 }
 
 .captcha-box {
   align-items: center;
-  display: grid;
-  gap: 0.45rem;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: inline-flex;
+  gap: 0.25rem;
+  justify-self: start;
+  width: auto;
 }
 
 .captcha-image,
@@ -146,7 +154,12 @@
   background: #fff;
   border: 1px solid #d9d0bd;
   height: 46px;
-  object-fit: contain;
+  display: block;
+  object-fit: cover;
+  width: auto;
+}
+
+.captcha-image {
   width: 150px;
 }
 
@@ -156,6 +169,7 @@
   display: inline-flex;
   font-size: 0.82rem;
   justify-content: center;
+  min-width: 150px;
 }
 
 .captcha-refresh {
@@ -171,6 +185,8 @@
   font-weight: 600;
   height: 2rem;
   justify-content: center;
+  margin-left: 0;
+  flex: 0 0 auto;
   width: 2rem;
 }
 

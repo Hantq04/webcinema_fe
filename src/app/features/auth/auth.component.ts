@@ -15,6 +15,16 @@ interface FlashMessage {
   text: string;
 }
 
+interface BackendFieldError {
+  field?: string;
+  message?: string;
+}
+
+interface BackendErrorDetails {
+  message: string;
+  fieldErrors: BackendFieldError[];
+}
+
 @Component({
   selector: 'app-auth',
   imports: [CommonModule, ReactiveFormsModule],
@@ -36,11 +46,13 @@ export class AuthComponent implements OnInit, OnDestroy {
   protected readonly captchaLoading = signal(false);
   protected readonly captcha = signal<CaptchaChallenge | null>(null);
   protected readonly message = signal<FlashMessage | null>(null);
+  protected readonly loginServerErrors = signal<Record<string, string>>({});
+  protected readonly registerServerErrors = signal<Record<string, string>>({});
 
   protected readonly loginForm = this.formBuilder.group({
-    userName: ['', [Validators.required]],
-    passWord: ['', [Validators.required]],
-    captchaValue: ['', [Validators.required]]
+    userName: [''],
+    passWord: [''],
+    captchaValue: ['']
   });
 
   protected readonly registerForm = this.formBuilder.group({
@@ -110,6 +122,8 @@ export class AuthComponent implements OnInit, OnDestroy {
   protected selectTab(tab: AuthTab): void {
     this.activeTab.set(tab);
     this.message.set(null);
+    this.loginServerErrors.set({});
+    this.registerServerErrors.set({});
 
     if ((tab === 'login' || tab === 'register') && !this.captcha()) {
       this.loadCaptcha();
@@ -122,6 +136,7 @@ export class AuthComponent implements OnInit, OnDestroy {
 
   protected submitLogin(): void {
     this.message.set(null);
+    this.loginServerErrors.set({});
     this.loginForm.markAllAsTouched();
 
     if (this.loginForm.invalid || !this.loginCaptchaId()) {
@@ -145,7 +160,7 @@ export class AuthComponent implements OnInit, OnDestroy {
       .login(payload)
       .pipe(
         catchError((error: unknown) => {
-          return this.handleError(error, this.t('auth.loginError'), () => this.refreshCaptcha());
+          return this.handleFormError('login', error, this.t('auth.loginError'), () => this.refreshCaptcha());
         }),
         finalize(() => this.submittingLogin.set(false))
       )
@@ -160,6 +175,7 @@ export class AuthComponent implements OnInit, OnDestroy {
 
   protected submitRegister(): void {
     this.message.set(null);
+    this.registerServerErrors.set({});
     this.registerForm.markAllAsTouched();
 
     if (this.registerForm.invalid || !this.loginCaptchaId()) {
@@ -187,7 +203,7 @@ export class AuthComponent implements OnInit, OnDestroy {
       .register(payload)
       .pipe(
         catchError((error: unknown) => {
-          return this.handleError(error, this.t('auth.registerError'), () => this.refreshCaptcha());
+          return this.handleFormError('register', error, this.t('auth.registerError'), () => this.refreshCaptcha());
         }),
         finalize(() => this.submittingRegister.set(false))
       )
@@ -259,6 +275,14 @@ export class AuthComponent implements OnInit, OnDestroy {
     return control.touched && control.invalid;
   }
 
+  protected serverFieldError(form: AuthTab, fieldName: string): string {
+    if (form === 'login') {
+      return this.loginServerErrors()[fieldName] ?? '';
+    }
+
+    return this.registerServerErrors()[fieldName] ?? '';
+  }
+
   private applyCaptcha(challenge: CaptchaChallenge): void {
     if (this.captchaObjectUrl && this.captchaObjectUrl.startsWith('blob:')) {
       URL.revokeObjectURL(this.captchaObjectUrl);
@@ -269,81 +293,145 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   private handleError(error: unknown, fallbackMessage: string, afterAction?: () => void) {
-    return from(this.extractErrorMessageAsync(error, fallbackMessage)).pipe(
-      tap((message) => {
-        this.message.set({ type: 'error', text: message });
+    return from(this.extractErrorDetailsAsync(error, fallbackMessage)).pipe(
+      tap((details) => {
+        this.message.set({ type: 'error', text: details.message });
         afterAction?.();
       }),
       switchMap(() => EMPTY)
     );
   }
 
-  private async extractErrorMessageAsync(error: unknown, fallbackMessage: string): Promise<string> {
+  private handleFormError(form: AuthTab, error: unknown, fallbackMessage: string, afterAction?: () => void) {
+    return from(this.extractErrorDetailsAsync(error, fallbackMessage)).pipe(
+      tap((details) => {
+        this.message.set({ type: 'error', text: details.message });
+        this.setServerErrors(form, details.fieldErrors);
+        afterAction?.();
+      }),
+      switchMap(() => EMPTY)
+    );
+  }
+
+  private setServerErrors(form: AuthTab, fieldErrors: BackendFieldError[]): void {
+    const mappedErrors = fieldErrors.reduce<Record<string, string>>((accumulator, item) => {
+      if (item.field && item.message) {
+        accumulator[item.field] = item.message;
+      }
+
+      return accumulator;
+    }, {});
+
+    if (form === 'login') {
+      this.loginServerErrors.set(mappedErrors);
+      return;
+    }
+
+    this.registerServerErrors.set(mappedErrors);
+  }
+
+  private async extractErrorDetailsAsync(error: unknown, fallbackMessage: string): Promise<BackendErrorDetails> {
+    const payload = await this.extractErrorPayloadAsync(error);
+    const payloadObject = this.asRecord(payload);
+    const payloadData = this.asRecord(payloadObject['data']);
+    const payloadResult = this.asRecord(payloadObject['result']);
+    const payloadPayload = this.asRecord(payloadObject['payload']);
+    const message =
+      this.firstString(payloadObject, ['message', 'error', 'detail', 'title']) ??
+      this.firstString(payloadData, ['message', 'error', 'detail', 'title']) ??
+      this.firstString(payloadResult, ['message', 'error', 'detail', 'title']) ??
+      this.firstString(payloadPayload, ['message', 'error', 'detail', 'title']) ??
+      fallbackMessage;
+
+    return {
+      message,
+      fieldErrors: this.extractFieldErrors(payloadObject, payloadData, payloadResult, payloadPayload)
+    };
+  }
+
+  private async extractErrorPayloadAsync(error: unknown): Promise<unknown> {
     if (error instanceof HttpErrorResponse) {
       const responseError = error.error;
 
       if (typeof responseError === 'string' && responseError.trim()) {
-        return responseError.trim();
+        return this.tryParseJson(responseError);
       }
 
       if (responseError instanceof Blob) {
         try {
-          const text = await responseError.text();
-          const parsed = this.extractErrorMessageFromPayload(text, fallbackMessage);
-          if (parsed !== fallbackMessage) {
-            return parsed;
-          }
+          return this.tryParseJson(await responseError.text());
         } catch {
-          // fall through to standard handling
+          return responseError;
         }
       }
 
-      const payloadMessage = this.extractErrorMessageFromPayload(responseError, fallbackMessage);
-      if (payloadMessage !== fallbackMessage) {
-        return payloadMessage;
-      }
-
-      if (error.message && error.message.trim()) {
-        return error.message;
-      }
+      return responseError;
     }
 
-    return this.extractErrorMessageFromPayload(error, fallbackMessage);
+    return error;
   }
 
-  private extractErrorMessageFromPayload(error: unknown, fallbackMessage: string): string {
-    if (error instanceof Error && error.message) {
-      return error.message;
-    }
+  private extractFieldErrors(...payloads: Record<string, unknown>[]): BackendFieldError[] {
+    const fieldErrors: BackendFieldError[] = [];
 
-    if (typeof error === 'string' && error.trim()) {
-      return error;
-    }
+    for (const payload of payloads) {
+      const candidateErrors = payload['errors'] ?? payload['validationErrors'] ?? payload['fieldErrors'];
 
-    if (error && typeof error === 'object') {
-      const record = error as Record<string, unknown>;
+      if (!Array.isArray(candidateErrors)) {
+        continue;
+      }
 
-      for (const key of ['message', 'error', 'detail', 'title']) {
-        const candidate = record[key];
+      for (const candidateError of candidateErrors) {
+        const errorRecord = this.asRecord(candidateError);
+        const field = this.firstString(errorRecord, ['field', 'name', 'property', 'path']);
+        const message = this.firstString(errorRecord, ['message', 'detail', 'error', 'reason']);
 
-        if (typeof candidate === 'string' && candidate.trim()) {
-          return candidate;
-        }
-
-        if (candidate && typeof candidate === 'object') {
-          const nestedRecord = candidate as Record<string, unknown>;
-
-          for (const nestedKey of ['message', 'error', 'detail', 'title']) {
-            const nestedCandidate = nestedRecord[nestedKey];
-
-            if (typeof nestedCandidate === 'string' && nestedCandidate.trim()) {
-              return nestedCandidate;
-            }
-          }
+        if (field && message) {
+          fieldErrors.push({ field, message });
         }
       }
     }
 
-    return fallbackMessage;
+    return fieldErrors;
+  }
+
+  private asRecord(value: unknown): Record<string, unknown> {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return {};
+    }
+
+    return value as Record<string, unknown>;
+  }
+
+  private firstString(value: unknown, keys: string[]): string | null {
+    const record = this.asRecord(value);
+
+    for (const key of keys) {
+      const candidate = record[key];
+
+      if (typeof candidate === 'string' && candidate.trim()) {
+        return candidate.trim();
+      }
+    }
+
+    return null;
+  }
+
+  private tryParseJson(value: string): unknown {
+    const trimmed = value.trim();
+
+    if (!trimmed) {
+      return value;
+    }
+
+    if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+      try {
+        return JSON.parse(trimmed) as unknown;
+      } catch {
+        return value;
+      }
+    }
+
+    return value;
   }
 }

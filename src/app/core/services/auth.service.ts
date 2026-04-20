@@ -23,8 +23,10 @@ export interface RegisterRequest {
 
 export interface AuthSession {
   authenticated: boolean;
-  token: string | null;
+  accessToken: string | null;
+  expiresIn: number | null;
   userName: string | null;
+  role: string | null;
 }
 
 export interface CaptchaChallenge {
@@ -45,7 +47,7 @@ export class AuthService {
   readonly currentUserName = computed(() => this.session().userName);
 
   getAccessToken(): string | null {
-    return this.session().token;
+    return this.session().accessToken;
   }
 
   login(payload: LoginRequest): Observable<AuthSession> {
@@ -63,7 +65,13 @@ export class AuthService {
   }
 
   logout(): void {
-    this.session.set({ authenticated: false, token: null, userName: null });
+    this.session.set({
+      authenticated: false,
+      accessToken: null,
+      expiresIn: null,
+      userName: null,
+      role: null
+    });
     localStorage.removeItem(this.sessionKey);
   }
 
@@ -78,24 +86,44 @@ export class AuthService {
 
   private readSession(): AuthSession {
     if (typeof localStorage === 'undefined') {
-      return { authenticated: false, token: null, userName: null };
+      return {
+        authenticated: false,
+        accessToken: null,
+        expiresIn: null,
+        userName: null,
+        role: null
+      };
     }
 
     const rawSession = localStorage.getItem(this.sessionKey);
 
     if (!rawSession) {
-      return { authenticated: false, token: null, userName: null };
+      return {
+        authenticated: false,
+        accessToken: null,
+        expiresIn: null,
+        userName: null,
+        role: null
+      };
     }
 
     try {
       const parsed = JSON.parse(rawSession) as Partial<AuthSession>;
       return {
         authenticated: Boolean(parsed.authenticated),
-        token: typeof parsed.token === 'string' ? parsed.token : null,
-        userName: typeof parsed.userName === 'string' ? parsed.userName : null
+        accessToken: typeof parsed.accessToken === 'string' ? parsed.accessToken : null,
+        expiresIn: typeof parsed.expiresIn === 'number' && Number.isFinite(parsed.expiresIn) ? parsed.expiresIn : null,
+        userName: typeof parsed.userName === 'string' ? parsed.userName : null,
+        role: typeof parsed.role === 'string' ? parsed.role : null
       };
     } catch {
-      return { authenticated: false, token: null, userName: null };
+      return {
+        authenticated: false,
+        accessToken: null,
+        expiresIn: null,
+        userName: null,
+        role: null
+      };
     }
   }
 
@@ -109,22 +137,35 @@ export class AuthService {
     const responseData = this.asRecord(responseObject['data']);
     const responseResult = this.asRecord(responseObject['result']);
     const responsePayload = this.asRecord(responseObject['payload']);
-    const token =
-      this.firstString(responseObject, ['token', 'accessToken', 'jwt']) ??
-      this.firstString(responseData, ['token', 'accessToken', 'jwt']) ??
-      this.firstString(responseResult, ['token', 'accessToken', 'jwt']) ??
-      this.firstString(responsePayload, ['token', 'accessToken', 'jwt']);
+    const accessToken =
+      this.firstString(responseObject, ['accessToken', 'access_token']) ??
+      this.firstString(responseData, ['accessToken', 'access_token']) ??
+      this.firstString(responseResult, ['accessToken', 'access_token']) ??
+      this.firstString(responsePayload, ['accessToken', 'access_token']) ??
+      '';
+    const expiresIn =
+      this.firstNumber(responseObject, ['expiresIn', 'expires_in']) ??
+      this.firstNumber(responseData, ['expiresIn', 'expires_in']) ??
+      this.firstNumber(responseResult, ['expiresIn', 'expires_in']) ??
+      this.firstNumber(responsePayload, ['expiresIn', 'expires_in']);
     const userName =
       this.firstString(responseObject, ['userName', 'username', 'fullName', 'name']) ??
       this.firstString(responseData, ['userName', 'username', 'fullName', 'name']) ??
       this.firstString(responseResult, ['userName', 'username', 'fullName', 'name']) ??
       this.firstString(responsePayload, ['userName', 'username', 'fullName', 'name']) ??
       fallbackUserName;
+    const role =
+      this.firstString(responseObject, ['role', 'userRole']) ??
+      this.firstString(responseData, ['role', 'userRole']) ??
+      this.firstString(responseResult, ['role', 'userRole']) ??
+      this.firstString(responsePayload, ['role', 'userRole']);
 
     return {
       authenticated: true,
-      token,
-      userName
+      accessToken,
+      expiresIn,
+      userName,
+      role
     };
   }
 
@@ -238,6 +279,27 @@ export class AuthService {
 
       if (typeof candidate === 'string' && candidate.trim()) {
         return candidate;
+      }
+    }
+
+    return null;
+  }
+
+  private firstNumber(value: unknown, keys: string[]): number | null {
+    const record = this.asRecord(value);
+
+    for (const key of keys) {
+      const candidate = record[key];
+
+      if (typeof candidate === 'number' && Number.isFinite(candidate)) {
+        return candidate;
+      }
+
+      if (typeof candidate === 'string') {
+        const parsed = Number(candidate);
+        if (Number.isFinite(parsed)) {
+          return parsed;
+        }
       }
     }
 

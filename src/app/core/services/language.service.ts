@@ -12,6 +12,9 @@ const translations = {
       news: 'Tin mới & ưu đãi',
       myTickets: 'Vé của tôi',
       loginRegister: 'Đăng nhập / đăng ký',
+      hello: 'Xin chào,',
+      viewAccount: 'Xem tài khoản',
+      logout: 'Đăng xuất',
       movie: 'Phim',
       movieSub: 'Now showing',
       cinema: 'Rạp CineGo',
@@ -142,6 +145,17 @@ const translations = {
       registerError: 'Đăng ký không thành công',
       captchaError: 'Không tải được captcha',
       captchaReload: 'Vui lòng tải lại captcha.'
+      },
+      account: {
+        title: 'Thông tin tài khoản',
+        memberStatus: 'Thành viên CGV',
+        myTickets: 'Vé của tôi',
+        overviewTitle: 'Thông tin chung',
+        usernameLabel: 'Tên đăng nhập',
+        loginStateLabel: 'Trạng thái',
+        loggedIn: 'Đang đăng nhập',
+        quickActionLabel: 'Chức năng nhanh',
+        quickActionValue: 'Xem tài khoản và quản lý đăng xuất'
     }
   },
   en: {
@@ -151,6 +165,9 @@ const translations = {
       news: 'News & offers',
       myTickets: 'My tickets',
       loginRegister: 'Login / Register',
+      hello: 'Hello,',
+      viewAccount: 'View account',
+      logout: 'Logout',
       movie: 'Movies',
       movieSub: 'Now showing',
       cinema: 'CineGo theaters',
@@ -281,6 +298,17 @@ const translations = {
       registerError: 'Registration failed',
       captchaError: 'Unable to load captcha',
       captchaReload: 'Please reload the captcha.'
+      },
+      account: {
+        title: 'Account information',
+        memberStatus: 'CGV member',
+        myTickets: 'My tickets',
+        overviewTitle: 'General information',
+        usernameLabel: 'Username',
+        loginStateLabel: 'Status',
+        loggedIn: 'Logged in',
+        quickActionLabel: 'Quick action',
+        quickActionValue: 'View account and manage logout'
     }
   }
 } as const;

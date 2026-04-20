@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signa
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter } from 'rxjs';
 
+import { AuthService } from '../../core/services/auth.service';
 import { LanguageService } from '../../core/services/language.service';
 
 @Component({
@@ -25,7 +26,12 @@ import { LanguageService } from '../../core/services/language.service';
         <div class="utility-row">
           <a routerLink="/movies" class="utility-link">{{ t('header.news') }}</a>
           <a routerLink="/booking" class="utility-link">{{ t('header.myTickets') }}</a>
-          <a routerLink="/auth" class="utility-link">{{ t('header.loginRegister') }}</a>
+          @if (auth.isAuthenticated()) {
+            <a routerLink="/account" class="utility-user utility-user--link">{{ t('header.hello') }} {{ auth.currentUserName() || t('header.member') }}</a>
+            <button type="button" class="utility-link utility-link--button" (click)="logout()">{{ t('header.logout') }}</button>
+          } @else {
+            <a routerLink="/auth" class="utility-link">{{ t('header.loginRegister') }}</a>
+          }
           <span class="inline-flex gap-1">
             <button type="button" class="lang-button" [class.active]="language.isActive('vi')" (click)="language.useLanguage('vi')">{{ t('header.vi') }}</button>
             <button type="button" class="lang-button" [class.active]="language.isActive('en')" (click)="language.useLanguage('en')">{{ t('header.en') }}</button>
@@ -52,7 +58,7 @@ import { LanguageService } from '../../core/services/language.service';
             <small class="text-[0.72rem] font-bold text-[#7f6c57]">{{ t('header.cinemaSub') }}</small>
           </a>
 
-          <a routerLink="/auth" routerLinkActive="nav-link-active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
+          <a [routerLink]="memberLink()" routerLinkActive="nav-link-active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
             <span class="text-[0.95rem] font-extrabold tracking-[0.02em]">{{ t('header.member') }}</span>
             <small class="text-[0.72rem] font-bold text-[#7f6c57]">{{ t('header.memberSub') }}</small>
           </a>
@@ -151,6 +157,38 @@ import { LanguageService } from '../../core/services/language.service';
     }
 
     .utility-link:hover {
+      color: #d62f1f;
+    }
+
+    .utility-link--button {
+      align-items: center;
+      background: rgba(214, 47, 31, 0.08);
+      border-radius: 999px;
+      color: #d62f1f;
+      display: inline-flex;
+      justify-content: center;
+      padding: 0.35rem 0.75rem;
+    }
+
+    .utility-link--button {
+      border: 0;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .utility-user {
+      color: #3b3127;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .utility-user--link {
+      text-decoration: none;
+    }
+
+    .utility-user--link:hover {
       color: #d62f1f;
     }
 
@@ -274,9 +312,12 @@ import { LanguageService } from '../../core/services/language.service';
 export class HeaderComponent {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  protected readonly auth = inject(AuthService);
   protected readonly language = inject(LanguageService);
   protected readonly t = this.language.t.bind(this.language);
   private readonly activeIndex = signal(0);
+
+  protected readonly memberLink = computed(() => (this.auth.isAuthenticated() ? '/account' : '/auth'));
 
   readonly navIndicatorTransform = computed(() => `translateX(${this.activeIndex() * 100}%)`);
 
@@ -292,7 +333,12 @@ export class HeaderComponent {
 
   private syncActiveIndex(): void {
     const url = this.router.url.split('?')[0].split('#')[0];
-    const nextIndex = url.startsWith('/booking') ? 1 : url.startsWith('/auth') ? 2 : url.startsWith('/admin') ? 3 : 0;
+    const nextIndex = url.startsWith('/booking') ? 1 : url.startsWith('/auth') || url.startsWith('/account') ? 2 : url.startsWith('/admin') ? 3 : 0;
     this.activeIndex.set(nextIndex);
+  }
+
+  protected logout(): void {
+    this.auth.logout();
+    void this.router.navigateByUrl('/auth');
   }
 }

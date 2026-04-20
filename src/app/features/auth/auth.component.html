@@ -24,6 +24,9 @@
             @if (loginForm.controls.userName.touched && loginForm.controls.userName.invalid) {
               <small class="field-error">{{ t('auth.requiredUsername') }}</small>
             }
+            @if (serverFieldError('login', 'userName')) {
+              <small class="field-error">{{ serverFieldError('login', 'userName') }}</small>
+            }
           </label>
 
           <label class="field">
@@ -31,6 +34,9 @@
             <input type="password" formControlName="passWord" [placeholder]="t('auth.password')" autocomplete="current-password" />
             @if (loginForm.controls.passWord.touched && loginForm.controls.passWord.invalid) {
               <small class="field-error">{{ t('auth.requiredPassword') }}</small>
+            }
+            @if (serverFieldError('login', 'passWord')) {
+              <small class="field-error">{{ serverFieldError('login', 'passWord') }}</small>
             }
           </label>
 
@@ -40,6 +46,9 @@
               <input type="text" formControlName="captchaValue" [placeholder]="t('auth.captchaInput')" autocomplete="off" />
               @if (loginForm.controls.captchaValue.touched && loginForm.controls.captchaValue.invalid) {
                 <small class="field-error">{{ t('auth.requiredCaptcha') }}</small>
+              }
+              @if (serverFieldError('login', 'captchaValue')) {
+                <small class="field-error">{{ serverFieldError('login', 'captchaValue') }}</small>
               }
             </label>
 

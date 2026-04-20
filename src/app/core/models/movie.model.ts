@@ -4,6 +4,8 @@ export interface Movie {
   durationMinutes: number;
   posterUrl?: string;
   backdropUrl?: string;
+  trailerUrl?: string;
+  rate?: string;
   description?: string;
   ageRating?: string;
   releaseDate?: string;
