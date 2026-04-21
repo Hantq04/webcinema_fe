@@ -48,25 +48,56 @@ import { LanguageService } from '../../core/services/language.service';
         <nav aria-label="Main navigation" class="main-nav grid grid-cols-4 gap-1 pt-3 pb-3 max-[900px]:grid-cols-2 max-[640px]:grid-cols-1">
           <span class="nav-indicator" [style.transform]="navIndicatorTransform()"></span>
 
-          <a routerLink="/movies" routerLinkActive="nav-link-active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-            <span class="text-[0.95rem] font-extrabold tracking-[0.02em]">{{ t('header.movie') }}</span>
-            <small class="text-[0.72rem] font-bold text-[#7f6c57]">{{ t('header.movieSub') }}</small>
-          </a>
+          <!-- Phim -->
+          <div class="nav-item group">
+            <a routerLink="/movies" routerLinkActive="nav-link-active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
+              <span class="text-[0.95rem] font-extrabold tracking-[0.02em]">{{ t('header.movie') }}</span>
+              <small class="text-[0.72rem] font-bold text-[#7f6c57]">{{ t('header.movieSub') }}</small>
+            </a>
+            <div class="dropdown-menu">
+              <a routerLink="/movies" class="dropdown-link">Phim Đang Chiếu</a>
+              <a routerLink="/movies" class="dropdown-link">Phim Sắp Chiếu</a>
+            </div>
+          </div>
 
-          <a routerLink="/booking" routerLinkActive="nav-link-active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-            <span class="text-[0.95rem] font-extrabold tracking-[0.02em]">{{ t('header.cinema') }}</span>
-            <small class="text-[0.72rem] font-bold text-[#7f6c57]">{{ t('header.cinemaSub') }}</small>
-          </a>
+          <!-- Rạp -->
+          <div class="nav-item group">
+            <a routerLink="/booking" routerLinkActive="nav-link-active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
+              <span class="text-[0.95rem] font-extrabold tracking-[0.02em]">{{ t('header.cinema') }}</span>
+              <small class="text-[0.72rem] font-bold text-[#7f6c57]">{{ t('header.cinemaSub') }}</small>
+            </a>
+            <div class="dropdown-menu">
+              <a routerLink="/booking" class="dropdown-link">Tất Cả Các Rạp</a>
+              <a routerLink="/booking" class="dropdown-link">Rạp Đặc Biệt</a>
+              <a routerLink="/booking" class="dropdown-link">Rạp 3D</a>
+            </div>
+          </div>
 
-          <a [routerLink]="memberLink()" routerLinkActive="nav-link-active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-            <span class="text-[0.95rem] font-extrabold tracking-[0.02em]">{{ t('header.member') }}</span>
-            <small class="text-[0.72rem] font-bold text-[#7f6c57]">{{ t('header.memberSub') }}</small>
-          </a>
+          <!-- Thành viên -->
+          <div class="nav-item group">
+            <a [routerLink]="memberLink()" routerLinkActive="nav-link-active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
+              <span class="text-[0.95rem] font-extrabold tracking-[0.02em]">{{ t('header.member') }}</span>
+              <small class="text-[0.72rem] font-bold text-[#7f6c57]">{{ t('header.memberSub') }}</small>
+            </a>
+            <div class="dropdown-menu">
+              <a [routerLink]="memberLink()" class="dropdown-link">Tài Khoản CGV</a>
+              <a [routerLink]="memberLink()" class="dropdown-link">Quyền Lợi</a>
+            </div>
+          </div>
 
-          <a routerLink="/admin" routerLinkActive="nav-link-active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-            <span class="text-[0.95rem] font-extrabold tracking-[0.02em]">{{ t('header.cultureplex') }}</span>
-            <small class="text-[0.72rem] font-bold text-[#7f6c57]">{{ t('header.cultureplexSub') }}</small>
-          </a>
+          <!-- Cultureplex -->
+          <div class="nav-item group">
+            <a routerLink="/admin" routerLinkActive="nav-link-active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
+              <span class="text-[0.95rem] font-extrabold tracking-[0.02em]">{{ t('header.cultureplex') }}</span>
+              <small class="text-[0.72rem] font-bold text-[#7f6c57]">{{ t('header.cultureplexSub') }}</small>
+            </a>
+            <div class="dropdown-menu">
+              <a routerLink="/admin" class="dropdown-link">Quầy Online</a>
+              <a routerLink="/admin" class="dropdown-link">Thuê Rạp & Vé Nhóm</a>
+              <a routerLink="/admin" class="dropdown-link">CGV eGift</a>
+              <a routerLink="/admin" class="dropdown-link">CGV Rules</a>
+            </div>
+          </div>
         </nav>
       </div>
     </header>
@@ -86,8 +117,9 @@ import { LanguageService } from '../../core/services/language.service';
           rgba(214, 47, 31, 0.14) 0 0.25rem,
           transparent 0.25rem 1.9rem
         );
-      overflow: hidden;
+      overflow: visible;
       position: relative;
+      z-index: 30;
     }
 
     .cinema-header::before,
@@ -236,6 +268,7 @@ import { LanguageService } from '../../core/services/language.service';
 
     .main-nav {
       position: relative;
+      z-index: 1;
     }
 
     .nav-indicator {
@@ -251,6 +284,11 @@ import { LanguageService } from '../../core/services/language.service';
       z-index: 0;
     }
 
+    .nav-item {
+      position: relative;
+      z-index: 1;
+    }
+
     .nav-link {
       align-items: center;
       color: #231b14;
@@ -258,7 +296,7 @@ import { LanguageService } from '../../core/services/language.service';
       flex-direction: column;
       gap: 0.25rem;
       justify-content: center;
-      padding: 0.75rem 0.5rem 0.95rem;
+      padding: 0.7rem 0.45rem 0.9rem;
       position: relative;
       text-decoration: none;
       transition: color 180ms ease, transform 180ms ease;
@@ -275,6 +313,61 @@ import { LanguageService } from '../../core/services/language.service';
 
     .nav-link-active small {
       color: #9b5b45;
+    }
+
+    /* DROPDOWN MENU */
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 0.35rem);
+      left: 0;
+      min-width: 200px;
+      background: #333333;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      padding: 0.5rem 0;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
+      transition: opacity 200ms ease, transform 200ms ease, visibility 200ms;
+      z-index: 80;
+    }
+
+    .nav-item:hover,
+    .nav-item:focus-within {
+      z-index: 90;
+    }
+
+    .nav-item:hover .dropdown-menu,
+    .nav-item:focus-within .dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .nav-item::after {
+      content: '';
+      position: absolute;
+      bottom: -15px;
+      left: 0;
+      right: 0;
+      height: 15px;
+      z-index: 79;
+    }
+
+    .dropdown-link {
+      display: block;
+      color: #e5e5e5;
+      padding: 0.65rem 1.25rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: color 150ms ease, background 150ms ease;
+    }
+
+    .dropdown-link:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.1);
     }
 
     .lang-button {

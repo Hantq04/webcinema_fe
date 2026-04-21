@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -15,16 +15,53 @@ import { LanguageService } from '../../core/services/language.service';
     <section class="home-shell">
       <div class="home-shell__glow" aria-hidden="true"></div>
 
-      <div class="mx-auto max-w-7xl px-4 pb-12 pt-6 max-[640px]:pb-10 max-[640px]:pt-4">
-        <div class="quick-links-grid" aria-label="{{ t('home.quickAccessTitle') }}">
-          @for (link of quickLinks; track link.id) {
-            <a [routerLink]="link.href" class="quick-link-card">
-              <span class="quick-link-card__icon" aria-hidden="true">{{ link.icon }}</span>
-              <strong class="quick-link-card__title">{{ t(link.titleKey) }}</strong>
-              <small class="quick-link-card__subtitle">{{ t(link.subtitleKey) }}</small>
-            </a>
-          }
+      <!-- EVENT BANNER - CGV style slider -->
+      <section class="event-banner" aria-label="Event banner">
+        <div class="event-banner__wrap">
+          <div class="event-banner__stage">
+            @if (eventBannerSlides().length > 0) {
+              <!-- key bằng index để Angular re-render img → trigger CSS fade -->
+              @for (slide of eventBannerSlides(); track slide.id; let i = $index) {
+                <img
+                  class="event-banner__image"
+                  [class.event-banner__image--active]="i === eventBannerIndex()"
+                  [src]="slide.imageUrl"
+                  [alt]="slide.title || 'Event'"
+                  loading="eager"
+                />
+              }
+              <button type="button" class="event-banner__nav event-banner__nav--prev" (click)="previousEventSlide()" aria-label="Previous event">
+                &#8249;
+              </button>
+              <button type="button" class="event-banner__nav event-banner__nav--next" (click)="nextEventSlide()" aria-label="Next event">
+                &#8250;
+              </button>
+              <div class="event-banner__dots" role="tablist">
+                @for (dot of visibleEventDots(); track dot.index) {
+                  <button
+                    type="button"
+                    class="event-banner__dot"
+                    [class.event-banner__dot--active]="dot.index === eventBannerIndex()"
+                    (click)="goToEventSlide(dot.index)"
+                    [attr.aria-label]="'Event ' + (dot.index + 1)"
+                  ></button>
+                }
+              </div>
+            } @else {
+              <!-- Placeholder when no event images yet -->
+              <div class="event-banner__placeholder" aria-hidden="true">
+                <div class="event-banner__dots">
+                  @for (dot of [0,1,2,3,4]; track dot) {
+                    <span class="event-banner__dot event-banner__dot--placeholder"></span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
         </div>
+      </section>
+
+      <div class="mx-auto max-w-7xl px-4 pb-12 pt-6 max-[640px]:pb-10 max-[640px]:pt-4">
 
         <section class="movie-section" aria-labelledby="movie-selection-title">
           <div class="movie-section__header">
@@ -214,6 +251,122 @@ import { LanguageService } from '../../core/services/language.service';
       z-index: 0;
     }
 
+    /* ── EVENT BANNER (VenusCinema-style full-width) ───────────────────── */
+    .event-banner {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      padding: 0;
+      background: #0d0a08;
+    }
+
+    .event-banner__wrap {
+      width: 100%;
+    }
+
+    .event-banner__stage {
+      position: relative;
+      width: 100%;
+      /* Tỷ lệ rộng và cao kiểu VenusCinema: ~16:7 */
+      aspect-ratio: 16 / 7;
+      overflow: hidden;
+      border-radius: 0;
+      box-shadow: none;
+      background: #0d0a08;
+    }
+
+    .event-banner__image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 600ms ease;
+      will-change: opacity;
+    }
+
+    .event-banner__image--active {
+      opacity: 1;
+    }
+
+    .event-banner__placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 1rem;
+      background: linear-gradient(135deg, #23100a 0%, #3a1a0c 50%, #23100a 100%);
+    }
+
+    .event-banner__nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2;
+      background: rgba(0, 0, 0, 0.25);
+      border: none;
+      border-radius: 0;
+      color: #fff;
+      cursor: pointer;
+      font-size: 3rem;
+      width: 3rem;
+      height: 5rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 160ms ease;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .event-banner__nav:hover {
+      background: rgba(0, 0, 0, 0.42);
+    }
+
+    .event-banner__nav--prev {
+      left: 0;
+    }
+
+    .event-banner__nav--next {
+      right: 0;
+    }
+
+    .event-banner__dots {
+      position: absolute;
+      bottom: 0.75rem;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 0.4rem;
+      z-index: 2;
+    }
+
+    .event-banner__dot {
+      background: rgba(255, 248, 239, 0.35);
+      border: 0;
+      border-radius: 999px;
+      cursor: pointer;
+      height: 0.55rem;
+      width: 0.55rem;
+      padding: 0;
+      transition: width 220ms ease, background 220ms ease;
+    }
+
+    .event-banner__dot--active {
+      background: #ea2e1e;
+      width: 1.4rem;
+    }
+
+    .event-banner__dot--placeholder {
+      background: rgba(255, 248, 239, 0.2);
+      cursor: default;
+    }
+
+    /* ── END EVENT BANNER ──────────────────────────────────────────────────── */
+
     .quick-links-grid,
     .movie-section,
     .category-grid {
@@ -269,6 +422,8 @@ import { LanguageService } from '../../core/services/language.service';
       font-size: 0.78rem;
       font-weight: 700;
     }
+
+
 
     .movie-section {
       margin-bottom: 1.4rem;
@@ -760,6 +915,16 @@ import { LanguageService } from '../../core/services/language.service';
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
+      .event-banner__stage {
+        aspect-ratio: 16 / 8;
+      }
+
+      .event-banner__nav {
+        font-size: 2.5rem;
+        width: 2.5rem;
+        height: 4rem;
+      }
+
       .movie-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
@@ -781,6 +946,20 @@ import { LanguageService } from '../../core/services/language.service';
       .quick-links-grid,
       .category-grid__items {
         grid-template-columns: 1fr;
+      }
+
+      .event-banner__stage {
+        aspect-ratio: 16 / 9;
+      }
+
+      .event-banner__nav {
+        font-size: 2rem;
+        width: 2rem;
+        height: 3rem;
+      }
+
+      .event-banner__nav--next {
+        right: 0;
       }
 
       .movie-grid {
@@ -858,6 +1037,48 @@ export class HomeComponent {
   protected readonly t = this.language.t.bind(this.language);
   protected readonly movieCards = signal<Movie[]>([]);
   protected readonly loadingMovies = signal(true);
+  protected readonly carouselIndex = signal(0);
+  protected readonly carouselSlides = computed(() => this.movieCards().slice(0, 5));
+
+  // TODO: Xóa dữ liệu fake này khi có API event thật
+  protected readonly eventBannerSlides = signal<Array<{ id: string | number; imageUrl: string; title?: string; link?: string }>>([
+    {
+      id: 1,
+      imageUrl: 'https://picsum.photos/seed/cinema1/1920/660',
+      title: 'Sự kiện mùa hè 2026'
+    },
+    {
+      id: 2,
+      imageUrl: 'https://picsum.photos/seed/cinema2/1920/660',
+      title: 'Ưu đãi đặc biệt tháng 4'
+    },
+    {
+      id: 3,
+      imageUrl: 'https://picsum.photos/seed/cinema3/1920/660',
+      title: 'CGV – Xem phim mùa lễ'
+    },
+    {
+      id: 4,
+      imageUrl: 'https://picsum.photos/seed/cinema4/1920/660',
+      title: 'Thành viên VIP ưu đãi 50%'
+    }
+  ]);
+  protected readonly eventBannerIndex = signal(0);
+  // Giới hạn tối đa 6 dots
+  protected readonly visibleEventDots = computed(() =>
+    this.eventBannerSlides()
+      .slice(0, 6)
+      .map((_, i) => ({ index: i }))
+  );
+  protected readonly activeCarouselSlide = computed(() => {
+    const slides = this.carouselSlides();
+
+    if (slides.length === 0) {
+      return null;
+    }
+
+    return slides[this.carouselIndex() % slides.length] ?? slides[0] ?? null;
+  });
   protected readonly trailerPreview = signal<{ title: string; embedUrl: SafeResourceUrl } | null>(null);
   protected readonly loadingSlots = Array.from({ length: 8 }, (_, index) => index);
 
@@ -869,11 +1090,20 @@ export class HomeComponent {
   ] as const;
 
   constructor() {
+    const carouselTimer = setInterval(() => this.nextCarouselSlide(), 5000);
+    const eventTimer = setInterval(() => this.nextEventSlide(), 5000);
+
+    this.destroyRef.onDestroy(() => {
+      clearInterval(carouselTimer);
+      clearInterval(eventTimer);
+    });
+
     this.movieService
       .getNowShowingMovies()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((movies) => {
         this.movieCards.set(movies);
+        this.syncCarouselIndex(movies.length);
         this.loadingMovies.set(false);
       });
   }
@@ -902,6 +1132,60 @@ export class HomeComponent {
     return movie.trailerUrl?.trim() || '';
   }
 
+  protected previousCarouselSlide(): void {
+    const slides = this.carouselSlides();
+
+    if (slides.length === 0) {
+      return;
+    }
+
+    this.carouselIndex.update((currentIndex) => (currentIndex - 1 + slides.length) % slides.length);
+  }
+
+  protected nextCarouselSlide(): void {
+    const slides = this.carouselSlides();
+
+    if (slides.length === 0) {
+      return;
+    }
+
+    this.carouselIndex.update((currentIndex) => (currentIndex + 1) % slides.length);
+  }
+
+  protected goToCarouselSlide(index: number): void {
+    const slides = this.carouselSlides();
+
+    if (index < 0 || index >= slides.length) {
+      return;
+    }
+
+    this.carouselIndex.set(index);
+  }
+
+  protected previousEventSlide(): void {
+    const slides = this.eventBannerSlides();
+
+    if (slides.length === 0) return;
+
+    this.eventBannerIndex.update((i) => (i - 1 + slides.length) % slides.length);
+  }
+
+  protected nextEventSlide(): void {
+    const slides = this.eventBannerSlides();
+
+    if (slides.length === 0) return;
+
+    this.eventBannerIndex.update((i) => (i + 1) % slides.length);
+  }
+
+  protected goToEventSlide(index: number): void {
+    const slides = this.eventBannerSlides();
+
+    if (index < 0 || index >= slides.length) return;
+
+    this.eventBannerIndex.set(index);
+  }
+
   protected openTrailer(movie: Movie): void {
     const trailerUrl = this.movieTrailer(movie);
 
@@ -924,6 +1208,19 @@ export class HomeComponent {
 
   protected closeTrailer(): void {
     this.trailerPreview.set(null);
+  }
+
+  private syncCarouselIndex(movieCount: number): void {
+    const slides = this.carouselSlides();
+
+    if (slides.length === 0) {
+      this.carouselIndex.set(0);
+      return;
+    }
+
+    if (this.carouselIndex() >= slides.length || movieCount < slides.length) {
+      this.carouselIndex.set(0);
+    }
   }
 
   private toYoutubeEmbedUrl(value: string): string {
