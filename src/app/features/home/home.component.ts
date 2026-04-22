@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal, viewChild, ElementRef } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -6,6 +6,19 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Movie } from '../../core/models/movie.model';
 import { MovieService } from '../../core/services/movie.service';
 import { LanguageService } from '../../core/services/language.service';
+
+type EventCardAccent = 'crimson' | 'navy' | 'rose' | 'gold';
+
+interface EventCard {
+  id: string;
+  kicker: string;
+  title: string;
+  subtitle?: string;
+  description?: string;
+  href: string;
+  cta?: string;
+  accent: EventCardAccent;
+}
 
 @Component({
   selector: 'app-home',
@@ -73,7 +86,7 @@ import { LanguageService } from '../../core/services/language.service';
           </div>
 
           @if (loadingMovies()) {
-            <div class="movie-grid movie-grid--loading" aria-hidden="true">
+            <div class="movie-carousel__track movie-carousel__track--loading" aria-hidden="true">
               @for (slot of loadingSlots; track slot) {
                 <article class="poster-card poster-card--loading">
                   <div class="poster-card__poster"></div>
@@ -94,8 +107,15 @@ import { LanguageService } from '../../core/services/language.service';
               }
             </div>
           } @else if (movieCards().length > 0) {
-            <div class="movie-grid">
-              @for (movie of movieCards(); track movie.id) {
+            <div class="movie-carousel">
+              @if (canScrollLeft()) {
+                <button type="button" class="movie-carousel__nav movie-carousel__nav--prev" (click)="scrollMovies(-1)" aria-label="Previous movies">
+                  &#10094;
+                </button>
+              }
+              
+              <div class="movie-carousel__track" #movieTrack (scroll)="updateScrollState()">
+                @for (movie of movieCards(); track movie.id) {
                 <article class="poster-card" tabindex="0">
                   <div class="poster-card__poster">
                     <img class="poster-card__image" [src]="movieImage(movie)" [alt]="movie.title" loading="lazy" />
@@ -140,11 +160,18 @@ import { LanguageService } from '../../core/services/language.service';
                     </div>
 
                     <div class="poster-card__actions">
-                      <a routerLink="/movies" class="poster-card__button poster-card__button--solid">{{ t('home.movieActionDetails') }}</a>
-                      <a routerLink="/booking" class="poster-card__button poster-card__button--solid">{{ t('home.movieActionBook') }}</a>
+                      <a [routerLink]="['/movies', movie.code || movie.id]" class="poster-card__button poster-card__button--solid">{{ t('home.movieActionDetails') }}</a>
+                      <a routerLink="/booking" [queryParams]="{ movieId: movie.id }" class="poster-card__button poster-card__button--solid">{{ t('home.movieActionBook') }}</a>
                     </div>
                   </div>
                 </article>
+                }
+              </div>
+
+              @if (canScrollRight()) {
+                <button type="button" class="movie-carousel__nav movie-carousel__nav--next" (click)="scrollMovies(1)" aria-label="Next movies">
+                  &#10095;
+                </button>
               }
             </div>
           } @else {
@@ -153,6 +180,41 @@ import { LanguageService } from '../../core/services/language.service';
               <span>{{ t('home.movieEmptyDescription') }}</span>
             </div>
           }
+        </section>
+
+        <section class="event-section" aria-labelledby="event-section-title">
+          <div class="event-section__header">
+            <div class="event-section__line"></div>
+            <h2 id="event-section-title" class="event-section__title">EVENT</h2>
+            <div class="event-section__line"></div>
+          </div>
+
+          <div class="event-section__badge-row">
+            <span class="event-section__badge">Thành Viên CineGo | Tin Mới & Ưu Đãi</span>
+          </div>
+
+          <div class="event-section__grid event-section__grid--top">
+            @for (card of eventTopCards; track card.id) {
+              <a [routerLink]="card.href" class="event-card event-card--compact" [class.event-card--crimson]="card.accent === 'crimson'" [class.event-card--rose]="card.accent === 'rose'" [class.event-card--navy]="card.accent === 'navy'" [class.event-card--gold]="card.accent === 'gold'">
+                <span class="event-card__kicker">{{ card.kicker }}</span>
+                <strong class="event-card__title">{{ card.title }}</strong>
+                <span class="event-card__subtitle">{{ card.subtitle }}</span>
+              </a>
+            }
+          </div>
+
+          <div class="event-section__grid event-section__grid--bottom">
+            @for (card of eventBottomCards; track card.id) {
+              <a [routerLink]="card.href" class="event-card event-card--feature" [class.event-card--crimson]="card.accent === 'crimson'" [class.event-card--rose]="card.accent === 'rose'" [class.event-card--navy]="card.accent === 'navy'" [class.event-card--gold]="card.accent === 'gold'">
+                <span class="event-card__kicker">{{ card.kicker }}</span>
+                <strong class="event-card__title">{{ card.title }}</strong>
+                <p class="event-card__description">{{ card.description }}</p>
+                @if (card.cta) {
+                  <span class="event-card__cta">{{ card.cta }}</span>
+                }
+              </a>
+            }
+          </div>
         </section>
 
         @if (trailerPreview()) {
@@ -429,6 +491,189 @@ import { LanguageService } from '../../core/services/language.service';
       margin-bottom: 1.4rem;
     }
 
+    .event-section {
+      margin-bottom: 1.8rem;
+    }
+
+    .event-section__header {
+      align-items: center;
+      display: grid;
+      gap: 0.9rem;
+      grid-template-columns: 1fr auto 1fr;
+      margin-bottom: 0.85rem;
+    }
+
+    .event-section__line {
+      border-top: 2px solid rgba(49, 36, 25, 0.72);
+      border-bottom: 2px solid rgba(49, 36, 25, 0.38);
+      height: 0.35rem;
+    }
+
+    .event-section__title {
+      color: #201b16;
+      font-size: clamp(1.8rem, 3vw, 3rem);
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      line-height: 1;
+      margin: 0;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .event-section__badge-row {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .event-section__badge {
+      align-items: center;
+      background: linear-gradient(90deg, #ea2e1e, #d62f1f);
+      color: #fff8ef;
+      display: inline-flex;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      padding: 0.5rem 1rem;
+      position: relative;
+      text-transform: uppercase;
+    }
+
+    .event-section__badge::before,
+    .event-section__badge::after {
+      border-top: 0.7rem solid transparent;
+      border-bottom: 0.7rem solid transparent;
+      content: '';
+      position: absolute;
+      top: 0;
+    }
+
+    .event-section__badge::before {
+      border-right: 0.9rem solid #ea2e1e;
+      left: -0.9rem;
+    }
+
+    .event-section__badge::after {
+      border-left: 0.9rem solid #d62f1f;
+      right: -0.9rem;
+    }
+
+    .event-section__grid {
+      display: grid;
+      gap: 0.85rem;
+    }
+
+    .event-section__grid--top {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-bottom: 1rem;
+    }
+
+    .event-section__grid--bottom {
+      grid-template-columns: 1fr 1.6fr 0.9fr;
+    }
+
+    .event-card {
+      align-items: flex-start;
+      border: 2px solid rgba(46, 32, 22, 0.72);
+      box-shadow: 0 0.8rem 1.5rem rgba(36, 22, 12, 0.08);
+      color: #fff8ef;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      justify-content: flex-end;
+      min-height: 13rem;
+      overflow: hidden;
+      padding: 1rem;
+      position: relative;
+      text-decoration: none;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .event-card::before {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 42%),
+        radial-gradient(circle at top right, rgba(255, 255, 255, 0.28), transparent 26%),
+        radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.12), transparent 28%);
+      content: '';
+      inset: 0;
+      position: absolute;
+      z-index: 0;
+    }
+
+    .event-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .event-card:hover {
+      box-shadow: 0 1rem 2rem rgba(36, 22, 12, 0.14);
+      transform: translateY(-2px);
+    }
+
+    .event-card--compact {
+      aspect-ratio: 1 / 1;
+      min-height: 0;
+    }
+
+    .event-card--feature {
+      min-height: 16rem;
+    }
+
+    .event-card__kicker {
+      color: rgba(255, 248, 239, 0.88);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+
+    .event-card__title {
+      font-size: clamp(1rem, 1.8vw, 1.55rem);
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      line-height: 1.1;
+      margin: 0;
+      text-transform: uppercase;
+    }
+
+    .event-card__subtitle,
+    .event-card__description {
+      color: rgba(255, 248, 239, 0.9);
+      font-size: 0.88rem;
+      font-weight: 600;
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    .event-card__cta {
+      align-self: flex-start;
+      background: rgba(255, 248, 239, 0.12);
+      border: 1px solid rgba(255, 248, 239, 0.24);
+      border-radius: 999px;
+      color: #fff8ef;
+      font-size: 0.74rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      padding: 0.35rem 0.7rem;
+      text-transform: uppercase;
+    }
+
+    .event-card--crimson {
+      background: linear-gradient(145deg, #241311 0%, #8e120f 46%, #ea2e1e 100%);
+    }
+
+    .event-card--rose {
+      background: linear-gradient(145deg, #ffb3b8 0%, #f66f8f 46%, #cc2e59 100%);
+    }
+
+    .event-card--navy {
+      background: linear-gradient(145deg, #1d2d4f 0%, #0f3f74 52%, #d63e2f 100%);
+    }
+
+    .event-card--gold {
+      background: linear-gradient(145deg, #3a2104 0%, #b36815 52%, #f2b11d 100%);
+    }
+
     .movie-section__header {
       align-items: center;
       display: grid;
@@ -462,15 +707,87 @@ import { LanguageService } from '../../core/services/language.service';
       text-align: center;
     }
 
-    .movie-grid {
-      display: grid;
-      gap: 1rem;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+    .movie-carousel {
+      position: relative;
+      width: 100%;
       margin-top: 0.15rem;
     }
 
-    .movie-grid--loading {
+    .movie-carousel__track {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none; /* Firefox */
+      padding-bottom: 0.5rem;
+    }
+
+    .movie-carousel__track::-webkit-scrollbar {
+      display: none; /* Chrome/Safari */
+    }
+
+    .movie-carousel__track--loading {
       pointer-events: none;
+    }
+
+    .movie-carousel__track .poster-card {
+      flex: 0 0 calc(25% - 0.75rem);
+      scroll-snap-align: start;
+    }
+
+    @media (max-width: 1024px) {
+      .movie-carousel__track .poster-card {
+        flex: 0 0 calc(33.333% - 0.666rem);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .movie-carousel__track .poster-card {
+        flex: 0 0 calc(50% - 0.5rem);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .movie-carousel__track .poster-card {
+        flex: 0 0 100%;
+      }
+    }
+
+    .movie-carousel__nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      background: rgba(226, 33, 20, 0.95);
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      font-size: 1.6rem;
+      width: 2rem;
+      height: 4rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      transition: background 160ms ease, transform 160ms ease;
+    }
+
+    .movie-carousel__nav:hover {
+      background: #f01919;
+      transform: translateY(-50%) scale(1.05);
+    }
+
+    .movie-carousel__nav--prev {
+      left: -2rem;
+      border-radius: 4rem 0 0 4rem;
+      padding-right: 0.2rem;
+    }
+
+    .movie-carousel__nav--next {
+      right: -2rem;
+      border-radius: 0 4rem 4rem 0;
+      padding-left: 0.2rem;
     }
 
     .movie-grid__empty {
@@ -636,23 +953,18 @@ import { LanguageService } from '../../core/services/language.service';
     }
 
     .trailer-modal__close {
-      align-items: center;
       background: transparent;
-      border: 2px solid rgba(255, 248, 239, 0.7);
-      border-radius: 999px;
-      color: #fff8ef;
+      border: none;
+      color: #888;
       cursor: pointer;
-      display: inline-flex;
-      flex: 0 0 auto;
-      font-size: 1.35rem;
-      height: 2.4rem;
-      justify-content: center;
+      font-size: 2rem;
       line-height: 1;
-      width: 2.4rem;
+      padding: 0 0.5rem;
+      transition: color 0.2s;
     }
 
     .trailer-modal__close:hover {
-      background: rgba(255, 248, 239, 0.12);
+      color: #fff;
     }
 
     .trailer-modal__frame-shell {
@@ -680,7 +992,7 @@ import { LanguageService } from '../../core/services/language.service';
       pointer-events: none;
       padding: 0.4rem 0.65rem;
       position: absolute;
-      right: 0.85rem;
+      left: 0.85rem;
       top: 0.85rem;
       z-index: 3;
     }
@@ -736,10 +1048,11 @@ import { LanguageService } from '../../core/services/language.service';
       font-weight: 900;
       letter-spacing: 0.02em;
       line-height: 1.02;
-      margin: 0;
+      margin: 0 0 0 auto;
       min-width: 0;
       max-width: calc(100% - 4.8rem);
       text-transform: uppercase;
+      text-align: right;
     }
 
     .poster-card__description {
@@ -929,6 +1242,19 @@ import { LanguageService } from '../../core/services/language.service';
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
+      .event-section__grid--top {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .event-section__grid--bottom {
+        grid-template-columns: 1fr;
+      }
+
+      .event-card--compact,
+      .event-card--feature {
+        min-height: 11rem;
+      }
+
       .poster-card {
         min-height: 24rem;
       }
@@ -964,6 +1290,23 @@ import { LanguageService } from '../../core/services/language.service';
 
       .movie-grid {
         grid-template-columns: 1fr;
+      }
+
+      .event-section__header {
+        grid-template-columns: 1fr;
+      }
+
+      .event-section__line {
+        display: none;
+      }
+
+      .event-section__grid--top {
+        grid-template-columns: 1fr;
+      }
+
+      .event-section__badge {
+        font-size: 0.75rem;
+        text-align: center;
       }
 
       .poster-card {
@@ -1079,6 +1422,67 @@ export class HomeComponent {
 
     return slides[this.carouselIndex() % slides.length] ?? slides[0] ?? null;
   });
+  protected readonly eventTopCards: readonly EventCard[] = [
+    {
+      id: 'membership',
+      kicker: 'CGV Membership',
+      title: 'Gia nhập ngay quà tặng đầy tay',
+      subtitle: 'Ưu đãi thành viên và quà tặng theo mùa',
+      href: '/auth',
+      accent: 'gold'
+    },
+    {
+      id: 'ticket-79000-1',
+      kicker: 'Đồng giá',
+      title: '79.000đ',
+      subtitle: 'Cho tất cả khách hàng thành viên',
+      href: '/booking',
+      accent: 'crimson'
+    },
+    {
+      id: 'ticket-79000-2',
+      kicker: 'Đồng giá',
+      title: '79.000đ VNĐ',
+      subtitle: 'Tại CGV Pandora',
+      href: '/booking',
+      accent: 'navy'
+    },
+    {
+      id: 'birthday',
+      kicker: 'Happy Birthday',
+      title: 'Quà sinh nhật cho CGV members',
+      subtitle: 'Bánh, bắp và voucher ưu đãi',
+      href: '/account',
+      accent: 'rose'
+    }
+  ];
+  protected readonly eventBottomCards: readonly EventCard[] = [
+    {
+      id: 'gift-card',
+      kicker: 'Quà tặng',
+      title: 'Khéo chọn quà phim hay',
+      description: 'Bộ sưu tập quà tặng, voucher và ưu đãi dành cho người mê điện ảnh.',
+      href: '/auth',
+      accent: 'navy'
+    },
+    {
+      id: 'under-23',
+      kicker: 'Khách hàng dưới 23 tuổi',
+      title: '60.000đ - 70.000đ',
+      description: 'Giá vé tiêu chuẩn và giá vé rạp đặc biệt áp dụng theo điều kiện chương trình.',
+      href: '/movies',
+      accent: 'rose'
+    },
+    {
+      id: 'group-booking',
+      kicker: 'Thuê rạp / Sự kiện',
+      title: 'Vé nhóm và đặt rạp riêng',
+      description: 'Phù hợp cho hội nhóm, sinh nhật, team building và các buổi chiếu nội bộ.',
+      href: '/booking',
+      cta: 'Xem ngay',
+      accent: 'crimson'
+    }
+  ];
   protected readonly trailerPreview = signal<{ title: string; embedUrl: SafeResourceUrl } | null>(null);
   protected readonly loadingSlots = Array.from({ length: 8 }, (_, index) => index);
 
@@ -1088,6 +1492,10 @@ export class HomeComponent {
     { id: 'special', icon: '⭐', titleKey: 'home.ctaSpecial', subtitleKey: 'home.ctaSpecialSub', href: '/movies' },
     { id: 'register', icon: '🎟️', titleKey: 'home.ctaRegister', subtitleKey: 'home.ctaRegisterSub', href: '/auth' }
   ] as const;
+
+  protected readonly movieTrack = viewChild<ElementRef<HTMLElement>>('movieTrack');
+  protected readonly canScrollLeft = signal(false);
+  protected readonly canScrollRight = signal(true);
 
   constructor() {
     const carouselTimer = setInterval(() => this.nextCarouselSlide(), 5000);
@@ -1102,10 +1510,28 @@ export class HomeComponent {
       .getNowShowingMovies()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((movies) => {
-        this.movieCards.set(movies);
-        this.syncCarouselIndex(movies.length);
+        const validMovies = movies.filter(m => m.title && m.posterUrl);
+        this.movieCards.set(validMovies);
+        this.syncCarouselIndex(validMovies.length);
         this.loadingMovies.set(false);
+        setTimeout(() => this.updateScrollState(), 50);
       });
+  }
+
+  protected updateScrollState(): void {
+    const track = this.movieTrack()?.nativeElement;
+    if (track) {
+      this.canScrollLeft.set(track.scrollLeft > 1);
+      this.canScrollRight.set(track.scrollLeft + track.clientWidth < track.scrollWidth - 1);
+    }
+  }
+
+  protected scrollMovies(direction: number): void {
+    const track = this.movieTrack()?.nativeElement;
+    if (track) {
+      const scrollAmount = track.clientWidth * 0.75; // Scroll by 75% of container width
+      track.scrollBy({ left: scrollAmount * direction, behavior: 'smooth' });
+    }
   }
 
   protected movieImage(movie: Movie): string {

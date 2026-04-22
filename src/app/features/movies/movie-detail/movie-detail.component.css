@@ -1,0 +1,588 @@
+.movie-detail-page {
+  padding: 1rem 0 3rem;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #333;
+}
+
+.movie-detail-page__shell {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Breadcrumb */
+.movies-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 2rem;
+  padding: 0.5rem 0;
+  border-bottom: 2px solid #e1e1e1;
+}
+
+.movies-breadcrumb__home-icon {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+}
+
+.movies-breadcrumb__link {
+  color: #666;
+  text-decoration: none;
+}
+
+.movies-breadcrumb__link:hover {
+  text-decoration: underline;
+}
+
+.movies-breadcrumb__current {
+  font-weight: bold;
+  color: #333;
+}
+
+/* Hero Heading */
+.movie-detail-hero__heading {
+  font-size: 2rem;
+  font-weight: normal;
+  color: #222;
+  margin: 0 0 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 3px solid #333;
+  text-transform: capitalize;
+}
+
+/* Content Layout */
+.movie-detail-content {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.movie-detail-content__left {
+  flex: 0 0 250px;
+}
+
+.movie-detail-content__right {
+  flex: 1;
+}
+
+/* Poster */
+.movie-detail-poster {
+  width: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.movie-detail-poster__image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Info */
+.movie-detail-info__title {
+  font-size: 1.5rem;
+  margin: 0 0 1.5rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.movie-detail-info__grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  font-size: 0.95rem;
+}
+
+.movie-detail-info__row {
+  display: flex;
+  line-height: 1.4;
+}
+
+.movie-detail-info__row strong {
+  width: 120px;
+  flex-shrink: 0;
+  font-weight: 600;
+}
+
+.movie-detail-info__row span {
+  flex: 1;
+}
+
+/* Formats & Badges */
+.movie-detail-formats {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.movie-detail-badge {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: bold;
+  border: 1px solid #333;
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+}
+
+.movie-detail-badge--rate {
+  background: #f39c12;
+  color: #fff;
+  border-color: #f39c12;
+}
+
+.movie-detail-badge--starium {
+  border-color: #e67e22;
+  color: #e67e22;
+}
+
+/* Actions */
+.movie-detail-actions {
+  margin-top: 1.5rem;
+}
+
+.movie-detail-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e71a0f;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 0.6rem 1.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.movie-detail-btn:hover {
+  background-color: #c0140c;
+}
+
+/* Tabs */
+.movie-detail-tabs {
+  margin-top: 2rem;
+}
+
+.movie-detail-tabs__header-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.movie-detail-tabs__ribbon {
+  background: #e71a0f;
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1.5rem;
+  position: relative;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.movie-detail-tabs__ribbon::before,
+.movie-detail-tabs__ribbon::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  background: inherit;
+}
+
+.movie-detail-tabs__ribbon::before {
+  left: -10px;
+  clip-path: polygon(100% 0, 100% 100%, 0 50%);
+}
+
+.movie-detail-tabs__ribbon::after {
+  right: -10px;
+  clip-path: polygon(0 0, 0 100%, 100% 50%);
+}
+
+.movie-detail-tabs__btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font: inherit;
+  cursor: pointer;
+  padding: 0 0.5rem;
+}
+
+.movie-detail-tabs__btn--active {
+  color: white;
+}
+
+.movie-detail-tabs__separator {
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 0.2rem;
+}
+
+.movie-detail-desc {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #444;
+  text-align: justify;
+}
+
+/* Loading & Error */
+.movie-detail-loading,
+.movie-detail-error {
+  text-align: center;
+  padding: 4rem 0;
+}
+
+.movie-detail-error {
+  color: #e71a0f;
+  font-size: 1.1rem;
+}
+
+.movie-detail-error__link {
+  display: inline-block;
+  margin-top: 1rem;
+  color: #333;
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .movie-detail-content {
+    flex-direction: column;
+  }
+  
+  .movie-detail-content__left {
+    flex: none;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+}
+
+/* Trailer Modal */
+.trailer-modal {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.85);
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  padding: 1.5rem;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.trailer-modal__panel {
+  background: #111;
+  border-radius: 8px;
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  max-width: 960px;
+  padding: 1rem;
+  width: 100%;
+  animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.trailer-modal__header {
+  align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.trailer-modal__title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.trailer-modal__title {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.trailer-modal__subtitle {
+  color: #aaa;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.trailer-modal__close {
+  background: transparent;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 2rem;
+  line-height: 1;
+  padding: 0 0.5rem;
+  transition: color 0.2s;
+}
+
+.trailer-modal__close:hover {
+  color: #fff;
+}
+
+.trailer-modal__frame-shell {
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.trailer-modal__frame {
+  border: none;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+/* Schedule Modal */
+.schedule-modal {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.85);
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  padding: 1rem;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.schedule-modal__panel {
+  background: #fdfcf0;
+  border: 4px solid #f4efe3;
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  max-height: 95vh;
+  max-width: 1000px;
+  width: 100%;
+  position: relative;
+  animation: modalFadeIn 0.3s ease;
+  overflow: hidden;
+}
+
+.schedule-modal__close {
+  background: #333;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.5rem;
+  height: 30px;
+  width: 30px;
+  line-height: 1;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.schedule-modal__close:hover {
+  background: #e71a0f;
+}
+
+.schedule-modal__header {
+  border-bottom: 2px solid #222;
+  padding: 2rem 2rem 1rem;
+}
+
+.schedule-dates {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.schedule-date-btn {
+  background: transparent;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem;
+  min-width: 60px;
+  transition: all 0.2s;
+}
+
+.schedule-date-btn:hover {
+  background: #fff;
+  border-color: #999;
+}
+
+.schedule-date-btn--active {
+  background: #fff;
+  border: 2px solid #222;
+  padding: 0.4rem; /* adjust for border width */
+}
+
+.schedule-date-btn__month,
+.schedule-date-btn__weekday {
+  font-size: 0.75rem;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.schedule-date-btn__day {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #222;
+  line-height: 1.2;
+}
+
+.schedule-dates__empty {
+  color: #888;
+  font-style: italic;
+  padding: 1rem 0;
+}
+
+.schedule-modal__filters {
+  border-bottom: 2px solid #ddd;
+  padding: 1rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.schedule-locations,
+.schedule-rooms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.schedule-filter-btn {
+  background: transparent;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  color: #444;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.4rem 0.8rem;
+  transition: all 0.2s;
+}
+
+.schedule-filter-btn:hover {
+  border-color: #666;
+  color: #222;
+}
+
+.schedule-filter-btn--active {
+  background: #222;
+  border-color: #222;
+  color: #fff;
+  font-weight: bold;
+}
+
+.schedule-rooms .schedule-filter-btn--active {
+  background: #fff;
+  color: #222;
+  border: 2px solid #222;
+}
+
+.schedule-modal__content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 2rem;
+  min-height: 200px;
+  transition: opacity 0.2s ease;
+}
+
+.schedule-modal__content--loading {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.schedule-spinner {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-style: italic;
+}
+
+.schedule-modal__empty {
+  text-align: center;
+  color: #888;
+  font-size: 1.1rem;
+  padding: 3rem 0;
+}
+
+.schedule-cinemas {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.schedule-cinema {
+  border-bottom: 1px solid #eaeaea;
+  padding-bottom: 1.5rem;
+}
+
+.schedule-cinema:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.schedule-cinema__name {
+  font-size: 1.3rem;
+  color: #555;
+  margin: 0 0 1rem;
+  font-weight: normal;
+}
+
+.schedule-cinema__room {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 0.8rem;
+}
+
+.schedule-cinema__times {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.schedule-time-btn {
+  background: #fcfcfc;
+  border: 1px solid #ddd;
+  color: #222;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0.5rem 1.2rem;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.schedule-time-btn:hover {
+  background: #e71a0f;
+  border-color: #e71a0f;
+  color: #fff;
+}

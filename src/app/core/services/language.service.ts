@@ -72,9 +72,9 @@ const translations = {
       movieEmptyDescription: 'Lưới poster sẽ xuất hiện sau khi backend trả danh sách phim.',
       categoriesTitle: 'Danh mục CineGo',
       categoriesSubtitle: 'Phim, rạp, thành viên, cultureplex',
-      nowShowingTitle: 'Phim đang chiếu',
+      nowShowingTitle: 'Phim Đang Chiếu',
       nowShowingDescription: 'Khám phá những suất chiếu mới nhất.',
-      comingSoonTitle: 'Phim sắp chiếu',
+      comingSoonTitle: 'Phim Sắp Chiếu',
       comingSoonDescription: 'Theo dõi lịch ra mắt và trailer mới.',
       theatersTitle: 'Rạp CineGo',
       theatersDescription: 'Danh sách rạp theo khu vực, dễ chọn nhanh.'

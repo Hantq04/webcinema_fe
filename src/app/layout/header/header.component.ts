@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
-import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
@@ -7,7 +7,7 @@ import { LanguageService } from '../../core/services/language.service';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <header class="cinema-header border-b-4 border-[#d62f1f] shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]">
@@ -46,27 +46,23 @@ import { LanguageService } from '../../core/services/language.service';
         </div>
 
         <nav aria-label="Main navigation" class="main-nav grid grid-cols-4 gap-1 pt-3 pb-3 max-[900px]:grid-cols-2 max-[640px]:grid-cols-1">
-          <span class="nav-indicator" [style.transform]="navIndicatorTransform()"></span>
-
           <!-- Phim -->
-          <div class="nav-item group">
-            <a routerLink="/movies" routerLinkActive="nav-link-active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-              <span class="text-[0.95rem] font-extrabold tracking-[0.02em]">{{ t('header.movie') }}</span>
-              <small class="text-[0.72rem] font-bold text-[#7f6c57]">{{ t('header.movieSub') }}</small>
-            </a>
-            <div class="dropdown-menu">
-              <a routerLink="/movies" class="dropdown-link">Phim Đang Chiếu</a>
-              <a routerLink="/movies" class="dropdown-link">Phim Sắp Chiếu</a>
+          <div class="nav-item group" [class.nav-item--open]="isMenuOpen('movies')" (mouseleave)="closeMenu()">
+            <button type="button" class="nav-link" [attr.aria-expanded]="isMenuOpen('movies')" aria-haspopup="menu" (click)="toggleMenu('movies')">
+              <span class="nav-link__label">{{ t('header.movie') }}</span>
+            </button>
+            <div class="dropdown-menu" [class.dropdown-menu--open]="isMenuOpen('movies')">
+              <a routerLink="/movies" [queryParams]="{ tab: 'now-showing' }" class="dropdown-link">Phim Đang Chiếu</a>
+              <a routerLink="/movies" [queryParams]="{ tab: 'coming-soon' }" class="dropdown-link">Phim Sắp Chiếu</a>
             </div>
           </div>
 
           <!-- Rạp -->
-          <div class="nav-item group">
-            <a routerLink="/booking" routerLinkActive="nav-link-active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-              <span class="text-[0.95rem] font-extrabold tracking-[0.02em]">{{ t('header.cinema') }}</span>
-              <small class="text-[0.72rem] font-bold text-[#7f6c57]">{{ t('header.cinemaSub') }}</small>
-            </a>
-            <div class="dropdown-menu">
+          <div class="nav-item group" [class.nav-item--open]="isMenuOpen('booking')" (mouseleave)="closeMenu()">
+            <button type="button" class="nav-link" [attr.aria-expanded]="isMenuOpen('booking')" aria-haspopup="menu" (click)="toggleMenu('booking')">
+              <span class="nav-link__label">{{ t('header.cinema') }}</span>
+            </button>
+            <div class="dropdown-menu" [class.dropdown-menu--open]="isMenuOpen('booking')">
               <a routerLink="/booking" class="dropdown-link">Tất Cả Các Rạp</a>
               <a routerLink="/booking" class="dropdown-link">Rạp Đặc Biệt</a>
               <a routerLink="/booking" class="dropdown-link">Rạp 3D</a>
@@ -74,24 +70,22 @@ import { LanguageService } from '../../core/services/language.service';
           </div>
 
           <!-- Thành viên -->
-          <div class="nav-item group">
-            <a [routerLink]="memberLink()" routerLinkActive="nav-link-active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-              <span class="text-[0.95rem] font-extrabold tracking-[0.02em]">{{ t('header.member') }}</span>
-              <small class="text-[0.72rem] font-bold text-[#7f6c57]">{{ t('header.memberSub') }}</small>
-            </a>
-            <div class="dropdown-menu">
+          <div class="nav-item group" [class.nav-item--open]="isMenuOpen('member')" (mouseleave)="closeMenu()">
+            <button type="button" class="nav-link" [attr.aria-expanded]="isMenuOpen('member')" aria-haspopup="menu" (click)="toggleMenu('member')">
+              <span class="nav-link__label">{{ t('header.member') }}</span>
+            </button>
+            <div class="dropdown-menu" [class.dropdown-menu--open]="isMenuOpen('member')">
               <a [routerLink]="memberLink()" class="dropdown-link">Tài Khoản CGV</a>
               <a [routerLink]="memberLink()" class="dropdown-link">Quyền Lợi</a>
             </div>
           </div>
 
           <!-- Cultureplex -->
-          <div class="nav-item group">
-            <a routerLink="/admin" routerLinkActive="nav-link-active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-              <span class="text-[0.95rem] font-extrabold tracking-[0.02em]">{{ t('header.cultureplex') }}</span>
-              <small class="text-[0.72rem] font-bold text-[#7f6c57]">{{ t('header.cultureplexSub') }}</small>
-            </a>
-            <div class="dropdown-menu">
+          <div class="nav-item group" [class.nav-item--open]="isMenuOpen('cultureplex')" (mouseleave)="closeMenu()">
+            <button type="button" class="nav-link" [attr.aria-expanded]="isMenuOpen('cultureplex')" aria-haspopup="menu" (click)="toggleMenu('cultureplex')">
+              <span class="nav-link__label">{{ t('header.cultureplex') }}</span>
+            </button>
+            <div class="dropdown-menu" [class.dropdown-menu--open]="isMenuOpen('cultureplex')">
               <a routerLink="/admin" class="dropdown-link">Quầy Online</a>
               <a routerLink="/admin" class="dropdown-link">Thuê Rạp & Vé Nhóm</a>
               <a routerLink="/admin" class="dropdown-link">CGV eGift</a>
@@ -241,11 +235,12 @@ import { LanguageService } from '../../core/services/language.service';
     .logo-text {
       color: #d62f1f;
       display: inline-block;
-      font-size: clamp(2.6rem, 5vw, 4.8rem);
+      font-size: clamp(2.9rem, 5.6vw, 5.4rem);
       font-weight: 900;
-      letter-spacing: -0.08em;
+      letter-spacing: -0.1em;
       line-height: 1;
       text-transform: uppercase;
+      text-shadow: 0 0.08rem 0 rgba(255, 255, 255, 0.6), 0 0.25rem 0.6rem rgba(214, 47, 31, 0.08);
     }
 
     .buy-ticket-chip {
@@ -271,48 +266,43 @@ import { LanguageService } from '../../core/services/language.service';
       z-index: 1;
     }
 
-    .nav-indicator {
-      background: #d62f1f;
-      border-radius: 999px 999px 0 0;
-      bottom: 0;
-      display: block;
-      height: 3px;
-      left: 0;
-      position: absolute;
-      transition: transform 220ms ease;
-      width: 25%;
-      z-index: 0;
-    }
-
     .nav-item {
       position: relative;
       z-index: 1;
     }
 
+    .nav-item--open {
+      z-index: 90;
+    }
+
     .nav-link {
       align-items: center;
+      background: transparent;
+      border: 0;
       color: #231b14;
       display: flex;
       flex-direction: column;
-      gap: 0.25rem;
+      gap: 0;
       justify-content: center;
-      padding: 0.7rem 0.45rem 0.9rem;
+      min-height: 4rem;
+      padding: 0.45rem 0.45rem 0.8rem;
       position: relative;
       text-decoration: none;
       transition: color 180ms ease, transform 180ms ease;
       z-index: 1;
+      width: 100%;
+    }
+
+    .nav-link__label {
+      font-size: 1.2rem;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      line-height: 1.1;
+      text-transform: uppercase;
     }
 
     .nav-link:hover {
       transform: translateY(-1px);
-    }
-
-    .nav-link-active {
-      color: #d62f1f;
-    }
-
-    .nav-link-active small {
-      color: #9b5b45;
     }
 
     /* DROPDOWN MENU */
@@ -333,13 +323,11 @@ import { LanguageService } from '../../core/services/language.service';
       z-index: 80;
     }
 
-    .nav-item:hover,
-    .nav-item:focus-within {
+    .nav-item:hover {
       z-index: 90;
     }
 
-    .nav-item:hover .dropdown-menu,
-    .nav-item:focus-within .dropdown-menu {
+    .nav-item:hover .dropdown-menu {
       opacity: 1;
       visibility: visible;
       transform: translateY(0);
@@ -368,6 +356,12 @@ import { LanguageService } from '../../core/services/language.service';
     .dropdown-link:hover {
       color: #ffffff;
       background: rgba(255, 255, 255, 0.1);
+    }
+
+    .dropdown-menu--open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
     }
 
     .lang-button {
@@ -408,26 +402,28 @@ export class HeaderComponent {
   protected readonly auth = inject(AuthService);
   protected readonly language = inject(LanguageService);
   protected readonly t = this.language.t.bind(this.language);
-  private readonly activeIndex = signal(0);
+  private readonly openMenu = signal<'movies' | 'booking' | 'member' | 'cultureplex' | null>(null);
 
   protected readonly memberLink = computed(() => (this.auth.isAuthenticated() ? '/account' : '/auth'));
 
-  readonly navIndicatorTransform = computed(() => `translateX(${this.activeIndex() * 100}%)`);
-
   constructor() {
-    this.syncActiveIndex();
-
     const subscription = this.router.events.pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd)).subscribe(() => {
-      this.syncActiveIndex();
+      this.openMenu.set(null);
     });
 
     this.destroyRef.onDestroy(() => subscription.unsubscribe());
   }
 
-  private syncActiveIndex(): void {
-    const url = this.router.url.split('?')[0].split('#')[0];
-    const nextIndex = url.startsWith('/booking') ? 1 : url.startsWith('/auth') || url.startsWith('/account') ? 2 : url.startsWith('/admin') ? 3 : 0;
-    this.activeIndex.set(nextIndex);
+  protected isMenuOpen(menu: 'movies' | 'booking' | 'member' | 'cultureplex'): boolean {
+    return this.openMenu() === menu;
+  }
+
+  protected toggleMenu(menu: 'movies' | 'booking' | 'member' | 'cultureplex'): void {
+    this.openMenu.update((current) => (current === menu ? null : menu));
+  }
+
+  protected closeMenu(): void {
+    this.openMenu.set(null);
   }
 
   protected logout(): void {

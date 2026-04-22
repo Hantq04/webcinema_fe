@@ -3,20 +3,23 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map, of, catchError } from 'rxjs';
 
 import { ApiService } from './api.service';
-import { Movie } from '../models/movie.model';
+import { Movie, MovieDetail, DailySchedule, CinemaSchedule } from '../models/movie.model';
 
 interface MovieApiItem {
   id?: string | number;
   movieId?: string | number;
+  code?: string;
   title?: string;
   name?: string;
+  image?: string;
+  movieType?: string;
+  premiereDate?: string;
   durationMinutes?: number | string;
   duration?: number | string;
   posterUrl?: string;
   posterPath?: string;
   poster?: string;
   imageUrl?: string;
-  image?: string;
   thumbnailUrl?: string;
   thumbnail?: string;
   backdropUrl?: string;
@@ -24,10 +27,15 @@ interface MovieApiItem {
   trailerUrl?: string;
   trailer?: string;
   rate?: string;
+  rateName?: string;
   description?: string;
   ageRating?: string;
   releaseDate?: string;
   genre?: string;
+  director?: string;
+  actor?: string;
+  language?: string;
+  subtitle?: string;
 }
 
 @Injectable({
@@ -42,6 +50,54 @@ export class MovieService {
       map((response) => this.normalizeMovieList(response)),
       catchError(() => of([]))
     );
+  }
+
+  getNowShowingMoviesHot(): Observable<Movie[]> {
+    return this.http.get<unknown>(this.apiService.apiUrl('/api/v1/movie/get-now-showing-movie-hot')).pipe(
+      map((response) => this.normalizeMovieList(response)),
+      catchError(() => of([]))
+    );
+  }
+
+  getComingSoonMovies(): Observable<Movie[]> {
+    return this.http.get<unknown>(this.apiService.apiUrl('/api/v1/movie/get-coming-soon-movie')).pipe(
+      map((response) => this.normalizeMovieList(response)),
+      catchError(() => of([]))
+    );
+  }
+
+  getMovieDetailByCode(code: string): Observable<MovieDetail | null> {
+    return this.http.get<unknown>(this.apiService.apiUrl(`/api/v1/movie/get-movie-detail?code=${encodeURIComponent(code)}`)).pipe(
+      map((response) => {
+        const item = this.extractSingleMovie(response);
+        return item ? this.normalizeMovieDetail(item) : null;
+      }),
+      catchError(() => of(null))
+    );
+  }
+
+  getMovieSchedule(movieId: string | number, address: string, roomType: string): Observable<DailySchedule[]> {
+    return this.http.get<any>(this.apiService.apiUrl(`/api/v1/schedule/movie?movieId=${movieId}&address=${encodeURIComponent(address)}&roomType=${encodeURIComponent(roomType)}`)).pipe(
+      map((response) => {
+        if (response && response.data && Array.isArray(response.data)) {
+          return response.data as DailySchedule[];
+        }
+        return [];
+      }),
+      catchError(() => of([]))
+    );
+  }
+
+  private extractSingleMovie(response: unknown): MovieApiItem | null {
+    if (this.isRecord(response)) {
+      const candidates = [response['data'], response['result'], response['payload'], response];
+      for (const candidate of candidates) {
+        if (this.isRecord(candidate) && (candidate['id'] || candidate['code'])) {
+          return candidate as MovieApiItem;
+        }
+      }
+    }
+    return null;
   }
 
   private normalizeMovieList(response: unknown): Movie[] {
@@ -91,6 +147,7 @@ export class MovieService {
 
     return {
       id,
+      code: this.toStringValue(item.code),
       title,
       durationMinutes: this.toNumberValue(item.durationMinutes ?? item.duration),
       posterUrl: this.resolveMediaUrl(item.posterUrl ?? item.posterPath ?? item.poster ?? item.imageUrl ?? item.image ?? item.thumbnailUrl ?? item.thumbnail),
@@ -99,8 +156,22 @@ export class MovieService {
       rate: this.toStringValue(item.rate),
       description: this.toStringValue(item.description),
       ageRating: this.toStringValue(item.ageRating),
-      releaseDate: this.toStringValue(item.releaseDate),
-      genre: this.toStringValue(item.genre)
+      releaseDate: this.toStringValue(item.releaseDate ?? item.premiereDate),
+      genre: this.toStringValue(item.genre ?? item.movieType)
+    };
+  }
+
+  private normalizeMovieDetail(item: MovieApiItem): MovieDetail | null {
+    const movie = this.normalizeMovieItem(item, 0);
+    if (!movie) return null;
+
+    return {
+      ...movie,
+      director: this.toStringValue(item.director),
+      actor: this.toStringValue(item.actor),
+      language: this.toStringValue(item.language),
+      movieSubtitle: this.toStringValue(item.subtitle),
+      rateName: this.toStringValue(item.rateName)
     };
   }
 
