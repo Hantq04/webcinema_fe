@@ -2,16 +2,18 @@ import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signa
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { MovieDetail, DailySchedule } from '../../../core/models/movie.model';
+import { Movie, MovieDetail, DailySchedule } from '../../../core/models/movie.model';
 import { MovieService } from '../../../core/services/movie.service';
 import { LanguageService } from '../../../core/services/language.service';
 import { Title, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 
+import { MovieScheduleModalComponent } from '../../../shared/components/movie-schedule-modal/movie-schedule-modal.component';
+
 @Component({
   selector: 'app-movie-detail',
-  imports: [RouterLink, CommonModule],
+  imports: [RouterLink, CommonModule, MovieScheduleModalComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="movie-detail-page">
@@ -21,13 +23,18 @@ import { AuthService } from '../../../core/services/auth.service';
             <img src="/home.png" alt="" class="movies-breadcrumb__home-icon" aria-hidden="true" />
           </a>
           <span>›</span>
-          <a routerLink="/movies" class="movies-breadcrumb__link">Phim</a>
+          <a routerLink="/movies" class="movies-breadcrumb__link">{{ t('home.breadcrumbPhim') }}</a>
+          <span>›</span>
+          <a [routerLink]="['/movies']" [queryParams]="{ tab: isComingSoon() ? 'coming-soon' : 'now-showing' }" 
+             class="movies-breadcrumb__link">
+            {{ isComingSoon() ? t('movies.coming') : t('movies.showing') }}
+          </a>
           <span>›</span>
           <span class="movies-breadcrumb__current">{{ movie()?.title | uppercase }}</span>
         </nav>
 
         <div class="movie-detail-hero">
-          <h1 class="movie-detail-hero__heading">Nội Dung Phim</h1>
+          <h1 class="movie-detail-hero__heading">{{ t('movies.contentTitle') }}</h1>
           
           @if (movie(); as m) {
             <div class="movie-detail-content">
@@ -38,52 +45,62 @@ import { AuthService } from '../../../core/services/auth.service';
               </div>
               
               <div class="movie-detail-content__right">
-                <h2 class="movie-detail-info__title">{{ m.title | uppercase }}</h2>
+                <h2 class="movie-detail-info__title">{{ getTitle(m) | uppercase }}</h2>
                 
                 <div class="movie-detail-info__grid">
                   <div class="movie-detail-info__row">
-                    <strong>Đạo diễn:</strong>
+                    <strong>{{ t('movies.director') }}:</strong>
                     <span>{{ m.director || 'Đang cập nhật' }}</span>
                   </div>
                   <div class="movie-detail-info__row">
-                    <strong>Diễn viên:</strong>
+                    <strong>{{ t('movies.actor') }}:</strong>
                     <span>{{ m.actor || 'Đang cập nhật' }}</span>
                   </div>
                   <div class="movie-detail-info__row">
-                    <strong>Thể loại:</strong>
-                    <span>{{ m.genre || 'Đang cập nhật' }}</span>
+                    <strong>{{ t('movies.genre') }}:</strong>
+                    <span>{{ getGenre(m) }}</span>
                   </div>
                   <div class="movie-detail-info__row">
-                    <strong>Khởi chiếu:</strong>
+                    <strong>{{ t('movies.releaseDate') }}:</strong>
                     <span>{{ formatDate(m.releaseDate) }}</span>
                   </div>
                   <div class="movie-detail-info__row">
-                    <strong>Thời lượng:</strong>
-                    <span>{{ m.durationMinutes ? m.durationMinutes + ' phút' : 'Đang cập nhật' }}</span>
+                    <strong>{{ t('movies.duration') }}:</strong>
+                    <span>{{ m.durationMinutes }} {{ t('movies.minutes') }}</span>
                   </div>
                   <div class="movie-detail-info__row">
-                    <strong>Ngôn ngữ:</strong>
-                    <span>{{ m.language || 'Tiếng Việt' }}{{ m.movieSubtitle ? ' - Phụ đề ' + m.movieSubtitle : '' }}</span>
+                    <strong>{{ t('movies.language') }}:</strong>
+                    <span>{{ getLanguage(m) }}</span>
                   </div>
-                  <div class="movie-detail-info__row movie-detail-info__row--rated">
-                    <strong>Rated:</strong>
-                    <span style="text-transform: uppercase; font-weight: bold;">{{ formatRate(m) }}</span>
+                  <div class="movie-detail-info__row">
+                    <strong>{{ t('movies.rated') }}:</strong>
+                    <span class="movie-detail-info__rated-text">{{ getRateText(m) }}</span>
                   </div>
                 </div>
 
                 <div class="movie-detail-formats">
                   @if (m.rate) {
-                    <span class="movie-detail-badge movie-detail-badge--rate">{{ m.rate }}</span>
+                    <span class="movie-detail-badge movie-detail-badge--rate"
+                          [class.movie-detail-badge--g]="movieRateCode(m) === 'G'"
+                          [class.movie-detail-badge--pg]="movieRateCode(m) === 'PG'"
+                          [class.movie-detail-badge--pg13]="movieRateCode(m) === 'PG-13'"
+                          [class.movie-detail-badge--r]="movieRateCode(m) === 'R'"
+                          [class.movie-detail-badge--nc17]="movieRateCode(m) === 'NC-17'">
+                      {{ movieRateCode(m) }}
+                    </span>
                   }
                   <span class="movie-detail-badge movie-detail-badge--format">4DX</span>
-                  <span class="movie-detail-badge movie-detail-badge--format movie-detail-badge--starium">STARIUM</span>
+                  <span class="movie-detail-badge movie-detail-badge--format movie-detail-badge--imax">IMAX</span>
                   <span class="movie-detail-badge movie-detail-badge--format">ULTRA 4DX</span>
                 </div>
 
                 <div class="movie-detail-actions">
-                  <button type="button" (click)="openSchedule()" class="movie-detail-btn movie-detail-btn--buy">
-                    MUA VÉ
-                  </button>
+                  @if (!isComingSoon()) {
+                    <button type="button" (click)="openSchedule()" class="movie-detail-btn movie-detail-btn--buy">
+                      <span class="btn-arrow-icon">»</span>
+                      {{ t('home.movieActionBook') }}
+                    </button>
+                  }
                 </div>
               </div>
             </div>
@@ -91,6 +108,11 @@ import { AuthService } from '../../../core/services/auth.service';
             <div class="movie-detail-tabs">
               <div class="movie-detail-tabs__header-container">
                 <div class="movie-detail-tabs__ribbon">
+                  <div class="movie-detail-tabs__icon-wrap">
+                    <svg class="ribbon-icon" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/>
+                    </svg>
+                  </div>
                   <button type="button" class="movie-detail-tabs__btn movie-detail-tabs__btn--active">
                     Chi tiết
                   </button>
@@ -99,7 +121,7 @@ import { AuthService } from '../../../core/services/auth.service';
                 </div>
               </div>
               <div class="movie-detail-tabs__content">
-                <p class="movie-detail-desc">{{ m.description || 'Nội dung đang được cập nhật.' }}</p>
+                <p class="movie-detail-desc">{{ getDescription(m) }}</p>
               </div>
             </div>
 
@@ -132,65 +154,13 @@ import { AuthService } from '../../../core/services/auth.service';
             }
 
             @if (isScheduleOpen()) {
-              <div class="schedule-modal" role="dialog" aria-modal="true" (click)="closeSchedule()">
-                <div class="schedule-modal__panel" (click)="$event.stopPropagation()">
-                  <button type="button" class="schedule-modal__close" (click)="closeSchedule()" aria-label="Đóng">×</button>
-                  
-                  <div class="schedule-modal__header">
-                    <div class="schedule-dates">
-                      @for (date of availableDates(); track date) {
-                        <button type="button" class="schedule-date-btn" 
-                                [class.schedule-date-btn--active]="scheduleDate() === date"
-                                (click)="setScheduleDate(date)">
-                          <span class="schedule-date-btn__month">{{ formatScheduleDateMonth(date) }}</span>
-                          <span class="schedule-date-btn__weekday">{{ formatScheduleDateWeekday(date) }}</span>
-                          <span class="schedule-date-btn__day">{{ formatScheduleDateDay(date) }}</span>
-                        </button>
-                      }
-                    </div>
-                  </div>
-
-                  <div class="schedule-modal__filters">
-                    <div class="schedule-locations">
-                      @for (loc of ['Hồ Chí Minh', 'Hà Nội', 'Đà Nẵng']; track loc) {
-                        <button type="button" class="schedule-filter-btn" 
-                                [class.schedule-filter-btn--active]="scheduleAddress() === loc"
-                                (click)="setScheduleAddress(loc)">{{ loc }}</button>
-                      }
-                    </div>
-                    <div class="schedule-rooms">
-                      <button type="button" class="schedule-filter-btn" 
-                              [class.schedule-filter-btn--active]="scheduleRoom() === 'STANDARD'"
-                              (click)="setScheduleRoom('STANDARD')">2D Phụ Đề Việt</button>
-                      <button type="button" class="schedule-filter-btn" 
-                              [class.schedule-filter-btn--active]="scheduleRoom() === 'IMAX'"
-                              (click)="setScheduleRoom('IMAX')">IMAX 2D Phụ Đề Việt</button>
-                    </div>
-                  </div>
-
-                  <div class="schedule-modal__content" [class.schedule-modal__content--loading]="loadingSchedule()">
-                    @if (displayedCinemas().length === 0 && !loadingSchedule()) {
-                      <p class="schedule-modal__empty">Xin lỗi, không có suất chiếu vào ngày này, hãy chọn một ngày khác.</p>
-                    } @else {
-                      <div class="schedule-cinemas">
-                        @for (cinema of displayedCinemas(); track cinema.cinemaId) {
-                          <div class="schedule-cinema">
-                            <h3 class="schedule-cinema__name">{{ cinema.cinemaName }}</h3>
-                            <div class="schedule-cinema__room">Rạp {{ cinema.roomType === 'STANDARD' ? '2D' : cinema.roomType }}</div>
-                            <div class="schedule-cinema__times">
-                              @for (st of cinema.showtimes; track st.scheduleCode) {
-                                <button type="button" class="schedule-time-btn" (click)="onSelectShowtime(st, cinema)">
-                                  {{ st.time }}
-                                </button>
-                              }
-                            </div>
-                          </div>
-                        }
-                      </div>
-                    }
-                  </div>
-                </div>
-              </div>
+              <app-movie-schedule-modal
+                [movieId]="movie()?.id || ''"
+                [movieTitle]="movie()?.title || ''"
+                [moviePoster]="moviePoster(movie()!)"
+                [movieRate]="movieRateCode(movie()!)"
+                (close)="closeSchedule()"
+              />
             }
           } @else if (!loading()) {
             <div class="movie-detail-error">
@@ -221,45 +191,29 @@ export class MovieDetailComponent {
   protected readonly t = this.languageService.t.bind(this.languageService);
   protected readonly movie = signal<MovieDetail | null>(null);
   protected readonly loading = signal(true);
+  protected readonly isComingSoon = computed(() => {
+    const m = this.movie();
+    if (!m?.releaseDate) return false;
+    // Format: "YYYY-MM-DD" or similar
+    const releaseDate = new Date(m.releaseDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return releaseDate > today;
+  });
   protected readonly trailerPreview = signal<{ title: string; embedUrl: SafeResourceUrl } | null>(null);
 
   protected readonly isScheduleOpen = signal(false);
-  protected readonly scheduleAddress = signal('Hồ Chí Minh');
-  protected readonly scheduleRoom = signal('STANDARD');
-  protected readonly scheduleDate = signal('');
-  protected readonly scheduleData = signal<DailySchedule[]>([]);
-  protected readonly loadingSchedule = signal(false);
-
-  protected readonly availableDates = computed(() => {
-    const dates: string[] = [];
-    const today = new Date();
-    for (let i = 0; i < 30; i++) {
-      const d = new Date(today);
-      d.setDate(today.getDate() + i);
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      dates.push(`${year}-${month}-${day}`);
-    }
-    return dates;
-  });
-
-  protected readonly displayedCinemas = computed(() => {
-    const data = this.scheduleData();
-    const date = this.scheduleDate();
-    const schedule = data.find(d => d.date === date);
-    return schedule ? schedule.cinemas : [];
-  });
 
   constructor() {
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const code = params.get('code');
       if (code) {
+        window.scrollTo(0, 0); // Always scroll to top when opening a new movie detail
         this.loading.set(true);
         this.movieService.getMovieDetailByCode(code).subscribe((detail) => {
           this.movie.set(detail);
           this.loading.set(false);
-          
+
           if (detail?.title) {
             this.titleService.setTitle(`${detail.title} - CineGo`);
           }
@@ -269,27 +223,21 @@ export class MovieDetailComponent {
       }
     });
 
-    effect(() => {
-      const movieId = this.movie()?.id;
-      const isOpen = this.isScheduleOpen();
-      const address = this.scheduleAddress();
-      const roomType = this.scheduleRoom();
-
-      if (isOpen && movieId) {
-        this.loadingSchedule.set(true);
-        this.movieService.getMovieSchedule(movieId, address, roomType).subscribe(data => {
-          this.scheduleData.set(data);
-          if (data.length > 0) {
-            if (!data.find(d => d.date === this.scheduleDate())) {
-              this.scheduleDate.set(data[0].date);
-            }
-          } else {
-            this.scheduleDate.set('');
-          }
-          this.loadingSchedule.set(false);
-        });
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
+      if (params.get('openSchedule') === 'true') {
+        this.openSchedule();
       }
     });
+  }
+
+  protected movieRateCode(movie: MovieDetail | Movie): string {
+    const rate = (movie.rate || (movie as any).ageRating || '').toUpperCase();
+    if (rate.includes('PG-13')) return 'PG-13';
+    if (rate.includes('NC-17')) return 'NC-17';
+    if (rate.startsWith('PG')) return 'PG';
+    if (rate.startsWith('G')) return 'G';
+    if (rate.startsWith('R')) return 'R';
+    return (rate.split(/[\s-]/)[0] || '').trim();
   }
 
   protected moviePoster(movie: MovieDetail): string {
@@ -300,11 +248,44 @@ export class MovieDetailComponent {
     if (movie.rate && movie.rateName) {
       return `${movie.rate} - ${movie.rateName}`;
     }
-    return movie.rateName || movie.rate || 'P - Phù hợp với mọi lứa tuổi';
+    return movie.rateName || movie.rate || 'P';
+  }
+
+  protected isEn(): boolean {
+    return this.languageService.currentLanguage() === 'en';
+  }
+
+  protected getGenre(m: MovieDetail): string {
+    const genre = this.isEn() ? (m.genreEn ?? m.genre) : m.genre;
+    if (Array.isArray(genre)) {
+      return genre.join(', ');
+    }
+    return genre || 'Đang cập nhật';
+  }
+
+  protected getTitle(m: MovieDetail): string {
+    return (this.isEn() ? m.titleEn : m.title) || m.title;
+  }
+
+  protected getDescription(m: MovieDetail): string {
+    return (this.isEn() ? m.descriptionEn : m.description) || m.description || 'Nội dung đang được cập nhật.';
+  }
+
+  protected getRateText(m: MovieDetail): string {
+    const rate = this.isEn() ? (m.rateEn ?? m.rate) : m.rate;
+    const name = this.isEn() ? (m.rateNameEn ?? m.rateName) : m.rateName;
+    return `${rate} - ${name}`;
+  }
+
+  protected getLanguage(m: MovieDetail): string {
+    if (m.language && m.movieSubtitle) {
+      return `${m.language} - Phụ đề ${m.movieSubtitle}`;
+    }
+    return m.language || 'Đang cập nhật';
   }
 
   protected formatDate(dateString?: string): string {
-    if (!dateString) return 'Đang cập nhật';
+    if (!dateString) return this.t('shared.loading');
     // dateString from API might be "2026-04-13 00:00:00"
     try {
       const parts = dateString.split(' ');
@@ -387,55 +368,5 @@ export class MovieDetailComponent {
 
   protected closeSchedule(): void {
     this.isScheduleOpen.set(false);
-  }
-
-  protected setScheduleAddress(address: string): void {
-    this.scheduleAddress.set(address);
-  }
-
-  protected setScheduleRoom(roomType: string): void {
-    this.scheduleRoom.set(roomType);
-  }
-
-  protected setScheduleDate(date: string): void {
-    this.scheduleDate.set(date);
-  }
-
-  protected formatScheduleDateMonth(dateStr: string): string {
-    if (!dateStr) return '';
-    const parts = dateStr.split('-');
-    return parts.length === 3 ? parts[1] : '';
-  }
-
-  protected formatScheduleDateDay(dateStr: string): string {
-    if (!dateStr) return '';
-    const parts = dateStr.split('-');
-    return parts.length === 3 ? parts[2] : '';
-  }
-
-  protected formatScheduleDateWeekday(dateStr: string): string {
-    if (!dateStr) return '';
-    const date = new Date(dateStr);
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    return days[date.getDay()] || '';
-  }
-
-  protected onSelectShowtime(st: { time: string; scheduleCode: string }, cinema: any): void {
-    if (!this.authService.isAuthenticated()) {
-      void this.router.navigate(['/auth']);
-      return;
-    }
-
-    const m = this.movie();
-    if (m) {
-      sessionStorage.setItem('bookingContext', JSON.stringify({
-        movieTitle: m.title,
-        moviePoster: this.moviePoster(m),
-        movieRate: m.rate?.split('-')[0].trim() || m.rate,
-        roomType: this.scheduleRoom() === 'STANDARD' ? '2D' : this.scheduleRoom()
-      }));
-    }
-
-    void this.router.navigate(['/booking', st.scheduleCode]);
   }
 }

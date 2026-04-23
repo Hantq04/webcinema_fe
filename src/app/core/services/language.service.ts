@@ -26,7 +26,16 @@ const translations = {
       buyNow: 'Mua vé ngay',
       homeAria: 'Trang chủ CineGo',
       vi: 'VN',
-      en: 'EN'
+      en: 'EN',
+      allCinemas: 'Tất Cả Các Rạp',
+      specialCinemas: 'Rạp Đặc Biệt',
+      threeDCinemas: 'Rạp 3D',
+      accountCgv: 'Tài Khoản CineGo',
+      memberBenefits: 'Quyền Lợi',
+      onlineStore: 'Quầy Online',
+      groupBooking: 'Thuê Rạp & Vé Nhóm',
+      egift: 'CineGo eGift',
+      rules: 'CineGo Rules'
     },
     footer: {
       companyName: 'CineGo Việt Nam',
@@ -76,8 +85,9 @@ const translations = {
       nowShowingDescription: 'Khám phá những suất chiếu mới nhất.',
       comingSoonTitle: 'Phim Sắp Chiếu',
       comingSoonDescription: 'Theo dõi lịch ra mắt và trailer mới.',
-      theatersTitle: 'Rạp CineGo',
-      theatersDescription: 'Danh sách rạp theo khu vực, dễ chọn nhanh.'
+      theatersDescription: 'Danh sách rạp theo khu vực, dễ chọn nhanh.',
+      breadcrumbPhim: 'Phim',
+      eventBadge: 'Thành Viên CineGo | Tin Mới & Ưu Đãi'
     },
     admin: {
       title: 'Quản trị CineGo',
@@ -85,15 +95,52 @@ const translations = {
     },
     movies: {
       title: 'Phim CineGo',
-      description: 'Danh sách phim đang chiếu và sắp chiếu.'
+      description: 'Danh sách phim đang chiếu và sắp chiếu.',
+      genre: 'Thể loại',
+      duration: 'Thời lượng',
+      releaseDate: 'Khởi chiếu',
+      director: 'Đạo diễn',
+      actor: 'Diễn viên',
+      language: 'Ngôn ngữ',
+      rated: 'Rated',
+      contentTitle: 'Nội Dung Phim',
+      showing: 'Phim Đang Chiếu',
+      coming: 'Phim Sắp Chiếu',
+      minutes: 'phút',
+      preBook: 'ĐẶT TRƯỚC'
     },
     booking: {
       title: 'Đặt vé CineGo',
-      description: 'Chọn suất chiếu, ghế ngồi và thanh toán nhanh.'
+      description: 'Chọn suất chiếu, ghế ngồi và thanh toán nhanh.',
+      chooseDate: 'Chọn ngày',
+      chooseCity: 'Tất cả khu vực',
+      chooseCinema: 'Tất cả rạp',
+      noShowtimes: 'Xin lỗi, không có suất chiếu vào ngày này, hãy chọn một ngày khác.',
+      selectShowtime: 'Vui lòng chọn ngày để xem lịch chiếu.',
+      loadingSchedule: 'Đang tải thông tin...',
+      cityHcm: 'Hồ Chí Minh',
+      cityHn: 'Hà Nội',
+      cityDn: 'Đà Nẵng',
+      roomStandard: '2D Phụ Đề Việt',
+      roomImax: 'IMAX 2D Phụ Đề Việt',
+      cinemaLabel: 'Rạp',
+      personSeat: 'Người / Ghế',
+      screen: 'SCREEN',
+      legendSelected: 'Đã chọn',
+      legendUnavailable: 'Không thể chọn',
+      legendStandard: 'Thường',
+      legendVip: 'VIP',
+      legendSweetbox: 'Sweet Box',
+      showtime: 'Suất chiếu',
+      roomLabel: 'Phòng chiếu',
+      movieLabel: 'Tên phim',
+      seatLabel: 'Ghế',
+      totalLabel: 'Tổng'
     },
     shared: {
       loading: 'Đang tải',
-      website: 'Website'
+      website: 'Website',
+      close: 'Đóng'
     },
     auth: {
       loginTab: 'Đăng nhập',
@@ -145,17 +192,17 @@ const translations = {
       registerError: 'Đăng ký không thành công',
       captchaError: 'Không tải được captcha',
       captchaReload: 'Vui lòng tải lại captcha.'
-      },
-      account: {
-        title: 'Thông tin tài khoản',
-        memberStatus: 'Thành viên CGV',
-        myTickets: 'Vé của tôi',
-        overviewTitle: 'Thông tin chung',
-        usernameLabel: 'Tên đăng nhập',
-        loginStateLabel: 'Trạng thái',
-        loggedIn: 'Đang đăng nhập',
-        quickActionLabel: 'Chức năng nhanh',
-        quickActionValue: 'Xem tài khoản và quản lý đăng xuất'
+    },
+    account: {
+      title: 'Thông tin tài khoản',
+      memberStatus: 'Thành viên CGV',
+      myTickets: 'Vé của tôi',
+      overviewTitle: 'Thông tin chung',
+      usernameLabel: 'Tên đăng nhập',
+      loginStateLabel: 'Trạng thái',
+      loggedIn: 'Đang đăng nhập',
+      quickActionLabel: 'Chức năng nhanh',
+      quickActionValue: 'Xem tài khoản và quản lý đăng xuất'
     }
   },
   en: {
@@ -229,8 +276,9 @@ const translations = {
       nowShowingDescription: 'Explore the latest screening slots.',
       comingSoonTitle: 'Coming soon',
       comingSoonDescription: 'Track release dates and new trailers.',
-      theatersTitle: 'CineGo theaters',
-      theatersDescription: 'Theater list by region, easy to choose quickly.'
+      theatersDescription: 'Theater list by region, easy to choose quickly.',
+      breadcrumbPhim: 'Movies',
+      eventBadge: 'CineGo Member | News & Offers'
     },
     admin: {
       title: 'CineGo Admin',
@@ -238,15 +286,52 @@ const translations = {
     },
     movies: {
       title: 'CineGo Movies',
-      description: 'List of now-playing and coming-soon movies.'
+      description: 'List of now-playing and coming-soon movies.',
+      genre: 'Genre',
+      duration: 'Duration',
+      releaseDate: 'Release Date',
+      director: 'Director',
+      actor: 'Cast',
+      language: 'Language',
+      rated: 'Rated',
+      contentTitle: 'Movie Details',
+      showing: 'Now Showing',
+      coming: 'Coming Soon',
+      minutes: 'minutes',
+      preBook: 'PRE-BOOK'
     },
     booking: {
       title: 'CineGo Booking',
-      description: 'Choose screening, seats, and pay quickly.'
+      description: 'Choose screening, seats, and pay quickly.',
+      chooseDate: 'Select Date',
+      chooseCity: 'All Cities',
+      chooseCinema: 'All Cinemas',
+      noShowtimes: 'Sorry, no showtimes available for this date, please choose another day.',
+      selectShowtime: 'Please select a date to view showtimes.',
+      loadingSchedule: 'Loading information...',
+      cityHcm: 'Ho Chi Minh',
+      cityHn: 'Ha Noi',
+      cityDn: 'Da Nang',
+      roomStandard: '2D Subtitles',
+      roomImax: 'IMAX 2D Subtitles',
+      cinemaLabel: 'Cinema',
+      personSeat: 'Person / Seat',
+      screen: 'SCREEN',
+      legendSelected: 'Selected',
+      legendUnavailable: 'Unavailable',
+      legendStandard: 'Standard',
+      legendVip: 'VIP',
+      legendSweetbox: 'Sweet Box',
+      showtime: 'Showtime',
+      roomLabel: 'Room',
+      movieLabel: 'Movie',
+      seatLabel: 'Seat',
+      totalLabel: 'Total'
     },
     shared: {
       loading: 'Loading',
-      website: 'Website'
+      website: 'Website',
+      close: 'Close'
     },
     auth: {
       loginTab: 'Login',
@@ -298,17 +383,17 @@ const translations = {
       registerError: 'Registration failed',
       captchaError: 'Unable to load captcha',
       captchaReload: 'Please reload the captcha.'
-      },
-      account: {
-        title: 'Account information',
-        memberStatus: 'CGV member',
-        myTickets: 'My tickets',
-        overviewTitle: 'General information',
-        usernameLabel: 'Username',
-        loginStateLabel: 'Status',
-        loggedIn: 'Logged in',
-        quickActionLabel: 'Quick action',
-        quickActionValue: 'View account and manage logout'
+    },
+    account: {
+      title: 'Account information',
+      memberStatus: 'CGV member',
+      myTickets: 'My tickets',
+      overviewTitle: 'General information',
+      usernameLabel: 'Username',
+      loginStateLabel: 'Status',
+      loggedIn: 'Logged in',
+      quickActionLabel: 'Quick action',
+      quickActionValue: 'View account and manage logout'
     }
   }
 } as const;

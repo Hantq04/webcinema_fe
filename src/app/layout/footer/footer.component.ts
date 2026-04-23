@@ -7,7 +7,7 @@ import { LanguageService } from '../../core/services/language.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <footer class="bg-[#f5efd9] text-[#5e5a53]">
-      <div class="border-y border-[rgba(54,54,54,0.65)] px-6 py-5">
+      <div class="border-y border-[rgba(54,54,54,1)] px-6 py-5">
         <div class="mx-auto grid max-w-7xl gap-10 md:grid-cols-4">
           <section>
             <h3 class="mb-3 text-lg font-bold text-[#5e5a53]">{{ t('footer.companyName') }}</h3>
@@ -67,7 +67,7 @@ import { LanguageService } from '../../core/services/language.service';
         </div>
       </div>
 
-      <div class="border-b border-[rgba(54,54,54,0.65)] px-6 py-5">
+      <div class="border-b border-[rgba(54,54,54,1)] px-6 py-5">
         <div class="mx-auto grid max-w-7xl gap-4 md:grid-cols-[auto_1fr] md:items-start">
           <div class="text-3xl font-black uppercase tracking-[-0.08em] text-[#808080]">CG</div>
           <div class="space-y-1 text-[0.95rem] leading-6">

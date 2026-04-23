@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
-import { Location } from '@angular/common';
+import { DecimalPipe, Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -9,27 +9,29 @@ import { SeatItem, SeatScheduleData } from '../../core/models/seat.model';
 
 @Component({
   selector: 'app-booking',
+  standalone: true,
+  imports: [DecimalPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './booking.component.css',
   template: `
     <div class="booking-container">
       @if (loading()) {
-        <div class="loading-spinner">Đang tải sơ đồ ghế...</div>
+        <div class="loading-spinner">{{ t('shared.loading') }}...</div>
       } @else if (seatData()) {
         <div class="booking-header">
           <h2>BOOKING ONLINE</h2>
           <div class="booking-info-bar">
-            <span>{{ seatData()?.cinema }} | Phòng chiếu {{ seatData()?.room }} | Số ghế ({{ seatData()?.remainSeats }}/{{ seatData()?.capacity }})</span>
+            <span>{{ seatData()?.cinema }} | {{ t('booking.roomLabel') }} {{ seatData()?.room }} | {{ t('booking.seatLabel') }} ({{ seatData()?.remainSeats }}/{{ seatData()?.capacity }})</span>
             <br>
             <span>{{ seatData()?.startAt }} ~ {{ seatData()?.endAt }}</span>
           </div>
         </div>
 
         <div class="booking-content">
-          <div class="booking-step-title">Người / Ghế</div>
+          <div class="booking-step-title">{{ t('booking.personSeat') }}</div>
           
           <div class="screen-area">
-            <div class="screen-curve">SCREEN</div>
+            <div class="screen-curve">{{ t('booking.screen') }}</div>
           </div>
 
           <div class="seat-map">
@@ -57,11 +59,11 @@ import { SeatItem, SeatScheduleData } from '../../core/models/seat.model';
 
           <div class="seat-legend">
             <div class="legend-item"><span class="legend-color legend-checked"></span> Checked</div>
-            <div class="legend-item"><span class="legend-color legend-booked"></span> Đã chọn</div>
-            <div class="legend-item"><span class="legend-color legend-unavailable"></span> Không thể chọn</div>
-            <div class="legend-item"><span class="legend-color legend-standard"></span> Thường</div>
-            <div class="legend-item"><span class="legend-color legend-vip"></span> VIP</div>
-            <div class="legend-item"><span class="legend-color legend-sweetbox"></span> Sweet Box</div>
+            <div class="legend-item"><span class="legend-color legend-booked"></span> {{ t('booking.legendSelected') }}</div>
+            <div class="legend-item"><span class="legend-color legend-unavailable"></span> {{ t('booking.legendUnavailable') }}</div>
+            <div class="legend-item"><span class="legend-color legend-standard"></span> {{ t('booking.legendStandard') }}</div>
+            <div class="legend-item"><span class="legend-color legend-vip"></span> {{ t('booking.legendVip') }}</div>
+            <div class="legend-item"><span class="legend-color legend-sweetbox"></span> {{ t('booking.legendSweetbox') }}</div>
           </div>
         </div>
 
@@ -86,11 +88,11 @@ import { SeatItem, SeatScheduleData } from '../../core/models/seat.model';
 
             <div class="summary-details">
               <div class="summary-col">
-                <div class="summary-row"><span class="label">Rạp</span> <strong>{{ seatData()?.cinema }}</strong></div>
-                <div class="summary-row"><span class="label">Suất chiếu</span> <strong>{{ seatData()?.startAt }}</strong></div>
-                <div class="summary-row"><span class="label">Phòng chiếu</span> <strong>{{ seatData()?.room }}</strong></div>
+                <div class="summary-row"><span class="label">{{ t('booking.cinemaLabel') }}</span> <strong>{{ seatData()?.cinema }}</strong></div>
+                <div class="summary-row"><span class="label">{{ t('booking.showtime') }}</span> <strong>{{ seatData()?.startAt }}</strong></div>
+                <div class="summary-row"><span class="label">{{ t('booking.roomLabel') }}</span> <strong>{{ seatData()?.room }}</strong></div>
                 @if (selectedSeats().length > 0) {
-                  <div class="summary-row"><span class="label">Ghế</span> 
+                  <div class="summary-row"><span class="label">{{ t('booking.seatLabel') }}</span> 
                     <div style="display: flex; flex-direction: column;">
                       <strong>{{ getSelectedSeatType() }}</strong>
                       <strong>{{ getSelectedSeatNumbers() }}</strong>
@@ -98,10 +100,10 @@ import { SeatItem, SeatScheduleData } from '../../core/models/seat.model';
                   </div>
                 }
               </div>
-              <div class="summary-col summary-price">
-                <div class="summary-row"><span class="label">Tên phim</span> <strong>0,00 ₫</strong></div>
+              <div class="summary-col">
+                <div class="summary-row"><span class="label">{{ t('booking.movieLabel') }}</span> <strong>{{ totalPrice() | number:'1.0-0' }} ₫</strong></div>
                 <div class="summary-row"><span class="label">Combo</span> <strong>0,00 ₫</strong></div>
-                <div class="summary-row"><span class="label">Tổng</span> <strong class="total-price">0,00 ₫</strong></div>
+                <div class="summary-row"><span class="label">{{ t('booking.totalLabel') }}</span> <strong class="total-price">{{ totalPrice() | number:'1.0-0' }} ₫</strong></div>
               </div>
             </div>
           </div>
@@ -112,8 +114,8 @@ import { SeatItem, SeatScheduleData } from '../../core/models/seat.model';
         </div>
       } @else {
         <div class="error-state">
-          <p>Không tìm thấy lịch chiếu. Vui lòng thử lại.</p>
-          <button class="btn-previous" (click)="goBack()">Quay lại</button>
+          <p>{{ t('booking.noShowtimes') }}</p>
+          <button class="btn-previous" (click)="goBack()">{{ t('header.allCinemas') }}</button>
         </div>
       }
     </div>
@@ -131,6 +133,10 @@ export class BookingComponent {
   protected readonly seatData = signal<SeatScheduleData | null>(null);
   protected readonly selectedSeats = signal<SeatItem[]>([]);
   protected readonly bookingContext = signal<{ movieTitle?: string; moviePoster?: string; movieRate?: string; roomType?: string } | null>(null);
+
+  protected readonly totalPrice = computed(() => {
+    return this.selectedSeats().reduce((sum, seat) => sum + (seat.priceTicket || 0), 0);
+  });
 
   protected readonly seatRows = computed(() => {
     const data = this.seatData();

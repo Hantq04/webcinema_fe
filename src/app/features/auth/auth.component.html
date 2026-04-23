@@ -5,221 +5,232 @@
         <button type="button" class="auth-tab" [class.active]="activeTab() === 'login'" (click)="selectTab('login')">
           {{ t('auth.loginTab') }}
         </button>
-        <button type="button" class="auth-tab" [class.active]="activeTab() === 'register'" (click)="selectTab('register')">
+        <button type="button" class="auth-tab" [class.active]="activeTab() === 'register'"
+          (click)="selectTab('register')">
           {{ t('auth.registerTab') }}
         </button>
       </div>
 
       @if (message(); as flash) {
-        <div class="flash" [class.flash-success]="flash.type === 'success'" [class.flash-error]="flash.type === 'error'" [class.flash-info]="flash.type === 'info'">
-          {{ flash.text }}
-        </div>
+      <div class="flash" [class.flash-success]="flash.type === 'success'" [class.flash-error]="flash.type === 'error'"
+        [class.flash-info]="flash.type === 'info'">
+        {{ flash.text }}
+      </div>
       }
 
       @if (activeTab() === 'login') {
-        <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="submitLogin()" novalidate>
-          <label class="field">
-            <span>{{ t('auth.username') }}</span>
-            <input type="text" formControlName="userName" [placeholder]="t('auth.username')" autocomplete="username" />
-            @if (loginForm.controls.userName.touched && loginForm.controls.userName.invalid) {
-              <small class="field-error">{{ t('auth.requiredUsername') }}</small>
+      <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="submitLogin()" novalidate>
+        <label class="field">
+          <span>{{ t('auth.username') }}</span>
+          <input type="text" formControlName="userName" [placeholder]="t('auth.username')" autocomplete="username" />
+          @if (loginForm.controls.userName.touched && loginForm.controls.userName.invalid) {
+          <small class="field-error">{{ t('auth.requiredUsername') }}</small>
+          }
+          @if (serverFieldError('login', 'userName')) {
+          <small class="field-error">{{ serverFieldError('login', 'userName') }}</small>
+          }
+        </label>
+
+        <label class="field">
+          <span>{{ t('auth.password') }}</span>
+          <input type="password" formControlName="passWord" [placeholder]="t('auth.password')"
+            autocomplete="current-password" />
+          @if (loginForm.controls.passWord.touched && loginForm.controls.passWord.invalid) {
+          <small class="field-error">{{ t('auth.requiredPassword') }}</small>
+          }
+          @if (serverFieldError('login', 'passWord')) {
+          <small class="field-error">{{ serverFieldError('login', 'passWord') }}</small>
+          }
+        </label>
+
+        <div class="captcha-row">
+          <label class="field captcha-input">
+            <span>{{ t('auth.captchaPrompt') }}</span>
+            <input type="text" formControlName="captchaValue" [placeholder]="t('auth.captchaInput')"
+              autocomplete="off" />
+            @if (loginForm.controls.captchaValue.touched && loginForm.controls.captchaValue.invalid) {
+            <small class="field-error">{{ t('auth.requiredCaptcha') }}</small>
             }
-            @if (serverFieldError('login', 'userName')) {
-              <small class="field-error">{{ serverFieldError('login', 'userName') }}</small>
+            @if (serverFieldError('login', 'captchaValue')) {
+            <small class="field-error">{{ serverFieldError('login', 'captchaValue') }}</small>
             }
           </label>
 
-          <label class="field">
-            <span>{{ t('auth.password') }}</span>
-            <input type="password" formControlName="passWord" [placeholder]="t('auth.password')" autocomplete="current-password" />
-            @if (loginForm.controls.passWord.touched && loginForm.controls.passWord.invalid) {
-              <small class="field-error">{{ t('auth.requiredPassword') }}</small>
+          <div class="captcha-box">
+            @if (captchaLoading()) {
+            <div class="captcha-placeholder">{{ t('auth.loadingCaptcha') }}</div>
+            } @else if (loginCaptchaImage()) {
+            <img class="captcha-image" [src]="loginCaptchaImage()" alt="Captcha" />
+            } @else {
+            <div class="captcha-placeholder">{{ t('auth.noCaptcha') }}</div>
             }
-            @if (serverFieldError('login', 'passWord')) {
-              <small class="field-error">{{ serverFieldError('login', 'passWord') }}</small>
-            }
-          </label>
 
+            <button type="button" class="captcha-refresh" (click)="refreshCaptcha()"
+              aria-label="Tải lại captcha">↻</button>
+          </div>
+        </div>
+
+        <input type="hidden" [value]="loginCaptchaId()" />
+
+        <button type="submit" class="submit-button" [disabled]="submittingLogin()">
+          {{ submittingLogin() ? '...' : t('auth.loginButton') }}
+        </button>
+
+        <a class="forgot-link" href="#">{{ t('auth.forgotPassword') }}</a>
+      </form>
+      } @else {
+      <form class="auth-form auth-form-register" [formGroup]="registerForm" (ngSubmit)="submitRegister()" novalidate>
+        <label class="field">
+          <span>{{ t('auth.name') }}<span class="required-mark">*</span></span>
+          <input type="text" formControlName="name" [placeholder]="t('auth.name')" autocomplete="name" />
+          @if (registerForm.controls.name.touched && registerForm.controls.name.invalid) {
+          <small class="field-error">{{ t('auth.requiredName') }}</small>
+          }
+        </label>
+
+        <label class="field">
+          <span>{{ t('auth.username') }}<span class="required-mark">*</span></span>
+          <input type="text" formControlName="userName" [placeholder]="t('auth.username')" autocomplete="username" />
+          @if (registerForm.controls.userName.touched && registerForm.controls.userName.invalid) {
+          <small class="field-error">{{ t('auth.requiredUsername') }}</small>
+          }
+        </label>
+
+        <label class="field">
+          <span>{{ t('auth.phoneNumber') }}<span class="required-mark">*</span></span>
+          <input type="text" formControlName="phoneNumber" [placeholder]="t('auth.phoneNumber')" autocomplete="tel" />
+          @if (registerForm.controls.phoneNumber.touched && registerForm.controls.phoneNumber.invalid) {
+          <small class="field-error">{{ t('auth.requiredPhone') }}</small>
+          }
+        </label>
+
+        <label class="field">
+          <span>{{ t('auth.email') }}<span class="required-mark">*</span></span>
+          <input type="email" formControlName="email" [placeholder]="t('auth.email')" autocomplete="email" />
+          @if (registerForm.controls.email.touched && registerForm.controls.email.invalid) {
+          <small class="field-error">{{ registerForm.controls.email.hasError('email') ? t('auth.invalidEmail') :
+            t('auth.requiredEmail') }}</small>
+          }
+        </label>
+
+        <label class="field">
+          <span>{{ t('auth.password') }}<span class="required-mark">*</span></span>
+          <input type="password" formControlName="password" [placeholder]="t('auth.password')"
+            autocomplete="new-password" />
+          @if (registerForm.controls.password.touched && registerForm.controls.password.invalid) {
+          <small class="field-error">{{ t('auth.requiredPassword') }}</small>
+          }
+        </label>
+
+        <div class="birth-gender-row">
+          <div class="field birth-group">
+            <span>{{ t('auth.birthDate') }}<span class="required-mark">*</span></span>
+            <div class="birth-selects">
+              <select formControlName="birthDay">
+                <option value="">{{ t('auth.day') }}</option>
+                @for (day of dayOptions; track day) {
+                <option [value]="day">{{ day }}</option>
+                }
+              </select>
+              <select formControlName="birthMonth">
+                <option value="">{{ t('auth.month') }}</option>
+                @for (month of monthOptions; track month) {
+                <option [value]="month">{{ month }}</option>
+                }
+              </select>
+              <select formControlName="birthYear">
+                <option value="">{{ t('auth.year') }}</option>
+                @for (year of yearOptions; track year) {
+                <option [value]="year">{{ year }}</option>
+                }
+              </select>
+            </div>
+            @if (birthDateInvalid) {
+            <small class="field-error">{{ t('auth.requiredBirthDate') }}</small>
+            }
+          </div>
+
+          <div class="field gender-group">
+            <span>{{ t('auth.gender') }}<span class="required-mark">*</span></span>
+            <div class="gender-options">
+              <label><input type="radio" formControlName="gender" value="Nam" /> <span>{{ t('auth.male')
+                  }}</span></label>
+              <label><input type="radio" formControlName="gender" value="Nữ" /> <span>{{ t('auth.female')
+                  }}</span></label>
+            </div>
+            @if (genderInvalid) {
+            <small class="field-error">{{ t('auth.requiredGender') }}</small>
+            }
+          </div>
+        </div>
+
+        <div class="field">
+          <span>{{ t('auth.captchaPrompt') }}</span>
           <div class="captcha-row">
-            <label class="field captcha-input">
-              <span>{{ t('auth.captchaPrompt') }}</span>
-              <input type="text" formControlName="captchaValue" [placeholder]="t('auth.captchaInput')" autocomplete="off" />
-              @if (loginForm.controls.captchaValue.touched && loginForm.controls.captchaValue.invalid) {
-                <small class="field-error">{{ t('auth.requiredCaptcha') }}</small>
-              }
-              @if (serverFieldError('login', 'captchaValue')) {
-                <small class="field-error">{{ serverFieldError('login', 'captchaValue') }}</small>
-              }
-            </label>
-
+            <input type="text" formControlName="captchaValue" [placeholder]="t('auth.captchaInput')"
+              autocomplete="off" />
             <div class="captcha-box">
               @if (captchaLoading()) {
-                <div class="captcha-placeholder">{{ t('auth.loadingCaptcha') }}</div>
+              <div class="captcha-placeholder">{{ t('auth.loadingCaptcha') }}</div>
               } @else if (loginCaptchaImage()) {
-                <img class="captcha-image" [src]="loginCaptchaImage()" alt="Captcha" />
+              <img class="captcha-image" [src]="loginCaptchaImage()" alt="Captcha" />
               } @else {
-                <div class="captcha-placeholder">{{ t('auth.noCaptcha') }}</div>
+              <div class="captcha-placeholder">{{ t('auth.noCaptcha') }}</div>
               }
 
-              <button type="button" class="captcha-refresh" (click)="refreshCaptcha()" aria-label="Tải lại captcha">↻</button>
+              <button type="button" class="captcha-refresh" (click)="refreshCaptcha()"
+                aria-label="Tải lại captcha">↻</button>
             </div>
           </div>
+          @if (registerForm.controls.captchaValue.touched && registerForm.controls.captchaValue.invalid) {
+          <small class="field-error">{{ t('auth.requiredCaptcha') }}</small>
+          }
+        </div>
 
-          <input type="hidden" [value]="loginCaptchaId()" />
-
-          <button type="submit" class="submit-button" [disabled]="submittingLogin()">
-            {{ submittingLogin() ? '...' : t('auth.loginButton') }}
-          </button>
-
-          <a class="forgot-link" href="#">{{ t('auth.forgotPassword') }}</a>
-        </form>
-      } @else {
-        <form class="auth-form auth-form-register" [formGroup]="registerForm" (ngSubmit)="submitRegister()" novalidate>
-          <label class="field">
-            <span>{{ t('auth.name') }}<span class="required-mark">*</span></span>
-            <input type="text" formControlName="name" [placeholder]="t('auth.name')" autocomplete="name" />
-            @if (registerForm.controls.name.touched && registerForm.controls.name.invalid) {
-              <small class="field-error">{{ t('auth.requiredName') }}</small>
-            }
+        <div class="register-notice-list">
+          <label class="consent-item">
+            <input type="checkbox" formControlName="acceptPrivacyPolicy" />
+            <span>
+              {{ t('auth.terms1') }} <strong>{{ t('auth.privacyPolicy') }}</strong>
+            </span>
           </label>
+          @if (consentInvalid('acceptPrivacyPolicy')) {
+          <small class="field-error consent-error">{{ t('auth.consentLine') }}</small>
+          }
 
-          <label class="field">
-            <span>{{ t('auth.username') }}<span class="required-mark">*</span></span>
-            <input type="text" formControlName="userName" [placeholder]="t('auth.username')" autocomplete="username" />
-            @if (registerForm.controls.userName.touched && registerForm.controls.userName.invalid) {
-              <small class="field-error">{{ t('auth.requiredUsername') }}</small>
-            }
+          <label class="consent-item">
+            <input type="checkbox" formControlName="confirmIdentity" />
+            <span>{{ t('auth.terms2') }}</span>
           </label>
+          @if (consentInvalid('confirmIdentity')) {
+          <small class="field-error consent-error">{{ t('auth.consentLine') }}</small>
+          }
 
-          <label class="field">
-            <span>{{ t('auth.phoneNumber') }}<span class="required-mark">*</span></span>
-            <input type="text" formControlName="phoneNumber" [placeholder]="t('auth.phoneNumber')" autocomplete="tel" />
-            @if (registerForm.controls.phoneNumber.touched && registerForm.controls.phoneNumber.invalid) {
-              <small class="field-error">{{ t('auth.requiredPhone') }}</small>
-            }
+          <label class="consent-item">
+            <input type="checkbox" formControlName="confirmEmailBirth" />
+            <span>
+              {{ t('auth.terms3') }} <strong>{{ t('auth.memberBenefits') }}</strong>
+            </span>
           </label>
+          @if (consentInvalid('confirmEmailBirth')) {
+          <small class="field-error consent-error">{{ t('auth.consentLine') }}</small>
+          }
 
-          <label class="field">
-            <span>{{ t('auth.email') }}<span class="required-mark">*</span></span>
-            <input type="email" formControlName="email" [placeholder]="t('auth.email')" autocomplete="email" />
-            @if (registerForm.controls.email.touched && registerForm.controls.email.invalid) {
-              <small class="field-error">{{ registerForm.controls.email.hasError('email') ? t('auth.invalidEmail') : t('auth.requiredEmail') }}</small>
-            }
+          <label class="consent-item">
+            <input type="checkbox" formControlName="acceptTerms" />
+            <span>{{ t('auth.terms4') }} <strong>{{ t('auth.termsOfUse') }}</strong></span>
           </label>
+          @if (consentInvalid('acceptTerms')) {
+          <small class="field-error consent-error">{{ t('auth.consentLine') }}</small>
+          }
+        </div>
 
-          <label class="field">
-            <span>{{ t('auth.password') }}<span class="required-mark">*</span></span>
-            <input type="password" formControlName="password" [placeholder]="t('auth.password')" autocomplete="new-password" />
-            @if (registerForm.controls.password.touched && registerForm.controls.password.invalid) {
-              <small class="field-error">{{ t('auth.requiredPassword') }}</small>
-            }
-          </label>
+        <button type="submit" class="submit-button" [disabled]="submittingRegister()">
+          {{ submittingRegister() ? '...' : t('auth.registerButton') }}
+        </button>
 
-          <div class="birth-gender-row">
-            <div class="field birth-group">
-              <span>{{ t('auth.birthDate') }}<span class="required-mark">*</span></span>
-              <div class="birth-selects">
-                <select formControlName="birthDay">
-                  <option value="">{{ t('auth.day') }}</option>
-                  @for (day of dayOptions; track day) {
-                    <option [value]="day">{{ day }}</option>
-                  }
-                </select>
-                <select formControlName="birthMonth">
-                  <option value="">{{ t('auth.month') }}</option>
-                  @for (month of monthOptions; track month) {
-                    <option [value]="month">{{ month }}</option>
-                  }
-                </select>
-                <select formControlName="birthYear">
-                  <option value="">{{ t('auth.year') }}</option>
-                  @for (year of yearOptions; track year) {
-                    <option [value]="year">{{ year }}</option>
-                  }
-                </select>
-              </div>
-              @if (birthDateInvalid) {
-                <small class="field-error">{{ t('auth.requiredBirthDate') }}</small>
-              }
-            </div>
-
-            <div class="field gender-group">
-              <span>{{ t('auth.gender') }}<span class="required-mark">*</span></span>
-              <div class="gender-options">
-                <label><input type="radio" formControlName="gender" value="Nam" /> <span>{{ t('auth.male') }}</span></label>
-                <label><input type="radio" formControlName="gender" value="Nữ" /> <span>{{ t('auth.female') }}</span></label>
-              </div>
-              @if (genderInvalid) {
-                <small class="field-error">{{ t('auth.requiredGender') }}</small>
-              }
-            </div>
-          </div>
-
-          <div class="field">
-            <span>{{ t('auth.captchaPrompt') }}</span>
-            <div class="captcha-row">
-              <input type="text" formControlName="captchaValue" [placeholder]="t('auth.captchaInput')" autocomplete="off" />
-              <div class="captcha-box">
-                @if (captchaLoading()) {
-                  <div class="captcha-placeholder">{{ t('auth.loadingCaptcha') }}</div>
-                } @else if (loginCaptchaImage()) {
-                  <img class="captcha-image" [src]="loginCaptchaImage()" alt="Captcha" />
-                } @else {
-                  <div class="captcha-placeholder">{{ t('auth.noCaptcha') }}</div>
-                }
-
-                <button type="button" class="captcha-refresh" (click)="refreshCaptcha()" aria-label="Tải lại captcha">↻</button>
-              </div>
-            </div>
-            @if (registerForm.controls.captchaValue.touched && registerForm.controls.captchaValue.invalid) {
-              <small class="field-error">{{ t('auth.requiredCaptcha') }}</small>
-            }
-          </div>
-
-          <div class="register-notice-list">
-            <label class="consent-item">
-              <input type="checkbox" formControlName="acceptPrivacyPolicy" />
-              <span>
-                {{ t('auth.terms1') }} <strong>{{ t('auth.privacyPolicy') }}</strong>
-              </span>
-            </label>
-            @if (consentInvalid('acceptPrivacyPolicy')) {
-              <small class="field-error consent-error">{{ t('auth.consentLine') }}</small>
-            }
-
-            <label class="consent-item">
-              <input type="checkbox" formControlName="confirmIdentity" />
-              <span>{{ t('auth.terms2') }}</span>
-            </label>
-            @if (consentInvalid('confirmIdentity')) {
-              <small class="field-error consent-error">{{ t('auth.consentLine') }}</small>
-            }
-
-            <label class="consent-item">
-              <input type="checkbox" formControlName="confirmEmailBirth" />
-              <span>
-                {{ t('auth.terms3') }} <strong>{{ t('auth.memberBenefits') }}</strong>
-              </span>
-            </label>
-            @if (consentInvalid('confirmEmailBirth')) {
-              <small class="field-error consent-error">{{ t('auth.consentLine') }}</small>
-            }
-
-            <label class="consent-item">
-              <input type="checkbox" formControlName="acceptTerms" />
-              <span>{{ t('auth.terms4') }} <strong>{{ t('auth.termsOfUse') }}</strong></span>
-            </label>
-            @if (consentInvalid('acceptTerms')) {
-              <small class="field-error consent-error">{{ t('auth.consentLine') }}</small>
-            }
-          </div>
-
-          <button type="submit" class="submit-button" [disabled]="submittingRegister()">
-            {{ submittingRegister() ? '...' : t('auth.registerButton') }}
-          </button>
-
-          <p class="register-note">{{ t('auth.registerNote') }}</p>
-        </form>
+        <p class="register-note">{{ t('auth.registerNote') }}</p>
+      </form>
       }
     </section>
 
@@ -239,13 +250,8 @@
 
       <div class="carousel-dots" role="tablist" aria-label="Danh sách ưu đãi">
         @for (slide of promoSlides; track $index) {
-          <button
-            type="button"
-            class="dot"
-            [class.active]="$index === activePromoIndex"
-            (click)="selectPromo($index)"
-            [attr.aria-label]="'Xem ưu đãi ' + (slide.badge || $index + 1)"
-          ></button>
+        <button type="button" class="dot" [class.active]="$index === activePromoIndex" (click)="selectPromo($index)"
+          [attr.aria-label]="'Xem ưu đãi ' + (slide.badge || $index + 1)"></button>
         }
       </div>
     </aside>

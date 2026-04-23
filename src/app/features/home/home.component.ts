@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal, viewChild, ElementRef } from '@angular/core';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { Movie } from '../../core/models/movie.model';
 import { MovieService } from '../../core/services/movie.service';
 import { LanguageService } from '../../core/services/language.service';
+import { MovieScheduleModalComponent } from '../../shared/components/movie-schedule-modal/movie-schedule-modal.component';
 
 type EventCardAccent = 'crimson' | 'navy' | 'rose' | 'gold';
 
@@ -22,7 +23,7 @@ interface EventCard {
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink],
+  imports: [RouterLink, MovieScheduleModalComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="home-shell">
@@ -161,7 +162,10 @@ interface EventCard {
 
                     <div class="poster-card__actions">
                       <a [routerLink]="['/movies', movie.code || movie.id]" class="poster-card__button poster-card__button--solid">{{ t('home.movieActionDetails') }}</a>
-                      <a routerLink="/booking" [queryParams]="{ movieId: movie.id }" class="poster-card__button poster-card__button--solid">{{ t('home.movieActionBook') }}</a>
+                      <button type="button" (click)="openSchedule(movie)" class="poster-card__button poster-card__button--solid">
+                        <span style="font-weight: 900; font-size: 1.1rem; margin-right: 6px; line-height: 1; transform: translateY(-1px);">»</span>
+                        {{ t('home.movieActionBook') }}
+                      </button>
                     </div>
                   </div>
                 </article>
@@ -190,7 +194,7 @@ interface EventCard {
           </div>
 
           <div class="event-section__badge-row">
-            <span class="event-section__badge">Thành Viên CineGo | Tin Mới & Ưu Đãi</span>
+            <span class="event-section__badge">{{ t('home.eventBadge') }}</span>
           </div>
 
           <div class="event-section__grid event-section__grid--top">
@@ -266,6 +270,16 @@ interface EventCard {
             </article>
           </div>
         </section>
+
+        @if (selectedMovieForSchedule(); as m) {
+          <app-movie-schedule-modal
+            [movieId]="m.id"
+            [movieTitle]="m.title"
+            [moviePoster]="movieImage(m)"
+            [movieRate]="movieRate(m)"
+            (close)="closeSchedule()"
+          />
+        }
       </div>
     </section>
   `,
@@ -1376,9 +1390,11 @@ export class HomeComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly movieService = inject(MovieService);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly titleService = inject(Title);
   protected readonly language = inject(LanguageService);
   protected readonly t = this.language.t.bind(this.language);
   protected readonly movieCards = signal<Movie[]>([]);
+  protected readonly selectedMovieForSchedule = signal<Movie | null>(null);
   protected readonly loadingMovies = signal(true);
   protected readonly carouselIndex = signal(0);
   protected readonly carouselSlides = computed(() => this.movieCards().slice(0, 5));
@@ -1498,6 +1514,8 @@ export class HomeComponent {
   protected readonly canScrollRight = signal(true);
 
   constructor() {
+    this.titleService.setTitle('CineGo');
+
     const carouselTimer = setInterval(() => this.nextCarouselSlide(), 5000);
     const eventTimer = setInterval(() => this.nextEventSlide(), 5000);
 
@@ -1526,6 +1544,14 @@ export class HomeComponent {
     }
   }
 
+  protected openSchedule(movie: Movie): void {
+    this.selectedMovieForSchedule.set(movie);
+  }
+
+  protected closeSchedule(): void {
+    this.selectedMovieForSchedule.set(null);
+  }
+
   protected scrollMovies(direction: number): void {
     const track = this.movieTrack()?.nativeElement;
     if (track) {
@@ -1539,6 +1565,9 @@ export class HomeComponent {
   }
 
   protected movieGenre(movie: Movie): string {
+    if (Array.isArray(movie.genre)) {
+      return movie.genre.join(', ') || 'MOVIE';
+    }
     return movie.genre?.trim() || 'MOVIE';
   }
 

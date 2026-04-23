@@ -52,8 +52,8 @@ import { LanguageService } from '../../core/services/language.service';
               <span class="nav-link__label">{{ t('header.movie') }}</span>
             </button>
             <div class="dropdown-menu" [class.dropdown-menu--open]="isMenuOpen('movies')">
-              <a routerLink="/movies" [queryParams]="{ tab: 'now-showing' }" class="dropdown-link">Phim Đang Chiếu</a>
-              <a routerLink="/movies" [queryParams]="{ tab: 'coming-soon' }" class="dropdown-link">Phim Sắp Chiếu</a>
+              <a routerLink="/movies" [queryParams]="{ tab: 'now-showing' }" class="dropdown-link">{{ t('movies.showing') }}</a>
+              <a routerLink="/movies" [queryParams]="{ tab: 'coming-soon' }" class="dropdown-link">{{ t('movies.coming') }}</a>
             </div>
           </div>
 
@@ -63,9 +63,9 @@ import { LanguageService } from '../../core/services/language.service';
               <span class="nav-link__label">{{ t('header.cinema') }}</span>
             </button>
             <div class="dropdown-menu" [class.dropdown-menu--open]="isMenuOpen('booking')">
-              <a routerLink="/booking" class="dropdown-link">Tất Cả Các Rạp</a>
-              <a routerLink="/booking" class="dropdown-link">Rạp Đặc Biệt</a>
-              <a routerLink="/booking" class="dropdown-link">Rạp 3D</a>
+              <a routerLink="/booking" class="dropdown-link">{{ t('header.allCinemas') }}</a>
+              <a routerLink="/booking" class="dropdown-link">{{ t('header.specialCinemas') }}</a>
+              <a routerLink="/booking" class="dropdown-link">{{ t('header.threeDCinemas') }}</a>
             </div>
           </div>
 
@@ -75,8 +75,8 @@ import { LanguageService } from '../../core/services/language.service';
               <span class="nav-link__label">{{ t('header.member') }}</span>
             </button>
             <div class="dropdown-menu" [class.dropdown-menu--open]="isMenuOpen('member')">
-              <a [routerLink]="memberLink()" class="dropdown-link">Tài Khoản CGV</a>
-              <a [routerLink]="memberLink()" class="dropdown-link">Quyền Lợi</a>
+              <a [routerLink]="memberLink()" class="dropdown-link">{{ t('header.accountCgv') }}</a>
+              <a [routerLink]="memberLink()" class="dropdown-link">{{ t('header.memberBenefits') }}</a>
             </div>
           </div>
 
@@ -86,10 +86,10 @@ import { LanguageService } from '../../core/services/language.service';
               <span class="nav-link__label">{{ t('header.cultureplex') }}</span>
             </button>
             <div class="dropdown-menu" [class.dropdown-menu--open]="isMenuOpen('cultureplex')">
-              <a routerLink="/admin" class="dropdown-link">Quầy Online</a>
-              <a routerLink="/admin" class="dropdown-link">Thuê Rạp & Vé Nhóm</a>
-              <a routerLink="/admin" class="dropdown-link">CGV eGift</a>
-              <a routerLink="/admin" class="dropdown-link">CGV Rules</a>
+              <a routerLink="/admin" class="dropdown-link">{{ t('header.onlineStore') }}</a>
+              <a routerLink="/admin" class="dropdown-link">{{ t('header.groupBooking') }}</a>
+              <a routerLink="/admin" class="dropdown-link">{{ t('header.egift') }}</a>
+              <a routerLink="/admin" class="dropdown-link">{{ t('header.rules') }}</a>
             </div>
           </div>
         </nav>

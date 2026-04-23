@@ -5,6 +5,7 @@ export interface SeatItem {
   status: 'AVAILABLE' | 'BOOKED' | 'UNAVAILABLE';
   seatType: 'Standard' | 'VIP' | 'Sweet Box';
   pairIndex?: number;
+  priceTicket?: number;
 }
 
 export interface SeatScheduleData {

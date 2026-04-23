@@ -2,15 +2,19 @@ export interface Movie {
   id: string;
   code?: string;
   title: string;
+  titleEn?: string;
   durationMinutes: number;
   posterUrl?: string;
   backdropUrl?: string;
   trailerUrl?: string;
   rate?: string;
+  rateEn?: string;
   description?: string;
+  descriptionEn?: string;
   ageRating?: string;
   releaseDate?: string;
-  genre?: string;
+  genre?: string | string[];
+  genreEn?: string | string[];
 }
 
 export interface MovieDetail extends Movie {
@@ -19,6 +23,7 @@ export interface MovieDetail extends Movie {
   language?: string;
   movieSubtitle?: string;
   rateName?: string;
+  rateNameEn?: string;
 }
 
 export interface CinemaSchedule {

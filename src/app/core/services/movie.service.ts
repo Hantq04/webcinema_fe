@@ -11,8 +11,10 @@ interface MovieApiItem {
   code?: string;
   title?: string;
   name?: string;
+  nameEn?: string;
   image?: string;
-  movieType?: string;
+  movieType?: string | string[];
+  movieTypeEn?: string | string[];
   premiereDate?: string;
   durationMinutes?: number | string;
   duration?: number | string;
@@ -20,6 +22,7 @@ interface MovieApiItem {
   posterPath?: string;
   poster?: string;
   imageUrl?: string;
+  imagePath?: string;
   thumbnailUrl?: string;
   thumbnail?: string;
   backdropUrl?: string;
@@ -27,11 +30,14 @@ interface MovieApiItem {
   trailerUrl?: string;
   trailer?: string;
   rate?: string;
+  rateEn?: string;
   rateName?: string;
+  rateNameEn?: string;
   description?: string;
+  descriptionEn?: string;
   ageRating?: string;
   releaseDate?: string;
-  genre?: string;
+  genre?: string | string[];
   director?: string;
   actor?: string;
   language?: string;
@@ -149,15 +155,19 @@ export class MovieService {
       id,
       code: this.toStringValue(item.code),
       title,
+      titleEn: this.toStringValue(item.nameEn),
       durationMinutes: this.toNumberValue(item.durationMinutes ?? item.duration),
-      posterUrl: this.resolveMediaUrl(item.posterUrl ?? item.posterPath ?? item.poster ?? item.imageUrl ?? item.image ?? item.thumbnailUrl ?? item.thumbnail),
+      posterUrl: this.resolveMediaUrl(item.posterUrl ?? item.posterPath ?? item.poster ?? item.imageUrl ?? item.image ?? item.imagePath ?? item.thumbnailUrl ?? item.thumbnail),
       backdropUrl: this.resolveMediaUrl(item.backdropUrl ?? item.backdropPath),
       trailerUrl: this.resolveMediaUrl(item.trailerUrl ?? item.trailer),
       rate: this.toStringValue(item.rate),
+      rateEn: this.toStringValue(item.rateEn),
       description: this.toStringValue(item.description),
+      descriptionEn: this.toStringValue(item.descriptionEn),
       ageRating: this.toStringValue(item.ageRating),
       releaseDate: this.toStringValue(item.releaseDate ?? item.premiereDate),
-      genre: this.toStringValue(item.genre ?? item.movieType)
+      genre: this.normalizeGenre(item.genre ?? item.movieType),
+      genreEn: this.normalizeGenre(item.movieTypeEn)
     };
   }
 
@@ -171,8 +181,16 @@ export class MovieService {
       actor: this.toStringValue(item.actor),
       language: this.toStringValue(item.language),
       movieSubtitle: this.toStringValue(item.subtitle),
-      rateName: this.toStringValue(item.rateName)
+      rateName: this.toStringValue(item.rateName),
+      rateNameEn: this.toStringValue(item.rateNameEn)
     };
+  }
+
+  private normalizeGenre(value: unknown): string | string[] {
+    if (Array.isArray(value)) {
+      return value.map(v => this.toStringValue(v)).filter(v => !!v);
+    }
+    return this.toStringValue(value);
   }
 
   private resolveMediaUrl(value: unknown): string {

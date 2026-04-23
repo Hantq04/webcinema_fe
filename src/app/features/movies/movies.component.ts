@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { Movie } from '../../core/models/movie.model';
 import { MovieService } from '../../core/services/movie.service';
 import { LanguageService } from '../../core/services/language.service';
+import { MovieScheduleModalComponent } from '../../shared/components/movie-schedule-modal/movie-schedule-modal.component';
 
 type MoviesSection = 'now-showing' | 'coming-soon';
 
@@ -21,7 +23,7 @@ interface MovieCard extends Movie {
 
 @Component({
   selector: 'app-movies',
-  imports: [RouterLink],
+  imports: [RouterLink, MovieScheduleModalComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="movies-page">
@@ -31,7 +33,7 @@ interface MovieCard extends Movie {
             <img src="/home.png" alt="" class="movies-breadcrumb__home-icon" aria-hidden="true" />
           </a>
           <span>›</span>
-          <span class="movies-breadcrumb__section">Phim</span>
+          <span class="movies-breadcrumb__section">{{ t('home.breadcrumbPhim') }}</span>
           <span>›</span>
           <span class="movies-breadcrumb__current">{{ sectionTitle() }}</span>
         </nav>
@@ -73,12 +75,15 @@ interface MovieCard extends Movie {
 
                 <div class="movie-card__body">
                   <a [routerLink]="['/movies', movie.code || movie.id]" style="text-decoration: none; color: inherit;">
-                    <h2 class="movie-card__title">{{ movie.title }}</h2>
+                    <h2 class="movie-card__title">{{ getTitle(movie) }}</h2>
                   </a>
-                  <p class="movie-card__meta"><strong>Thể loại:</strong> {{ movie.genre || movie.subtitle }}</p>
-                  <p class="movie-card__meta"><strong>Thời lượng:</strong> {{ movie.durationMinutes }} phút</p>
-                  <p class="movie-card__meta"><strong>Khởi chiếu:</strong> {{ movie.releaseHint }}</p>
-                  <a routerLink="/booking" [queryParams]="{ movieId: movie.id }" class="movie-card__button">{{ movie.ctaLabel }}</a>
+                  <p class="movie-card__meta"><strong>{{ t('movies.genre') }}:</strong> {{ movie.subtitle }}</p>
+                  <p class="movie-card__meta"><strong>{{ t('movies.duration') }}:</strong> {{ movie.durationMinutes }} {{ t('movies.minutes') }}</p>
+                  <p class="movie-card__meta"><strong>{{ t('movies.releaseDate') }}:</strong> {{ movie.releaseHint }}</p>
+                  <button type="button" (click)="openSchedule(movie)" class="movie-card__button">
+                    <span style="font-weight: 900; font-size: 1.1rem; margin-right: 6px; line-height: 1; transform: translateY(-1px);">»</span>
+                    {{ movie.ctaLabel }}
+                  </button>
                 </div>
               </article>
             }
@@ -93,7 +98,7 @@ interface MovieCard extends Movie {
                   } @else {
                     <div class="movie-card__poster-copy movie-card__poster-copy--centered">
                       <span class="movie-card__poster-kicker">{{ movie.posterLabel }}</span>
-                      <strong class="movie-card__poster-title movie-card__poster-title--coming">{{ movie.title }}</strong>
+                      <strong class="movie-card__poster-title movie-card__poster-title--coming">{{ getTitle(movie) }}</strong>
                       <span class="movie-card__poster-subtitle">{{ movie.releaseHint }}</span>
                     </div>
                   }
@@ -109,18 +114,27 @@ interface MovieCard extends Movie {
 
                 <div class="movie-card__body">
                   <a [routerLink]="['/movies', movie.code || movie.id]" style="text-decoration: none; color: inherit;">
-                    <h2 class="movie-card__title">{{ movie.title }}</h2>
+                    <h2 class="movie-card__title">{{ getTitle(movie) }}</h2>
                   </a>
-                  <p class="movie-card__meta"><strong>Thể loại:</strong> {{ movie.genre }}</p>
-                  <p class="movie-card__meta"><strong>Thời lượng:</strong> {{ movie.durationMinutes }} phút</p>
-                  <p class="movie-card__meta"><strong>Khởi chiếu:</strong> {{ movie.releaseHint }}</p>
-                  <a routerLink="/movies" [queryParams]="{ tab: 'now-showing' }" class="movie-card__button movie-card__button--ghost">{{ t('home.nowShowingTitle') }}</a>
+                  <p class="movie-card__meta"><strong>{{ t('movies.genre') }}:</strong> {{ movie.subtitle }}</p>
+                  <p class="movie-card__meta"><strong>{{ t('movies.duration') }}:</strong> {{ movie.durationMinutes }} {{ t('movies.minutes') }}</p>
+                  <p class="movie-card__meta"><strong>{{ t('movies.releaseDate') }}:</strong> {{ movie.releaseHint }}</p>
                 </div>
               </article>
             }
           </section>
         }
       </div>
+
+      @if (selectedMovieForSchedule(); as m) {
+        <app-movie-schedule-modal
+          [movieId]="m.id"
+          [movieTitle]="getTitle(m)"
+          [moviePoster]="moviePoster(m)"
+          [movieRate]="movieRateCode(m)"
+          (close)="closeSchedule()"
+        />
+      }
     </section>
   `,
   styles: `
@@ -458,7 +472,7 @@ interface MovieCard extends Movie {
     }
 
     .movies-list--coming-soon .movie-card__poster {
-      min-height: 335px;
+      min-height: 355px;
     }
 
     @media (max-width: 1100px) {
@@ -498,16 +512,19 @@ export class MoviesComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly movieService = inject(MovieService);
   protected readonly language = inject(LanguageService);
+  private readonly titleService = inject(Title);
   protected readonly t = this.language.t.bind(this.language);
 
   protected readonly activeSection = signal<MoviesSection>('now-showing');
   protected readonly nowShowingMovies = signal<MovieCard[]>([]);
   protected readonly comingSoonMovies = signal<MovieCard[]>([]);
+  protected readonly selectedMovieForSchedule = signal<MovieCard | null>(null);
 
   protected readonly sectionTitle = computed(() => (this.activeSection() === 'coming-soon' ? this.t('home.comingSoonTitle') : this.t('home.nowShowingTitle')));
   protected readonly sectionDescription = computed(() => (this.activeSection() === 'coming-soon' ? this.t('home.comingSoonDescription') : this.t('home.nowShowingDescription')));
 
   constructor() {
+    this.titleService.setTitle('Movies - CineGo');
     this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const tab = params.get('tab');
       this.activeSection.set(tab === 'coming-soon' ? 'coming-soon' : 'now-showing');
@@ -542,6 +559,30 @@ export class MoviesComponent {
     });
   }
 
+  protected openSchedule(movie: MovieCard): void {
+    this.selectedMovieForSchedule.set(movie);
+  }
+
+  protected isEn(): boolean {
+    return this.language.currentLanguage() === 'en';
+  }
+
+  protected getGenre(m: Movie): string {
+    const genre = this.isEn() ? (m.genreEn ?? m.genre) : m.genre;
+    if (Array.isArray(genre)) {
+      return genre.join(', ');
+    }
+    return (genre as string) || '';
+  }
+
+  protected getTitle(m: Movie): string {
+    return (this.isEn() ? m.titleEn : m.title) || m.title;
+  }
+
+  protected closeSchedule(): void {
+    this.selectedMovieForSchedule.set(null);
+  }
+
   protected moviePoster(movie: MovieCard): string {
     return movie.posterUrl || movie.backdropUrl || this.buildFallbackPoster(movie.title);
   }
@@ -556,12 +597,12 @@ export class MoviesComponent {
 
     return {
       ...movie,
-      subtitle: movie.genre || 'Phim đang chiếu',
+      subtitle: this.getGenre(movie) || 'Đang cập nhật',
       posterLabel: movie.ageRating || movie.rate || 'P',
       posterTone,
       rank: index < 3 ? index + 1 : undefined,
-      ctaLabel: 'MUA VÉ',
-      releaseHint: movie.releaseDate || 'Đang chiếu'
+      ctaLabel: this.t('home.movieActionBook'),
+      releaseHint: movie.releaseDate || this.t('movies.showing')
     };
   }
 
@@ -571,11 +612,11 @@ export class MoviesComponent {
 
     return {
       ...movie,
-      subtitle: movie.genre || 'Phim sắp chiếu',
+      subtitle: this.getGenre(movie) || this.t('movies.coming'),
       posterLabel: movie.ageRating || movie.rate || 'P',
       posterTone,
-      ctaLabel: 'ĐẶT TRƯỚC',
-      releaseHint: movie.releaseDate || 'Sắp chiếu'
+      ctaLabel: this.t('movies.preBook'),
+      releaseHint: movie.releaseDate || this.t('movies.coming')
     };
   }
 
