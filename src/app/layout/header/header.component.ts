@@ -15,17 +15,17 @@ import { LanguageService } from '../../core/services/language.service';
 
       <div class="mx-auto max-w-7xl px-4 py-3">
         <div class="top-row">
-          <div class="rounded-full bg-[#d9f5d3] px-3 py-1 text-sm font-bold whitespace-nowrap text-[#1f6a2f]">Zalopay</div>
+          <div class="rounded-full bg-[#d9f5d3] px-3 py-1 text-sm font-bold whitespace-nowrap text-[#1f6a2f] cursor-pointer" (click)="onDevelop()">Zalopay</div>
           <div class="flex flex-col items-center gap-1 text-center">
             <strong class="text-[1.1rem] font-black uppercase tracking-[0.12em] text-[#d62f1f]">CineGo</strong>
             <span class="text-sm text-[#6d5b46]">{{ t('header.slogan') }}</span>
           </div>
-          <div class="rounded-full bg-[#d62f1f] px-3 py-1 text-sm font-bold whitespace-nowrap text-[#fff6ec]">{{ t('header.deal') }}</div>
+          <div class="rounded-full bg-[#d62f1f] px-3 py-1 text-sm font-bold whitespace-nowrap text-[#fff6ec] cursor-pointer" (click)="onDevelop()">{{ t('header.deal') }}</div>
         </div>
 
         <div class="utility-row">
-          <a routerLink="/movies" class="utility-link">{{ t('header.news') }}</a>
-          <a routerLink="/booking" class="utility-link">{{ t('header.myTickets') }}</a>
+          <a href="javascript:void(0)" (click)="onDevelop()" class="utility-link">{{ t('header.news') }}</a>
+          <a href="javascript:void(0)" (click)="onDevelop()" class="utility-link">{{ t('header.myTickets') }}</a>
           @if (auth.isAuthenticated()) {
             <a routerLink="/account" class="utility-user utility-user--link">{{ t('header.hello') }} {{ auth.currentUserName() || t('header.member') }}</a>
             <button type="button" class="utility-link utility-link--button" (click)="logout()">{{ t('header.logout') }}</button>
@@ -42,7 +42,7 @@ import { LanguageService } from '../../core/services/language.service';
           <a routerLink="/home" class="logo-link" [attr.aria-label]="t('header.homeAria')">
             <span class="logo-text">CINEGO</span>
           </a>
-          <a routerLink="/booking" class="buy-ticket-chip">{{ t('header.buyNow') }}</a>
+          <a routerLink="/movies" class="buy-ticket-chip">{{ t('header.buyNow') }}</a>
         </div>
 
         <nav aria-label="Main navigation" class="main-nav grid grid-cols-4 gap-1 pt-3 pb-3 max-[900px]:grid-cols-2 max-[640px]:grid-cols-1">
@@ -64,8 +64,8 @@ import { LanguageService } from '../../core/services/language.service';
             </button>
             <div class="dropdown-menu" [class.dropdown-menu--open]="isMenuOpen('booking')">
               <a routerLink="/booking" class="dropdown-link">{{ t('header.allCinemas') }}</a>
-              <a routerLink="/booking" class="dropdown-link">{{ t('header.specialCinemas') }}</a>
-              <a routerLink="/booking" class="dropdown-link">{{ t('header.threeDCinemas') }}</a>
+              <a href="javascript:void(0)" (click)="onDevelop()" class="dropdown-link">{{ t('header.specialCinemas') }}</a>
+              <a href="javascript:void(0)" (click)="onDevelop()" class="dropdown-link">{{ t('header.threeDCinemas') }}</a>
             </div>
           </div>
 
@@ -75,8 +75,8 @@ import { LanguageService } from '../../core/services/language.service';
               <span class="nav-link__label">{{ t('header.member') }}</span>
             </button>
             <div class="dropdown-menu" [class.dropdown-menu--open]="isMenuOpen('member')">
-              <a [routerLink]="memberLink()" class="dropdown-link">{{ t('header.accountCgv') }}</a>
-              <a [routerLink]="memberLink()" class="dropdown-link">{{ t('header.memberBenefits') }}</a>
+              <a href="javascript:void(0)" (click)="onDevelop()" class="dropdown-link">{{ t('header.accountCgv') }}</a>
+              <a href="javascript:void(0)" (click)="onDevelop()" class="dropdown-link">{{ t('header.memberBenefits') }}</a>
             </div>
           </div>
 
@@ -86,10 +86,10 @@ import { LanguageService } from '../../core/services/language.service';
               <span class="nav-link__label">{{ t('header.cultureplex') }}</span>
             </button>
             <div class="dropdown-menu" [class.dropdown-menu--open]="isMenuOpen('cultureplex')">
-              <a routerLink="/admin" class="dropdown-link">{{ t('header.onlineStore') }}</a>
-              <a routerLink="/admin" class="dropdown-link">{{ t('header.groupBooking') }}</a>
-              <a routerLink="/admin" class="dropdown-link">{{ t('header.egift') }}</a>
-              <a routerLink="/admin" class="dropdown-link">{{ t('header.rules') }}</a>
+              <a href="javascript:void(0)" (click)="onDevelop()" class="dropdown-link">{{ t('header.onlineStore') }}</a>
+              <a href="javascript:void(0)" (click)="onDevelop()" class="dropdown-link">{{ t('header.groupBooking') }}</a>
+              <a href="javascript:void(0)" (click)="onDevelop()" class="dropdown-link">{{ t('header.egift') }}</a>
+              <a href="javascript:void(0)" (click)="onDevelop()" class="dropdown-link">{{ t('header.rules') }}</a>
             </div>
           </div>
         </nav>
@@ -428,6 +428,14 @@ export class HeaderComponent {
 
   protected logout(): void {
     this.auth.logout();
-    void this.router.navigateByUrl('/auth');
+    void this.router.navigate(['/auth']);
+  }
+
+  protected onDevelop(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    alert('Tính năng đang được phát triển. Vui lòng quay lại sau!');
   }
 }

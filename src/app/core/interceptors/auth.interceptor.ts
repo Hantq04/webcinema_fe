@@ -1,5 +1,6 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpInterceptorFn, HttpResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { catchError, tap, throwError } from 'rxjs';
 
 import { AuthService } from '../services/auth.service';
 import { LanguageService } from '../services/language.service';
@@ -10,24 +11,33 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
 	const token = authService.getAccessToken();
 	const acceptLanguage = languageService.currentLanguage();
 	const shouldSkipAuthHeader = request.url.includes('/api/v1/user/login') || request.url.includes('/api/v1/captcha');
-	const headers = {
+	const headers: Record<string, string> = {
 		'Accept-Language': acceptLanguage
 	};
 
-	if (!token || shouldSkipAuthHeader) {
-		return next(
-			request.clone({
-				setHeaders: headers
-			})
-		);
+	if (token && !shouldSkipAuthHeader) {
+		headers['Authorization'] = `Bearer ${token}`;
 	}
 
-	return next(
-		request.clone({
-			setHeaders: {
-				Authorization: `Bearer ${token}`,
-				...headers
+	const clonedRequest = request.clone({
+		setHeaders: headers
+	});
+
+	return next(clonedRequest).pipe(
+		tap((event) => {
+			if (event instanceof HttpResponse) {
+				const body = event.body as any;
+				if (body && (body.status === 1104 || body.code === 1104)) {
+					authService.logout();
+				}
 			}
+		}),
+		catchError((error) => {
+			const errorBody = error.error as any;
+			if (errorBody && (errorBody.status === 1104 || errorBody.code === 1104)) {
+				authService.logout();
+			}
+			return throwError(() => error);
 		})
 	);
 };

@@ -366,7 +366,7 @@ export class MovieScheduleModalComponent {
 
   protected readonly scheduleAddress = signal('Hồ Chí Minh');
   protected readonly scheduleRoom = signal('STANDARD');
-  protected readonly scheduleDate = signal('');
+  protected readonly scheduleDate = signal(new Date().toISOString().split('T')[0]);
   protected readonly scheduleData = signal<DailySchedule[]>([]);
   protected readonly loadingSchedule = signal(false);
   private isDateChanging = false;
@@ -397,6 +397,7 @@ export class MovieScheduleModalComponent {
       const movieId = this.movieId();
       const address = this.scheduleAddress();
       const roomType = this.scheduleRoom();
+      const date = this.scheduleDate();
 
       if (movieId) {
         if (this.isDateChanging) {

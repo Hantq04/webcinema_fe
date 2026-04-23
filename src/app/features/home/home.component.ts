@@ -34,16 +34,16 @@ interface EventCard {
         <div class="event-banner__wrap">
           <div class="event-banner__stage">
             @if (eventBannerSlides().length > 0) {
-              <!-- key bằng index để Angular re-render img → trigger CSS fade -->
-              @for (slide of eventBannerSlides(); track slide.id; let i = $index) {
-                <img
-                  class="event-banner__image"
-                  [class.event-banner__image--active]="i === eventBannerIndex()"
-                  [src]="slide.imageUrl"
-                  [alt]="slide.title || 'Event'"
-                  loading="eager"
-                />
-              }
+              <div class="event-banner__track" [style.transform]="'translateX(-' + (eventBannerIndex() * 100) + '%)'">
+                @for (slide of eventBannerSlides(); track slide.id) {
+                  <img
+                    class="event-banner__image"
+                    [src]="slide.imageUrl"
+                    [alt]="slide.title || 'Event'"
+                    loading="eager"
+                  />
+                }
+              </div>
               <button type="button" class="event-banner__nav event-banner__nav--prev" (click)="previousEventSlide()" aria-label="Previous event">
                 &#8249;
               </button>
@@ -145,8 +145,8 @@ interface EventCard {
                   </div>
 
                   <div class="poster-card__overlay">
-                    <h3 class="poster-card__title">{{ movie.title }}</h3>
-                    <p class="poster-card__description">{{ movie.description }}</p>
+                    <h3 class="poster-card__title">{{ getTitle(movie) }}</h3>
+                    <p class="poster-card__description">{{ getDescription(movie) }}</p>
 
                     <div class="poster-card__meta-row">
                       @if (movie.durationMinutes) {
@@ -199,7 +199,7 @@ interface EventCard {
 
           <div class="event-section__grid event-section__grid--top">
             @for (card of eventTopCards; track card.id) {
-              <a [routerLink]="card.href" class="event-card event-card--compact" [class.event-card--crimson]="card.accent === 'crimson'" [class.event-card--rose]="card.accent === 'rose'" [class.event-card--navy]="card.accent === 'navy'" [class.event-card--gold]="card.accent === 'gold'">
+              <a href="javascript:void(0)" (click)="onDevelop($event)" class="event-card event-card--compact" [class.event-card--crimson]="card.accent === 'crimson'" [class.event-card--rose]="card.accent === 'rose'" [class.event-card--navy]="card.accent === 'navy'" [class.event-card--gold]="card.accent === 'gold'">
                 <span class="event-card__kicker">{{ card.kicker }}</span>
                 <strong class="event-card__title">{{ card.title }}</strong>
                 <span class="event-card__subtitle">{{ card.subtitle }}</span>
@@ -209,7 +209,7 @@ interface EventCard {
 
           <div class="event-section__grid event-section__grid--bottom">
             @for (card of eventBottomCards; track card.id) {
-              <a [routerLink]="card.href" class="event-card event-card--feature" [class.event-card--crimson]="card.accent === 'crimson'" [class.event-card--rose]="card.accent === 'rose'" [class.event-card--navy]="card.accent === 'navy'" [class.event-card--gold]="card.accent === 'gold'">
+              <a href="javascript:void(0)" (click)="onDevelop($event)" class="event-card event-card--feature" [class.event-card--crimson]="card.accent === 'crimson'" [class.event-card--rose]="card.accent === 'rose'" [class.event-card--navy]="card.accent === 'navy'" [class.event-card--gold]="card.accent === 'gold'">
                 <span class="event-card__kicker">{{ card.kicker }}</span>
                 <strong class="event-card__title">{{ card.title }}</strong>
                 <p class="event-card__description">{{ card.description }}</p>
@@ -351,19 +351,19 @@ interface EventCard {
       background: #0d0a08;
     }
 
+    .event-banner__track {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform;
+    }
+
     .event-banner__image {
-      position: absolute;
-      inset: 0;
+      flex: 0 0 100%;
       width: 100%;
       height: 100%;
       object-fit: cover;
-      opacity: 0;
-      transition: opacity 600ms ease;
-      will-change: opacity;
-    }
-
-    .event-banner__image--active {
-      opacity: 1;
     }
 
     .event-banner__placeholder {
@@ -1564,11 +1564,24 @@ export class HomeComponent {
     return movie.posterUrl || movie.backdropUrl || this.buildFallbackPoster(movie.title);
   }
 
+  protected isEn(): boolean {
+    return this.language.currentLanguage() === 'en';
+  }
+
+  protected getTitle(m: Movie): string {
+    return (this.isEn() ? m.titleEn : m.title) || m.title;
+  }
+
+  protected getDescription(m: Movie): string {
+    return (this.isEn() ? m.descriptionEn : m.description) || m.description || '';
+  }
+
   protected movieGenre(movie: Movie): string {
-    if (Array.isArray(movie.genre)) {
-      return movie.genre.join(', ') || 'MOVIE';
+    const genre = this.isEn() ? (movie.genreEn ?? movie.genre) : movie.genre;
+    if (Array.isArray(genre)) {
+      return genre.join(', ') || 'MOVIE';
     }
-    return movie.genre?.trim() || 'MOVIE';
+    return (genre as string)?.trim() || 'MOVIE';
   }
 
   protected movieRating(movie: Movie): string {
@@ -1663,6 +1676,14 @@ export class HomeComponent {
 
   protected closeTrailer(): void {
     this.trailerPreview.set(null);
+  }
+
+  protected onDevelop(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    alert('Tính năng đang được phát triển. Vui lòng quay lại sau!');
   }
 
   private syncCarouselIndex(movieCount: number): void {

@@ -114,7 +114,7 @@ import { MovieScheduleModalComponent } from '../../../shared/components/movie-sc
                     </svg>
                   </div>
                   <button type="button" class="movie-detail-tabs__btn movie-detail-tabs__btn--active">
-                    Chi tiết
+                    {{ t('home.movieTrailerDetail') }}
                   </button>
                   <span class="movie-detail-tabs__separator">|</span>
                   <button type="button" class="movie-detail-tabs__btn" (click)="openTrailer(m)">Trailer</button>
@@ -215,7 +215,7 @@ export class MovieDetailComponent {
           this.loading.set(false);
 
           if (detail?.title) {
-            this.titleService.setTitle(`${detail.title} - CineGo`);
+            this.titleService.setTitle(`${this.getTitle(detail)} | Thông tin - Lịch chiếu`);
           }
         });
       } else {

@@ -25,4 +25,14 @@ export class BookingService {
       })
     );
   }
+
+  getAllFood(): Observable<any[]> {
+    return this.http.get<any>(this.apiService.apiUrl('/api/v1/food/get-all-food')).pipe(
+      map(response => response.data || []),
+      catchError((error) => {
+        console.error('Error fetching food', error);
+        return of([]);
+      })
+    );
+  }
 }

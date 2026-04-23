@@ -524,7 +524,7 @@ export class MoviesComponent {
   protected readonly sectionDescription = computed(() => (this.activeSection() === 'coming-soon' ? this.t('home.comingSoonDescription') : this.t('home.nowShowingDescription')));
 
   constructor() {
-    this.titleService.setTitle('Movies - CineGo');
+    this.titleService.setTitle('Movies | CineGo');
     this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const tab = params.get('tab');
       this.activeSection.set(tab === 'coming-soon' ? 'coming-soon' : 'now-showing');
@@ -591,6 +591,23 @@ export class MoviesComponent {
     return (movie.ageRating?.trim() || movie.posterLabel?.trim() || movie.rate?.trim() || '').toUpperCase();
   }
 
+  protected formatDate(dateString?: string): string {
+    if (!dateString) return '';
+    try {
+      const parts = dateString.split(' ');
+      if (parts.length > 0) {
+        const dateParts = parts[0].split('-');
+        if (dateParts.length === 3) {
+          // Format as dd-mm-yyyy
+          return `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return dateString;
+  }
+
   private toNowShowingCard(movie: Movie, index: number): MovieCard {
     const posterTones = ['teal', 'amber', 'red', 'green'] as const;
     const posterTone = posterTones[index % posterTones.length] ?? 'teal';
@@ -602,7 +619,7 @@ export class MoviesComponent {
       posterTone,
       rank: index < 3 ? index + 1 : undefined,
       ctaLabel: this.t('home.movieActionBook'),
-      releaseHint: movie.releaseDate || this.t('movies.showing')
+      releaseHint: this.formatDate(movie.releaseDate) || this.t('movies.showing')
     };
   }
 
@@ -616,7 +633,7 @@ export class MoviesComponent {
       posterLabel: movie.ageRating || movie.rate || 'P',
       posterTone,
       ctaLabel: this.t('movies.preBook'),
-      releaseHint: movie.releaseDate || this.t('movies.coming')
+      releaseHint: this.formatDate(movie.releaseDate) || this.t('movies.coming')
     };
   }
 

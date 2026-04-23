@@ -12,24 +12,24 @@ import { LanguageService } from '../../core/services/language.service';
           <section>
             <h3 class="mb-3 text-lg font-bold text-[#5e5a53]">{{ t('footer.companyName') }}</h3>
             <ul class="space-y-2 text-[0.95rem] leading-6">
-              <li>{{ t('footer.intro') }}</li>
-              <li>{{ t('footer.onlineUtilities') }}</li>
-              <li>{{ t('footer.giftCard') }}</li>
-              <li>{{ t('footer.careers') }}</li>
-              <li>{{ t('footer.advertisingContact') }}</li>
-              <li>{{ t('footer.partners') }}</li>
+              <li class="cursor-pointer" (click)="onDevelop()">{{ t('footer.intro') }}</li>
+              <li class="cursor-pointer" (click)="onDevelop()">{{ t('footer.onlineUtilities') }}</li>
+              <li class="cursor-pointer" (click)="onDevelop()">{{ t('footer.giftCard') }}</li>
+              <li class="cursor-pointer" (click)="onDevelop()">{{ t('footer.careers') }}</li>
+              <li class="cursor-pointer" (click)="onDevelop()">{{ t('footer.advertisingContact') }}</li>
+              <li class="cursor-pointer" (click)="onDevelop()">{{ t('footer.partners') }}</li>
             </ul>
           </section>
 
           <section>
             <h3 class="mb-3 text-lg font-bold text-[#5e5a53]">{{ t('footer.termsOfUse') }}</h3>
             <ul class="space-y-2 text-[0.95rem] leading-6">
-              <li>{{ t('footer.generalTerms') }}</li>
-              <li>{{ t('footer.transactionTerms') }}</li>
-              <li>{{ t('footer.paymentPolicy') }}</li>
-              <li>{{ t('footer.privacyPolicy') }}</li>
-              <li>{{ t('footer.cinemaRules') }}</li>
-              <li>{{ t('footer.faq') }}</li>
+              <li class="cursor-pointer" (click)="onDevelop()">{{ t('footer.generalTerms') }}</li>
+              <li class="cursor-pointer" (click)="onDevelop()">{{ t('footer.transactionTerms') }}</li>
+              <li class="cursor-pointer" (click)="onDevelop()">{{ t('footer.paymentPolicy') }}</li>
+              <li class="cursor-pointer" (click)="onDevelop()">{{ t('footer.privacyPolicy') }}</li>
+              <li class="cursor-pointer" (click)="onDevelop()">{{ t('footer.cinemaRules') }}</li>
+              <li class="cursor-pointer" (click)="onDevelop()">{{ t('footer.faq') }}</li>
             </ul>
           </section>
 
@@ -135,4 +135,7 @@ import { LanguageService } from '../../core/services/language.service';
 export class FooterComponent {
   protected readonly language = inject(LanguageService);
   protected readonly t = this.language.t.bind(this.language);
+  protected onDevelop(): void {
+    alert('Tính năng đang được phát triển. Vui lòng quay lại sau!');
+  }
 }
