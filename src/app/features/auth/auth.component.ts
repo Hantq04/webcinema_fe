@@ -80,24 +80,9 @@ export class AuthComponent implements OnInit, OnDestroy {
   protected readonly loginCaptchaId = computed(() => this.captcha()?.captchaId ?? '');
 
   protected readonly promoSlides = [
-    {
-      badge: 'CHƯƠNG TRÌNH TÍCH ĐIỂM',
-      title: '1 điểm = 1.000 VND',
-      description: 'tại tất cả các rạp CG trên toàn quốc',
-      accent: 'coin'
-    },
-    {
-      badge: 'CHƯƠNG TRÌNH KHUYẾN MÃI',
-      title: 'Nhiều chương trình hấp dẫn',
-      description: 'dành riêng cho thành viên CG',
-      accent: 'gift'
-    },
-    {
-      badge: 'QUÀ TẶNG SINH NHẬT',
-      title: 'Quà tặng dành cho thành viên',
-      description: 'áp dụng theo cấp độ thành viên trong tháng sinh nhật',
-      accent: 'celebration'
-    }
+    { imageUrl: '1.jpg' },
+    { imageUrl: '2.jpg' },
+    { imageUrl: '3.jpg' }
   ] as const;
 
   protected activePromoIndex = 0;

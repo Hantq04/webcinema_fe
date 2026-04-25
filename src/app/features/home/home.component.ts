@@ -5,6 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { Movie } from '../../core/models/movie.model';
 import { MovieService } from '../../core/services/movie.service';
+import { EventService } from '../../core/services/event.service';
 import { LanguageService } from '../../core/services/language.service';
 import { MovieScheduleModalComponent } from '../../shared/components/movie-schedule-modal/movie-schedule-modal.component';
 
@@ -249,27 +250,6 @@ interface EventCard {
           </div>
         }
 
-        <section class="category-grid" aria-label="{{ t('home.categoriesTitle') }}">
-          <div class="category-grid__header">
-            <h2 class="category-grid__title">{{ t('home.categoriesTitle') }}</h2>
-            <span class="category-grid__subtitle">{{ t('home.categoriesSubtitle') }}</span>
-          </div>
-
-          <div class="category-grid__items">
-            <article class="category-card">
-              <h3>{{ t('home.nowShowingTitle') }}</h3>
-              <p>{{ t('home.nowShowingDescription') }}</p>
-            </article>
-            <article class="category-card">
-              <h3>{{ t('home.comingSoonTitle') }}</h3>
-              <p>{{ t('home.comingSoonDescription') }}</p>
-            </article>
-            <article class="category-card">
-              <h3>{{ t('home.theatersTitle') }}</h3>
-              <p>{{ t('home.theatersDescription') }}</p>
-            </article>
-          </div>
-        </section>
 
         @if (selectedMovieForSchedule(); as m) {
           <app-movie-schedule-modal
@@ -344,7 +324,7 @@ interface EventCard {
       position: relative;
       width: 100%;
       /* Tỷ lệ rộng và cao kiểu VenusCinema: ~16:7 */
-      aspect-ratio: 16 / 7;
+      aspect-ratio: 16 / 6;
       overflow: hidden;
       border-radius: 0;
       box-shadow: none;
@@ -1181,64 +1161,9 @@ interface EventCard {
       min-height: 2.4rem;
     }
 
-    .category-grid {
-      margin-top: 0.5rem;
-    }
-
-    .category-grid__header {
-      align-items: baseline;
-      display: flex;
-      justify-content: space-between;
-      gap: 1rem;
-      margin-bottom: 0.8rem;
-    }
-
-    .category-grid__title {
-      color: #201b16;
-      font-size: 1.15rem;
-      font-weight: 900;
-      letter-spacing: 0.04em;
-      margin: 0;
-      text-transform: uppercase;
-    }
-
-    .category-grid__subtitle {
-      color: #6f5c49;
-      font-size: 0.88rem;
-      font-weight: 700;
-    }
-
-    .category-grid__items {
-      display: grid;
-      gap: 0.9rem;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .category-card {
-      background: rgba(255, 249, 238, 0.95);
-      border: 1px solid rgba(97, 72, 46, 0.16);
-      border-radius: 1rem;
-      box-shadow: 0 0.6rem 1.2rem rgba(36, 22, 12, 0.06);
-      min-height: 8.25rem;
-      padding: 1.1rem;
-    }
-
-    .category-card h3 {
-      color: #201b16;
-      font-size: 1rem;
-      margin: 0 0 0.5rem;
-      text-transform: uppercase;
-    }
-
-    .category-card p {
-      color: #6f5c49;
-      line-height: 1.65;
-      margin: 0;
-    }
 
     @media (max-width: 900px) {
-      .quick-links-grid,
-      .category-grid__items {
+      .quick-links-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
@@ -1283,8 +1208,7 @@ interface EventCard {
     }
 
     @media (max-width: 640px) {
-      .quick-links-grid,
-      .category-grid__items {
+      .quick-links-grid {
         grid-template-columns: 1fr;
       }
 
@@ -1389,6 +1313,7 @@ interface EventCard {
 export class HomeComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly movieService = inject(MovieService);
+  private readonly eventService = inject(EventService);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly titleService = inject(Title);
   protected readonly language = inject(LanguageService);
@@ -1400,28 +1325,7 @@ export class HomeComponent {
   protected readonly carouselSlides = computed(() => this.movieCards().slice(0, 5));
 
   // TODO: Xóa dữ liệu fake này khi có API event thật
-  protected readonly eventBannerSlides = signal<Array<{ id: string | number; imageUrl: string; title?: string; link?: string }>>([
-    {
-      id: 1,
-      imageUrl: 'https://picsum.photos/seed/cinema1/1920/660',
-      title: 'Sự kiện mùa hè 2026'
-    },
-    {
-      id: 2,
-      imageUrl: 'https://picsum.photos/seed/cinema2/1920/660',
-      title: 'Ưu đãi đặc biệt tháng 4'
-    },
-    {
-      id: 3,
-      imageUrl: 'https://picsum.photos/seed/cinema3/1920/660',
-      title: 'CGV – Xem phim mùa lễ'
-    },
-    {
-      id: 4,
-      imageUrl: 'https://picsum.photos/seed/cinema4/1920/660',
-      title: 'Thành viên VIP ưu đãi 50%'
-    }
-  ]);
+  protected readonly eventBannerSlides = signal<Array<{ id: string | number; imageUrl: string; title?: string; link?: string }>>([]);
   protected readonly eventBannerIndex = signal(0);
   // Giới hạn tối đa 6 dots
   protected readonly visibleEventDots = computed(() =>
@@ -1516,8 +1420,8 @@ export class HomeComponent {
   constructor() {
     this.titleService.setTitle('CineGo');
 
-    const carouselTimer = setInterval(() => this.nextCarouselSlide(), 5000);
-    const eventTimer = setInterval(() => this.nextEventSlide(), 5000);
+    const carouselTimer = setInterval(() => this.nextCarouselSlide(), 8000);
+    const eventTimer = setInterval(() => this.nextEventSlide(), 8000);
 
     this.destroyRef.onDestroy(() => {
       clearInterval(carouselTimer);
@@ -1533,6 +1437,20 @@ export class HomeComponent {
         this.syncCarouselIndex(validMovies.length);
         this.loadingMovies.set(false);
         setTimeout(() => this.updateScrollState(), 50);
+      });
+
+    this.eventService
+      .getEvents()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((events) => {
+        const slides = events
+          .filter(e => e.isActive && e.imageUrl)
+          .map((e, index) => ({
+            id: e.name || index,
+            imageUrl: e.imageUrl,
+            title: e.name
+          }));
+        this.eventBannerSlides.set(slides);
       });
   }
 

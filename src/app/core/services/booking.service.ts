@@ -35,4 +35,20 @@ export class BookingService {
       })
     );
   }
+
+  createTicket(payload: { roomName: string; roomCode: string; startTime: string; seats: string[] }): Observable<any> {
+    return this.http.post<any>(this.apiService.apiUrl('/api/v1/ticket/create'), payload);
+  }
+
+  cancelTicket(payload: { ticketCodes: string[]; tradingCode?: string }): Observable<any> {
+    return this.http.post<any>(this.apiService.apiUrl('/api/v1/ticket/cancel'), payload);
+  }
+
+  createBill(payload: { customerName: string; foods: any[]; tickets: string[]; promotionCode: string }): Observable<any> {
+    return this.http.post<any>(this.apiService.apiUrl('/api/v1/bill/create'), payload);
+  }
+
+  submitPayment(code: string): Observable<string> {
+    return this.http.post(this.apiService.apiUrl(`/api/v1/bill/payment/submit-payment?code=${code}`), {}, { responseType: 'text' });
+  }
 }

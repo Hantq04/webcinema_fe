@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal, effect } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal, effect, OnDestroy } from '@angular/core';
 import { DecimalPipe, Location, CommonModule } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
@@ -7,7 +7,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LanguageService } from '../../core/services/language.service';
 import { BookingService } from '../../core/services/booking.service';
 import { ApiService } from '../../core/services/api.service';
+import { AuthService } from '../../core/services/auth.service';
 import { SeatItem, SeatScheduleData } from '../../core/models/seat.model';
+import { finalize, switchMap } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-booking',
@@ -160,11 +163,11 @@ import { SeatItem, SeatScheduleData } from '../../core/models/seat.model';
                   <p>Countdown Clock</p>
                   <div class="timer-display">
                     <div class="timer-unit">
-                      <span class="timer-num">09</span>
+                      <span class="timer-num">{{ formatMinutes(remainingSeconds()) }}</span>
                       <span class="timer-label">Minutes</span>
                     </div>
                     <div class="timer-unit">
-                      <span class="timer-num">59</span>
+                      <span class="timer-num">{{ formatSeconds(remainingSeconds()) }}</span>
                       <span class="timer-label">Seconds</span>
                     </div>
                   </div>
@@ -254,7 +257,7 @@ import { SeatItem, SeatScheduleData } from '../../core/models/seat.model';
     </div>
   `
 })
-export class BookingComponent {
+export class BookingComponent implements OnDestroy {
   protected readonly language = inject(LanguageService);
   protected readonly t = this.language.t.bind(this.language);
   private readonly route = inject(ActivatedRoute);
@@ -263,6 +266,8 @@ export class BookingComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly title = inject(Title);
   private readonly apiService = inject(ApiService);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
   protected readonly loading = signal(true);
   protected readonly seatData = signal<SeatScheduleData | null>(null);
@@ -271,6 +276,9 @@ export class BookingComponent {
   protected readonly showConfirmModal = signal(false);
   protected readonly bookingStep = signal(1); // 1: Seats, 2: Food, 3: Payment
   protected readonly selectedPaymentMethod = signal<string>('');
+  protected readonly remainingSeconds = signal(0);
+  protected readonly currentTicketCodes = signal<string[]>([]);
+  private timerInterval: any;
 
   protected readonly foodItems = signal<Array<{ id: string; name: string; description: string; price: number; imageUrl: string; quantity: number }>>([]);
 
@@ -310,11 +318,11 @@ export class BookingComponent {
       const step = this.bookingStep();
       window.scrollTo(0, 0);
       if (step === 1) {
-        this.title.setTitle(`Mua vé | CineGo`);
+        this.title.setTitle(`Mua vé`);
       } else if (step === 2) {
-        this.title.setTitle(`Bắp nước | CineGo`);
+        this.title.setTitle(`Bắp nước`);
       } else if (step === 3) {
-        this.title.setTitle(`Thanh toán | CineGo`);
+        this.title.setTitle(`Thanh toán`);
       }
     });
 
@@ -339,6 +347,10 @@ export class BookingComponent {
         this.loading.set(false);
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.stopTimer();
   }
 
   protected toggleSeat(seat: SeatItem): void {
@@ -398,10 +410,21 @@ export class BookingComponent {
   }
 
   protected goBack(): void {
+    if (this.bookingStep() === 3) {
+      const codes = this.currentTicketCodes();
+      if (codes.length > 0) {
+        this.bookingService.cancelTicket({ ticketCodes: codes }).subscribe({
+          error: (err) => console.error('Error canceling ticket', err)
+        });
+      }
+      this.currentTicketCodes.set([]);
+    }
+
     if (this.bookingStep() === 3 || this.bookingStep() === 2) {
       this.loading.set(true);
-      
+
       setTimeout(() => {
+        this.stopTimer();
         // Clear selected items when returning to seat selection
         this.selectedSeats.set([]);
         this.foodItems.update(items => items.map(item => ({ ...item, quantity: 0 })));
@@ -452,11 +475,117 @@ export class BookingComponent {
       }
       this.showConfirmModal.set(true);
     } else if (this.bookingStep() === 2) {
-      this.bookingStep.set(3);
+      const data = this.seatData();
+      if (!data) return;
+
+      const payload = {
+        roomName: data.cinema,
+        roomCode: data.room,
+        startTime: data.startAt,
+        seats: this.selectedSeats().map(s => `${s.line}${s.number}`)
+      };
+
+      this.loading.set(true);
+      this.bookingService.createTicket(payload).subscribe({
+        next: (res) => {
+          if (res.status === 200) {
+            this.currentTicketCodes.set(res.data.ticketCodes || []);
+            this.remainingSeconds.set(res.data.remainingSeconds || 600);
+            this.startTimer();
+            this.bookingStep.set(3);
+          } else {
+            alert(res.message || 'Lỗi khi giữ ghế');
+          }
+          this.loading.set(false);
+        },
+        error: (err) => {
+          console.error(err);
+          alert('Lỗi kết nối khi giữ ghế');
+          this.loading.set(false);
+        }
+      });
     } else {
       // Step 3 Next: Final Payment
-      alert('Đang chuyển hướng tới cổng thanh toán VNPAY...');
+      const customerName = this.authService.currentUserName() || 'guest';
+      const foods = this.foodItems()
+        .filter(f => f.quantity > 0)
+        .map(f => ({ name: f.name, quantity: f.quantity }));
+      const tickets = this.currentTicketCodes();
+
+      this.loading.set(true);
+      this.bookingService.createBill({
+        customerName,
+        foods,
+        tickets,
+        promotionCode: ""
+      }).pipe(
+        switchMap(res => {
+          if (res.status === 200) {
+            const tradingCode = res.data.tradingCode;
+            return this.bookingService.submitPayment(tradingCode);
+          }
+          throw new Error(res.message || 'Lỗi khi tạo hóa đơn');
+        }),
+        finalize(() => this.loading.set(false))
+      ).subscribe({
+        next: (paymentUrl) => {
+          if (paymentUrl) {
+            window.open(paymentUrl, '_blank');
+            alert('Đã mở trang thanh toán ở tab mới. Vui lòng hoàn tất thanh toán.');
+            void this.router.navigateByUrl('/');
+          } else {
+            alert('Không lấy được link thanh toán');
+          }
+        },
+        error: (err: any) => {
+          console.error(err);
+          alert(err.message || 'Lỗi xử lý thanh toán');
+        }
+      });
     }
+  }
+
+  private startTimer(): void {
+    this.stopTimer();
+    this.timerInterval = setInterval(() => {
+      this.remainingSeconds.update(s => {
+        if (s <= 1) {
+          this.stopTimer();
+          alert('Thời gian giữ ghế đã hết. Vui lòng chọn lại ghế');
+          this.goBackToSeats();
+          return 0;
+        }
+        return s - 1;
+      });
+    }, 1000);
+  }
+
+  private stopTimer(): void {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+  }
+
+  private goBackToSeats(): void {
+    this.loading.set(true);
+    this.stopTimer();
+    this.currentTicketCodes.set([]);
+    this.selectedSeats.set([]);
+    this.foodItems.update(items => items.map(item => ({ ...item, quantity: 0 })));
+    this.selectedPaymentMethod.set('');
+    this.bookingStep.set(1);
+    this.loading.set(false);
+  }
+
+  protected formatMinutes(totalSeconds: number): string {
+    const mins = Math.floor(totalSeconds / 60);
+    return mins.toString().padStart(2, '0');
+  }
+
+  protected formatSeconds(totalSeconds: number): string {
+    const secs = totalSeconds % 60;
+    return secs.toString().padStart(2, '0');
   }
 
   protected confirmBooking(): void {

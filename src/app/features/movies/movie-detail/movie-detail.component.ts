@@ -39,8 +39,17 @@ import { MovieScheduleModalComponent } from '../../../shared/components/movie-sc
           @if (movie(); as m) {
             <div class="movie-detail-content">
               <div class="movie-detail-content__left">
-                <div class="movie-detail-poster">
+                <div class="movie-detail-poster" #posterContainer (mousemove)="onMouseMove($event)" (mouseleave)="onMouseLeave()">
                   <img class="movie-detail-poster__image" [src]="moviePoster(m)" [alt]="m.title" />
+                  @if (showZoom()) {
+                    <div class="movie-detail-poster__lens" [style.left.px]="lensX()" [style.top.px]="lensY()"></div>
+                    <div class="movie-detail-poster__zoom-view">
+                      <div class="movie-detail-poster__zoom-img" 
+                           [style.background-image]="'url(' + moviePoster(m) + ')'"
+                           [style.background-position]="zoomPos()">
+                      </div>
+                    </div>
+                  }
                 </div>
               </div>
               
@@ -203,6 +212,12 @@ export class MovieDetailComponent {
   protected readonly trailerPreview = signal<{ title: string; embedUrl: SafeResourceUrl } | null>(null);
 
   protected readonly isScheduleOpen = signal(false);
+  
+  // Zoom logic signals
+  protected readonly showZoom = signal(false);
+  protected readonly lensX = signal(0);
+  protected readonly lensY = signal(0);
+  protected readonly zoomPos = signal('0% 0%');
 
   constructor() {
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
@@ -274,7 +289,7 @@ export class MovieDetailComponent {
   protected getRateText(m: MovieDetail): string {
     const rate = this.isEn() ? (m.rateEn ?? m.rate) : m.rate;
     const name = this.isEn() ? (m.rateNameEn ?? m.rateName) : m.rateName;
-    return `${rate} - ${name}`;
+    return `${rate} - ${name}`.toUpperCase();
   }
 
   protected getLanguage(m: MovieDetail): string {
@@ -368,5 +383,35 @@ export class MovieDetailComponent {
 
   protected closeSchedule(): void {
     this.isScheduleOpen.set(false);
+  }
+
+  protected onMouseMove(event: MouseEvent): void {
+    const container = event.currentTarget as HTMLElement;
+    const rect = container.getBoundingClientRect();
+    
+    // Lens size (CSS)
+    const LENS_SIZE = 100;
+    
+    let x = event.clientX - rect.left - LENS_SIZE / 2;
+    let y = event.clientY - rect.top - LENS_SIZE / 2;
+    
+    // Boundary check
+    if (x < 0) x = 0;
+    if (y < 0) y = 0;
+    if (x > rect.width - LENS_SIZE) x = rect.width - LENS_SIZE;
+    if (y > rect.height - LENS_SIZE) y = rect.height - LENS_SIZE;
+    
+    this.lensX.set(x);
+    this.lensY.set(y);
+    this.showZoom.set(true);
+    
+    // Calculate zoom position percentage
+    const xp = (x / (rect.width - LENS_SIZE)) * 100;
+    const yp = (y / (rect.height - LENS_SIZE)) * 100;
+    this.zoomPos.set(`${xp}% ${yp}%`);
+  }
+
+  protected onMouseLeave(): void {
+    this.showZoom.set(false);
   }
 }

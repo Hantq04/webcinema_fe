@@ -427,6 +427,7 @@ export class MovieScheduleModalComponent {
 
   protected setScheduleAddress(address: string): void {
     this.scheduleAddress.set(address);
+    this.scheduleRoom.set('STANDARD');
   }
 
   protected setScheduleRoom(roomType: string): void {

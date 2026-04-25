@@ -13,22 +13,25 @@
 }
 
 .auth-shell {
-  display: grid;
-  gap: 0.5rem;
-  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.82fr);
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
   margin: 0 auto;
-  max-width: 1180px;
-}
-
-.auth-card,
-.promo-card {
-  min-height: 680px;
+  max-width: 1000px;
 }
 
 .auth-card {
-  background: rgba(255, 250, 240, 0.98);
-  border-right: 1px solid rgba(81, 60, 35, 0.08);
-  padding: 0 0 1.4rem;
+  flex: 0 0 500px;
+  min-height: 520px;
+  background: transparent;
+  padding: 0 0 1.5rem;
+}
+
+.promo-card {
+  flex: 1;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
 }
 
 .auth-tabs {
@@ -88,7 +91,7 @@
   gap: 0.3rem;
 }
 
-.field > span {
+.field>span {
   color: #2a2118;
   font-weight: 700;
 }
@@ -135,7 +138,7 @@
   max-width: 20rem;
 }
 
-.auth-form-register .captcha-row > input[type='text'] {
+.auth-form-register .captcha-row>input[type='text'] {
   justify-self: start;
   min-width: 0;
   width: min(20rem, 100%);
@@ -336,49 +339,70 @@
 
 .promo-card {
   align-items: center;
-  background: rgba(255, 255, 255, 0.96);
+  background: transparent;
   display: grid;
   gap: 0.8rem;
   grid-template-rows: 1fr auto;
   justify-items: center;
-  padding: 2.2rem 1.5rem 1.2rem;
+  padding: 0 1.5rem 1.2rem;
 }
 
 .promo-carousel {
-  align-items: center;
-  display: grid;
-  gap: 0.3rem;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  justify-items: center;
+  position: relative;
   width: 100%;
+  display: block;
 }
 
 .carousel-arrow {
-  background: transparent;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.4);
   border: 0;
-  color: #d08b5a;
+  color: #333;
   cursor: pointer;
-  font-size: 2.2rem;
-  padding: 0 0.25rem;
+  font-size: 2.5rem;
+  padding: 0 0.5rem;
+  z-index: 10;
+  border-radius: 50%;
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.carousel-arrow:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.carousel-arrow.prev {
+  left: 1rem;
+}
+
+.carousel-arrow.next {
+  right: 1rem;
 }
 
 .promo-slide {
   align-items: center;
   font-family: inherit;
-  display: grid;
-  justify-items: center;
-  min-height: 560px;
-  padding: 1rem 1.2rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  padding: 0;
   text-align: center;
   width: 100%;
 }
 
-.promo-illustration {
-  border-radius: 1.2rem;
-  height: 320px;
-  margin-bottom: 1rem;
-  background: radial-gradient(circle at 50% 42%, rgba(255, 194, 66, 0.65) 0 16%, transparent 17%), linear-gradient(180deg, #ffffff 0 56%, #eef3ff 56% 100%);
-  width: min(100%, 290px);
+.promo-image {
+  width: 100%;
+  height: auto;
+  max-height: 600px;
+  object-fit: contain;
+  display: block;
 }
 
 .promo-kicker {
@@ -405,7 +429,7 @@
 }
 
 .carousel-dots {
-  display: inline-flex;
+  display: flex;
   gap: 0.5rem;
   justify-content: center;
 }
@@ -425,16 +449,15 @@
 
 @media (max-width: 980px) {
   .auth-shell {
-    grid-template-columns: minmax(0, 1fr);
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .auth-card,
   .promo-card {
+    flex: none;
+    width: 100%;
     min-height: auto;
-  }
-
-  .promo-slide {
-    min-height: 480px;
   }
 }
 

@@ -228,30 +228,25 @@
         <button type="submit" class="submit-button" [disabled]="submittingRegister()">
           {{ submittingRegister() ? '...' : t('auth.registerButton') }}
         </button>
-
-        <p class="register-note">{{ t('auth.registerNote') }}</p>
       </form>
       }
     </section>
 
     <aside class="promo-card">
       <div class="promo-carousel">
-        <button type="button" class="carousel-arrow" (click)="previousPromo()" aria-label="Slide trước">‹</button>
+        <button type="button" class="carousel-arrow prev" (click)="previousPromo()" aria-label="Slide trước">‹</button>
 
-        <article class="promo-slide" [attr.data-accent]="activePromo.accent">
-          <div class="promo-illustration" [attr.data-accent]="activePromo.accent"></div>
-          <p class="promo-kicker">{{ activePromo.badge }}</p>
-          <h2>{{ activePromo.title }}</h2>
-          <p>{{ activePromo.description }}</p>
+        <article class="promo-slide">
+          <img [src]="activePromo.imageUrl" alt="" class="promo-image" />
         </article>
 
-        <button type="button" class="carousel-arrow" (click)="nextPromo()" aria-label="Slide sau">›</button>
+        <button type="button" class="carousel-arrow next" (click)="nextPromo()" aria-label="Slide sau">›</button>
       </div>
 
       <div class="carousel-dots" role="tablist" aria-label="Danh sách ưu đãi">
         @for (slide of promoSlides; track $index) {
         <button type="button" class="dot" [class.active]="$index === activePromoIndex" (click)="selectPromo($index)"
-          [attr.aria-label]="'Xem ưu đãi ' + (slide.badge || $index + 1)"></button>
+          [attr.aria-label]="'Xem ưu đãi ' + ($index + 1)"></button>
         }
       </div>
     </aside>
