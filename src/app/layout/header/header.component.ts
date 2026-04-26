@@ -55,7 +55,14 @@ import { LanguageService } from '../../core/services/language.service';
           <a routerLink="/home" class="logo-link" [attr.aria-label]="t('header.homeAria')">
             <span class="logo-text">CINEGO</span>
           </a>
-          <a routerLink="/movies" class="buy-ticket-chip">{{ t('header.buyNow') }}</a>
+          <a routerLink="/movies" class="buy-ticket-link">
+            <img src="/mua_ve_ngay.png" alt="{{ t('header.buyNow') }}" class="buy-ticket-img" />
+            @if (isEn()) {
+              <span class="buy-ticket-text--en">{{ t('header.buyNowShort') }}</span>
+            } @else {
+              <span class="buy-ticket-text--vi">{{ t('header.buyNowShort') }}</span>
+            }
+          </a>
         </div>
 
         <nav aria-label="Main navigation" class="main-nav grid grid-cols-4 gap-1 pt-2 pb-2 max-[900px]:grid-cols-2 max-[640px]:grid-cols-1">
@@ -247,22 +254,51 @@ import { LanguageService } from '../../core/services/language.service';
       text-shadow: 0 0.08rem 0 rgba(255, 255, 255, 0.6), 0 0.25rem 0.6rem rgba(214, 47, 31, 0.08);
     }
 
-    .buy-ticket-chip {
-      align-items: center;
-      background: linear-gradient(180deg, #ff5a3c, #d62f1f);
-      border-radius: 0.6rem;
-      box-shadow: 0 0.65rem 1.1rem rgba(214, 47, 31, 0.24);
+    .buy-ticket-link {
+      display: inline-block;
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
+      z-index: 10;
+      position: relative;
+    }
+
+    .buy-ticket-link:hover {
+      transform: scale(1.05);
+    }
+
+    .buy-ticket-img {
+      display: block;
+      height: auto;
+      max-height: 110px;
+      width: auto;
+    }
+
+    .buy-ticket-text--vi,
+    .buy-ticket-text--en {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
       color: #fff;
-      display: inline-flex;
-      font-size: 0.9rem;
-      font-weight: 900;
-      justify-content: center;
-      letter-spacing: 0.04em;
-      padding: 0.85rem 1.2rem;
-      text-decoration: none;
-      text-transform: uppercase;
-      transform: rotate(-7deg);
+      font-weight: 950;
       white-space: nowrap;
+      pointer-events: none;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+      text-align: center;
+    }
+
+    .buy-ticket-text--vi {
+      bottom: 22%;
+      font-size: 0.76rem;
+      letter-spacing: -0.01em;
+      width: 75%;
+    }
+
+    .buy-ticket-text--en {
+      bottom: 22%;
+      left: 52%;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      width: 80%;
     }
 
     .main-nav {
@@ -456,5 +492,9 @@ export class HeaderComponent {
       event.stopPropagation();
     }
     alert('Tính năng đang được phát triển. Vui lòng quay lại sau!');
+  }
+
+  protected isEn(): boolean {
+    return this.language.currentLanguage() === 'en';
   }
 }

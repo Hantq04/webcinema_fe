@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal, effect } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -524,7 +524,11 @@ export class MoviesComponent {
   protected readonly sectionDescription = computed(() => (this.activeSection() === 'coming-soon' ? this.t('home.comingSoonDescription') : this.t('home.nowShowingDescription')));
 
   constructor() {
-    this.titleService.setTitle('Movies | CineGo');
+    effect(() => {
+      this.language.currentLanguage();
+      const key = this.activeSection() === 'coming-soon' ? 'titles.moviesComing' : 'titles.moviesShowing';
+      this.titleService.setTitle(this.t(key));
+    });
     this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const tab = params.get('tab');
       this.activeSection.set(tab === 'coming-soon' ? 'coming-soon' : 'now-showing');

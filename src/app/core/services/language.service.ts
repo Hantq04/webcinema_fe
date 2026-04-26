@@ -24,6 +24,7 @@ const translations = {
       cultureplex: 'Cultureplex',
       cultureplexSub: 'Góc CineGo',
       buyNow: 'Mua vé ngay',
+      buyNowShort: 'MUA VÉ NGAY',
       homeAria: 'Trang chủ CineGo',
       vi: 'VN',
       en: 'EN',
@@ -204,6 +205,17 @@ const translations = {
       loggedIn: 'Đang đăng nhập',
       quickActionLabel: 'Chức năng nhanh',
       quickActionValue: 'Xem tài khoản và quản lý đăng xuất'
+    },
+    titles: {
+      home: 'CineGo Cinemas Vietnam',
+      login: 'Đăng nhập',
+      register: 'Đăng ký tài khoản',
+      movieDetail: 'Thông tin - Lịch chiếu',
+      bookingTicket: 'Mua vé',
+      bookingCorn: 'Bắp nước',
+      bookingPayment: 'Thanh toán',
+      moviesShowing: 'Phim đang chiếu',
+      moviesComing: 'Phim sắp chiếu'
     }
   },
   en: {
@@ -225,6 +237,7 @@ const translations = {
       cultureplex: 'Cultureplex',
       cultureplexSub: 'CineGo corner',
       buyNow: 'Buy tickets now',
+      buyNowShort: 'TICKETS',
       homeAria: 'CineGo home',
       vi: 'VN',
       en: 'EN',
@@ -405,6 +418,17 @@ const translations = {
       loggedIn: 'Logged in',
       quickActionLabel: 'Quick action',
       quickActionValue: 'View account and manage logout'
+    },
+    titles: {
+      home: 'CineGo Cinemas Vietnam',
+      login: 'Login',
+      register: 'Register Account',
+      movieDetail: 'Movie Details',
+      bookingTicket: 'Buy Tickets',
+      bookingCorn: 'Concessions',
+      bookingPayment: 'Payment',
+      moviesShowing: 'Now Showing',
+      moviesComing: 'Coming Soon'
     }
   }
 } as const;
@@ -449,8 +473,12 @@ export class LanguageService {
                 ? 'booking'
                 : key.startsWith('shared.')
                   ? 'shared'
-                  : 'auth';
-    const normalizedKey = key.replace(/^header\.|^footer\.|^home\.|^admin\.|^movies\.|^booking\.|^shared\.|^auth\./, '');
+                  : key.startsWith('account.')
+                    ? 'account'
+                    : key.startsWith('titles.')
+                      ? 'titles'
+                      : 'auth';
+    const normalizedKey = key.replace(/^header\.|^footer\.|^home\.|^admin\.|^movies\.|^booking\.|^shared\.|^auth\.|^account\.|^titles\./, '');
     const currentTranslations = translations[language][group] as Record<string, string>;
     return currentTranslations[normalizedKey] ?? key;
   }

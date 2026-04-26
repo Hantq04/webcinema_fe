@@ -316,13 +316,14 @@ export class BookingComponent implements OnDestroy {
   constructor() {
     effect(() => {
       const step = this.bookingStep();
+      this.language.currentLanguage();
       window.scrollTo(0, 0);
       if (step === 1) {
-        this.title.setTitle(`Mua vé`);
+        this.title.setTitle(this.t('titles.bookingTicket'));
       } else if (step === 2) {
-        this.title.setTitle(`Bắp nước`);
+        this.title.setTitle(this.t('titles.bookingCorn'));
       } else if (step === 3) {
-        this.title.setTitle(`Thanh toán`);
+        this.title.setTitle(this.t('titles.bookingPayment'));
       }
     });
 

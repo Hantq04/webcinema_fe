@@ -220,6 +220,14 @@ export class MovieDetailComponent {
   protected readonly zoomPos = signal('0% 0%');
 
   constructor() {
+    effect(() => {
+      this.languageService.currentLanguage();
+      const m = this.movie();
+      if (m) {
+        this.titleService.setTitle(`${this.getTitle(m)} | ${this.t('titles.movieDetail')}`);
+      }
+    });
+
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const code = params.get('code');
       if (code) {
@@ -228,10 +236,6 @@ export class MovieDetailComponent {
         this.movieService.getMovieDetailByCode(code).subscribe((detail) => {
           this.movie.set(detail);
           this.loading.set(false);
-
-          if (detail?.title) {
-            this.titleService.setTitle(`${this.getTitle(detail)} | Thông tin - Lịch chiếu`);
-          }
         });
       } else {
         this.loading.set(false);

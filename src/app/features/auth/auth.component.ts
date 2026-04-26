@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnDestroy, OnInit, signal, effect } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { catchError, EMPTY, finalize, from, switchMap, tap } from 'rxjs';
@@ -37,6 +38,7 @@ export class AuthComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly formBuilder = inject(FormBuilder);
   private readonly languageService = inject(LanguageService);
+  private readonly titleService = inject(Title);
 
   protected readonly t = this.languageService.t.bind(this.languageService);
 
@@ -89,6 +91,15 @@ export class AuthComponent implements OnInit, OnDestroy {
 
   private captchaObjectUrl: string | null = null;
 
+  constructor() {
+    effect(() => {
+      // Trigger update when tab or language changes
+      this.activeTab();
+      this.languageService.currentLanguage();
+      this.updateTitle();
+    });
+  }
+
   ngOnInit(): void {
     if (this.authService.isAuthenticated()) {
       void this.router.navigateByUrl('/');
@@ -96,6 +107,7 @@ export class AuthComponent implements OnInit, OnDestroy {
     }
 
     this.loadCaptcha();
+    this.updateTitle();
   }
 
   ngOnDestroy(): void {
@@ -113,6 +125,7 @@ export class AuthComponent implements OnInit, OnDestroy {
     if ((tab === 'login' || tab === 'register') && !this.captcha()) {
       this.loadCaptcha();
     }
+    this.updateTitle();
   }
 
   protected refreshCaptcha(): void {
@@ -208,6 +221,11 @@ export class AuthComponent implements OnInit, OnDestroy {
 
   protected nextPromo(): void {
     this.activePromoIndex = (this.activePromoIndex + 1) % this.promoSlides.length;
+  }
+
+  private updateTitle(): void {
+    const key = this.activeTab() === 'login' ? 'titles.login' : 'titles.register';
+    this.titleService.setTitle(this.t(key));
   }
 
   protected previousPromo(): void {

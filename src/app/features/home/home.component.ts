@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal, viewChild, ElementRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal, viewChild, ElementRef, effect } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl, Title } from '@angular/platform-browser';
 import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -1325,7 +1325,10 @@ export class HomeComponent {
   protected readonly canScrollRight = signal(true);
 
   constructor() {
-    this.titleService.setTitle('CineGo Cinemas Vietnam');
+    effect(() => {
+      this.language.currentLanguage();
+      this.titleService.setTitle(this.t('titles.home'));
+    });
 
     const carouselTimer = setInterval(() => this.nextCarouselSlide(), 8000);
     const eventTimer = setInterval(() => this.nextEventSlide(), 8000);
