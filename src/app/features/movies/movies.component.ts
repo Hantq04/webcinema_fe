@@ -282,8 +282,7 @@ interface MovieCard extends Movie {
     .movie-card__poster::before {
       background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.14), transparent 24%),
-        radial-gradient(circle at 50% 15%, rgba(255, 255, 255, 0.16), transparent 28%),
-        repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0 0.45rem, transparent 0.45rem 0.9rem);
+        radial-gradient(circle at 50% 15%, rgba(255, 255, 255, 0.16), transparent 28%);
       content: '';
       inset: 0;
       position: absolute;
