@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal, viewChild, ElementRef } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl, Title } from '@angular/platform-browser';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { Movie } from '../../core/models/movie.model';
@@ -13,13 +13,8 @@ type EventCardAccent = 'crimson' | 'navy' | 'rose' | 'gold';
 
 interface EventCard {
   id: string;
-  kicker: string;
-  title: string;
-  subtitle?: string;
-  description?: string;
+  imageUrl: string;
   href: string;
-  cta?: string;
-  accent: EventCardAccent;
 }
 
 @Component({
@@ -37,12 +32,14 @@ interface EventCard {
             @if (eventBannerSlides().length > 0) {
               <div class="event-banner__track" [style.transform]="'translateX(-' + (eventBannerIndex() * 100) + '%)'">
                 @for (slide of eventBannerSlides(); track slide.id) {
-                  <img
-                    class="event-banner__image"
-                    [src]="slide.imageUrl"
-                    [alt]="slide.title || 'Event'"
-                    loading="eager"
-                  />
+                  <a href="javascript:void(0)" (click)="onEventClick()" class="event-banner__link">
+                    <img
+                      class="event-banner__image"
+                      [src]="slide.imageUrl"
+                      [alt]="slide.title || 'Event'"
+                      loading="eager"
+                    />
+                  </a>
                 }
               </div>
               <button type="button" class="event-banner__nav event-banner__nav--prev" (click)="previousEventSlide()" aria-label="Previous event">
@@ -190,36 +187,44 @@ interface EventCard {
         <section class="event-section" aria-labelledby="event-section-title">
           <div class="event-section__header">
             <div class="event-section__line"></div>
-            <h2 id="event-section-title" class="event-section__title">EVENT</h2>
+            <p id="event-section-title" class="event-section__title">EVENT</p>
             <div class="event-section__line"></div>
           </div>
 
-          <div class="event-section__badge-row">
-            <span class="event-section__badge">{{ t('home.eventBadge') }}</span>
+          <div class="event-section__banner">
+            <div class="event-banner-ribbon">
+              <span class="event-banner-ribbon__icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 12l-6-6v4H4v4h10v4l6-6z"/></svg>
+              </span>
+              <span class="event-banner-ribbon__text">Thành Viên CGV | Tin Mới & Ưu Đãi</span>
+            </div>
           </div>
 
-          <div class="event-section__grid event-section__grid--top">
-            @for (card of eventTopCards; track card.id) {
-              <a href="javascript:void(0)" (click)="onDevelop($event)" class="event-card event-card--compact" [class.event-card--crimson]="card.accent === 'crimson'" [class.event-card--rose]="card.accent === 'rose'" [class.event-card--navy]="card.accent === 'navy'" [class.event-card--gold]="card.accent === 'gold'">
-                <span class="event-card__kicker">{{ card.kicker }}</span>
-                <strong class="event-card__title">{{ card.title }}</strong>
-                <span class="event-card__subtitle">{{ card.subtitle }}</span>
-              </a>
-            }
+          <div class="event-section__row-wrapper">
+            <div class="event-section__grid event-section__grid--top">
+              @for (card of eventTopCards; track card.id) {
+                <div class="event-card-frame">
+                  <a href="javascript:void(0)" (click)="onEventClick()" class="event-card-img">
+                    <img [src]="card.imageUrl" [alt]="card.id" loading="lazy" />
+                  </a>
+                </div>
+              }
+            </div>
           </div>
+
+          <div class="event-section__divider"></div>
 
           <div class="event-section__grid event-section__grid--bottom">
             @for (card of eventBottomCards; track card.id) {
-              <a href="javascript:void(0)" (click)="onDevelop($event)" class="event-card event-card--feature" [class.event-card--crimson]="card.accent === 'crimson'" [class.event-card--rose]="card.accent === 'rose'" [class.event-card--navy]="card.accent === 'navy'" [class.event-card--gold]="card.accent === 'gold'">
-                <span class="event-card__kicker">{{ card.kicker }}</span>
-                <strong class="event-card__title">{{ card.title }}</strong>
-                <p class="event-card__description">{{ card.description }}</p>
-                @if (card.cta) {
-                  <span class="event-card__cta">{{ card.cta }}</span>
-                }
-              </a>
+              <div class="event-card-frame">
+                <a href="javascript:void(0)" (click)="onEventClick()" class="event-card-img" [class.event-card-img--wide]="card.id === 'b2'">
+                  <img [src]="card.imageUrl" [alt]="card.id" loading="lazy" />
+                </a>
+              </div>
             }
           </div>
+
+          <div class="event-section__divider"></div>
         </section>
 
         @if (trailerPreview()) {
@@ -277,27 +282,7 @@ interface EventCard {
       position: relative;
     }
 
-    .home-shell::before,
-    .home-shell::after {
-      background: repeating-linear-gradient(
-        90deg,
-        rgba(214, 47, 31, 0.08) 0 1.2rem,
-        transparent 1.2rem 2.4rem
-      );
-      content: '';
-      inset-inline: 0;
-      height: 0.5rem;
-      position: absolute;
-      z-index: 0;
-    }
 
-    .home-shell::before {
-      top: 0;
-    }
-
-    .home-shell::after {
-      bottom: 0;
-    }
 
     .home-shell__glow {
       background: radial-gradient(circle at center, rgba(255, 237, 190, 0.55), transparent 58%);
@@ -339,8 +324,15 @@ interface EventCard {
       will-change: transform;
     }
 
-    .event-banner__image {
+    .event-banner__link {
       flex: 0 0 100%;
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: pointer;
+    }
+
+    .event-banner__image {
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -486,7 +478,9 @@ interface EventCard {
     }
 
     .event-section {
-      margin-bottom: 1.8rem;
+      margin: 0 auto 1.8rem;
+      max-width: 1200px;
+      padding: 0 2rem;
     }
 
     .event-section__header {
@@ -498,174 +492,133 @@ interface EventCard {
     }
 
     .event-section__line {
-      border-top: 2px solid rgba(49, 36, 25, 0.72);
-      border-bottom: 2px solid rgba(49, 36, 25, 0.38);
-      height: 0.35rem;
+      border-top: 2px solid #111;
+      border-bottom: 2px solid #111;
+      height: 8px;
     }
 
     .event-section__title {
-      color: #201b16;
-      font-size: clamp(1.8rem, 3vw, 3rem);
+      color: #000;
+      display: inline-block;
+      font-size: clamp(2rem, 3.3vw, 3.4rem);
       font-weight: 900;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
       line-height: 1;
       margin: 0;
       text-align: center;
+      text-shadow: 0.5px 0.5px 0px rgba(0, 0, 0, 0.15);
       text-transform: uppercase;
+      margin: 0 1.5rem;
     }
 
-    .event-section__badge-row {
+    .event-section__banner {
       display: flex;
       justify-content: center;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
+      margin-top: 0.5rem;
     }
 
-    .event-section__badge {
-      align-items: center;
-      background: linear-gradient(90deg, #ea2e1e, #d62f1f);
-      color: #fff8ef;
+    .event-banner-ribbon {
+      background: #e71a0f;
+      color: #fff;
       display: inline-flex;
-      font-size: 0.82rem;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      padding: 0.5rem 1rem;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.5rem 3.5rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      clip-path: polygon(0 0, 18px 50%, 0 100%, 100% 100%, calc(100% - 18px) 50%, 100% 0);
       position: relative;
-      text-transform: uppercase;
+      z-index: 10;
     }
 
-    .event-section__badge::before,
-    .event-section__badge::after {
-      border-top: 0.7rem solid transparent;
-      border-bottom: 0.7rem solid transparent;
-      content: '';
-      position: absolute;
-      top: 0;
+    .event-banner-ribbon__icon {
+      width: 1.4rem;
+      height: 1.4rem;
     }
 
-    .event-section__badge::before {
-      border-right: 0.9rem solid #ea2e1e;
-      left: -0.9rem;
+    .event-section__row-wrapper {
+      position: relative;
+      margin-bottom: 1.5rem;
     }
 
-    .event-section__badge::after {
-      border-left: 0.9rem solid #d62f1f;
-      right: -0.9rem;
+
+
+    .event-section__divider {
+      height: 2px;
+      background: #111;
+      margin: 1.5rem 0;
+      width: 100%;
+    }
+
+    .event-card-frame {
+      display: flex;
     }
 
     .event-section__grid {
       display: grid;
-      gap: 0.85rem;
+      gap: 1.25rem;
     }
 
     .event-section__grid--top {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      margin-bottom: 1rem;
+      grid-template-columns: repeat(4, 1fr);
     }
 
     .event-section__grid--bottom {
-      grid-template-columns: 1fr 1.6fr 0.9fr;
+      grid-template-columns: 1.2fr 3fr 1.2fr;
+      align-items: center;
     }
 
-    .event-card {
-      align-items: flex-start;
-      border: 2px solid rgba(46, 32, 22, 0.72);
-      box-shadow: 0 0.8rem 1.5rem rgba(36, 22, 12, 0.08);
-      color: #fff8ef;
-      display: flex;
-      flex-direction: column;
-      gap: 0.45rem;
-      justify-content: flex-end;
-      min-height: 13rem;
-      overflow: hidden;
-      padding: 1rem;
-      position: relative;
-      text-decoration: none;
-      transition: transform 180ms ease, box-shadow 180ms ease;
+    .event-section__grid--top .event-card-frame {
+      border: none;
+      padding: 0;
+      height: auto;
     }
 
-    .event-card::before {
-      background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 42%),
-        radial-gradient(circle at top right, rgba(255, 255, 255, 0.28), transparent 26%),
-        radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.12), transparent 28%);
-      content: '';
-      inset: 0;
-      position: absolute;
-      z-index: 0;
+    .event-section__grid--top .event-card-img {
+      border: none;
+      border-radius: 0;
     }
 
-    .event-card > * {
-      position: relative;
-      z-index: 1;
+    .event-section__grid--bottom .event-card-frame {
+      border: 2px solid #222;
+      padding: 3px;
+      height: auto;
+      background: #fff;
     }
 
-    .event-card:hover {
-      box-shadow: 0 1rem 2rem rgba(36, 22, 12, 0.14);
-      transform: translateY(-2px);
-    }
-
-    .event-card--compact {
+    .event-section__grid--bottom .event-card-frame:nth-child(odd) {
       aspect-ratio: 1 / 1;
-      min-height: 0;
     }
 
-    .event-card--feature {
-      min-height: 16rem;
+    .event-section__grid--bottom .event-card-img {
+      border: 1px solid #222;
     }
 
-    .event-card__kicker {
-      color: rgba(255, 248, 239, 0.88);
-      font-size: 0.72rem;
-      font-weight: 900;
-      letter-spacing: 0.11em;
-      text-transform: uppercase;
+    .event-card-img {
+      display: flex;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.2s ease;
+      background: #fff;
     }
 
-    .event-card__title {
-      font-size: clamp(1rem, 1.8vw, 1.55rem);
-      font-weight: 900;
-      letter-spacing: 0.02em;
-      line-height: 1.1;
-      margin: 0;
-      text-transform: uppercase;
+    .event-card-img:hover {
+      transform: scale(1.015);
     }
 
-    .event-card__subtitle,
-    .event-card__description {
-      color: rgba(255, 248, 239, 0.9);
-      font-size: 0.88rem;
-      font-weight: 600;
-      line-height: 1.55;
-      margin: 0;
+    .event-card-img img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
     }
 
-    .event-card__cta {
-      align-self: flex-start;
-      background: rgba(255, 248, 239, 0.12);
-      border: 1px solid rgba(255, 248, 239, 0.24);
-      border-radius: 999px;
-      color: #fff8ef;
-      font-size: 0.74rem;
-      font-weight: 900;
-      letter-spacing: 0.08em;
-      padding: 0.35rem 0.7rem;
-      text-transform: uppercase;
-    }
-
-    .event-card--crimson {
-      background: linear-gradient(145deg, #241311 0%, #8e120f 46%, #ea2e1e 100%);
-    }
-
-    .event-card--rose {
-      background: linear-gradient(145deg, #ffb3b8 0%, #f66f8f 46%, #cc2e59 100%);
-    }
-
-    .event-card--navy {
-      background: linear-gradient(145deg, #1d2d4f 0%, #0f3f74 52%, #d63e2f 100%);
-    }
-
-    .event-card--gold {
-      background: linear-gradient(145deg, #3a2104 0%, #b36815 52%, #f2b11d 100%);
+    /* Side images in bottom row should fill the square frame */
+    .event-section__grid--bottom .event-card-frame:nth-child(odd) .event-card-img img {
+      height: 100% !important;
+      object-fit: cover !important;
     }
 
     .movie-section__header {
@@ -677,19 +630,21 @@ interface EventCard {
     }
 
     .movie-section__rule {
-      border-top: 2px solid rgba(49, 36, 25, 0.72);
-      border-bottom: 2px solid rgba(49, 36, 25, 0.38);
+      border-top: 2px solid #000;
+      border-bottom: 2px solid rgba(0, 0, 0, 0.4);
       height: 0.35rem;
     }
 
     .movie-section__title {
-      color: #201b16;
+      color: #000;
+      display: inline-block;
       font-size: clamp(2rem, 3.3vw, 3.4rem);
       font-weight: 900;
       letter-spacing: 0.06em;
       line-height: 1;
       margin: 0;
       text-align: center;
+      text-shadow: 0.5px 0.5px 0px rgba(0, 0, 0, 0.15);
       text-transform: uppercase;
     }
 
@@ -1316,6 +1271,8 @@ export class HomeComponent {
   private readonly eventService = inject(EventService);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly titleService = inject(Title);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   protected readonly language = inject(LanguageService);
   protected readonly t = this.language.t.bind(this.language);
   protected readonly movieCards = signal<Movie[]>([]);
@@ -1343,65 +1300,15 @@ export class HomeComponent {
     return slides[this.carouselIndex() % slides.length] ?? slides[0] ?? null;
   });
   protected readonly eventTopCards: readonly EventCard[] = [
-    {
-      id: 'membership',
-      kicker: 'CGV Membership',
-      title: 'Gia nhập ngay quà tặng đầy tay',
-      subtitle: 'Ưu đãi thành viên và quà tặng theo mùa',
-      href: '/auth',
-      accent: 'gold'
-    },
-    {
-      id: 'ticket-79000-1',
-      kicker: 'Đồng giá',
-      title: '79.000đ',
-      subtitle: 'Cho tất cả khách hàng thành viên',
-      href: '/booking',
-      accent: 'crimson'
-    },
-    {
-      id: 'ticket-79000-2',
-      kicker: 'Đồng giá',
-      title: '79.000đ VNĐ',
-      subtitle: 'Tại CGV Pandora',
-      href: '/booking',
-      accent: 'navy'
-    },
-    {
-      id: 'birthday',
-      kicker: 'Happy Birthday',
-      title: 'Quà sinh nhật cho CGV members',
-      subtitle: 'Bánh, bắp và voucher ưu đãi',
-      href: '/account',
-      accent: 'rose'
-    }
+    { id: '1', imageUrl: '/event/qua_tang.png', href: '/auth' },
+    { id: '2', imageUrl: '/event/dong_gia.png', href: '/booking' },
+    { id: '3', imageUrl: '/event/hoan_ve.jpg', href: '/refund' },
+    { id: '4', imageUrl: '/event/birthday_popcorn.png', href: '/account' }
   ];
   protected readonly eventBottomCards: readonly EventCard[] = [
-    {
-      id: 'gift-card',
-      kicker: 'Quà tặng',
-      title: 'Khéo chọn quà phim hay',
-      description: 'Bộ sưu tập quà tặng, voucher và ưu đãi dành cho người mê điện ảnh.',
-      href: '/auth',
-      accent: 'navy'
-    },
-    {
-      id: 'under-23',
-      kicker: 'Khách hàng dưới 23 tuổi',
-      title: '60.000đ - 70.000đ',
-      description: 'Giá vé tiêu chuẩn và giá vé rạp đặc biệt áp dụng theo điều kiện chương trình.',
-      href: '/movies',
-      accent: 'rose'
-    },
-    {
-      id: 'group-booking',
-      kicker: 'Thuê rạp / Sự kiện',
-      title: 'Vé nhóm và đặt rạp riêng',
-      description: 'Phù hợp cho hội nhóm, sinh nhật, team building và các buổi chiếu nội bộ.',
-      href: '/booking',
-      cta: 'Xem ngay',
-      accent: 'crimson'
-    }
+    { id: 'b1', imageUrl: '/event/qua_keo_li.png', href: '/auth' },
+    { id: 'b2', imageUrl: '/event/kh_23.png', href: '/movies' },
+    { id: 'b3', imageUrl: '/event/thue_rap.png', href: '/booking' }
   ];
   protected readonly trailerPreview = signal<{ title: string; embedUrl: SafeResourceUrl } | null>(null);
   protected readonly loadingSlots = Array.from({ length: 8 }, (_, index) => index);
@@ -1418,7 +1325,7 @@ export class HomeComponent {
   protected readonly canScrollRight = signal(true);
 
   constructor() {
-    this.titleService.setTitle('CineGo');
+    this.titleService.setTitle('CineGo Cinemas Vietnam');
 
     const carouselTimer = setInterval(() => this.nextCarouselSlide(), 8000);
     const eventTimer = setInterval(() => this.nextEventSlide(), 8000);
@@ -1452,6 +1359,36 @@ export class HomeComponent {
           }));
         this.eventBannerSlides.set(slides);
       });
+
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        const status = params['paymentStatus'];
+        if (status) {
+          let message = '';
+          if (status === 'success') {
+            message = 'Thanh toán thành công';
+          } else if (status === 'cancel') {
+            message = 'Hủy thanh toán thành công';
+          } else if (status === 'fail') {
+            message = 'Thanh toán thất bại';
+          }
+
+          if (message) {
+            alert(message);
+            this.router.navigate([], {
+              relativeTo: this.route,
+              queryParams: { paymentStatus: null },
+              queryParamsHandling: 'merge',
+              replaceUrl: true
+            });
+          }
+        }
+      });
+  }
+
+  protected onEventClick(): void {
+    alert('Thông tin đang được cập nhật');
   }
 
   protected updateScrollState(): void {

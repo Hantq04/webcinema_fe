@@ -10,34 +10,47 @@ import { LanguageService } from '../../core/services/language.service';
   imports: [RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <header class="cinema-header border-b-4 border-[#d62f1f] shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]">
-      <div class="header-top-dotline"></div>
+    <!-- Banner quảng cáo thay thế top-row -->
+    <div class="ad-banner">
+      <img src="/vnpay_qc.jpg" alt="Quảng cáo" class="ad-banner__img" />
+    </div>
 
-      <div class="mx-auto max-w-7xl px-4 py-3">
-        <div class="top-row">
-          <div class="rounded-full bg-[#d9f5d3] px-3 py-1 text-sm font-bold whitespace-nowrap text-[#1f6a2f] cursor-pointer" (click)="onDevelop()">Zalopay</div>
-          <div class="flex flex-col items-center gap-1 text-center">
-            <strong class="text-[1.1rem] font-black uppercase tracking-[0.12em] text-[#d62f1f]">CineGo</strong>
-            <span class="text-sm text-[#6d5b46]">{{ t('header.slogan') }}</span>
-          </div>
-          <div class="rounded-full bg-[#d62f1f] px-3 py-1 text-sm font-bold whitespace-nowrap text-[#fff6ec] cursor-pointer" (click)="onDevelop()">{{ t('header.deal') }}</div>
-        </div>
-
+    <!-- Hàng tiện ích với nền trắng -->
+    <div class="utility-wrapper">
+      <div class="mx-auto max-w-7xl px-4 py-0.5">
         <div class="utility-row">
-          <a href="javascript:void(0)" (click)="onDevelop()" class="utility-link">{{ t('header.news') }}</a>
-          <a href="javascript:void(0)" (click)="onDevelop()" class="utility-link">{{ t('header.myTickets') }}</a>
+          <a href="javascript:void(0)" (click)="onDevelop()" class="utility-link inline-flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.586 2.586 2 13.172V22h8.828l10.586-10.586a2 2 0 0 0 0-2.828l-6.172-6.172a2 2 0 0 0-2.828 0z"/><path d="m9 13 4 4"/><circle cx="9" cy="17" r="0.5"/><circle cx="13" cy="13" r="0.5"/></svg>
+            {{ t('header.news') }}
+          </a>
+          <a href="javascript:void(0)" (click)="onDevelop()" class="utility-link inline-flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg>
+            {{ t('header.myTickets') }}
+          </a>
           @if (auth.isAuthenticated()) {
-            <a routerLink="/account" class="utility-user utility-user--link">{{ t('header.hello') }} {{ auth.currentUserName() || t('header.member') }}</a>
+            <a routerLink="/account" class="utility-user utility-user--link inline-flex items-center gap-1.5">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+              {{ t('header.hello') }} {{ auth.currentUserName() || t('header.member') }}
+            </a>
             <button type="button" class="utility-link utility-link--button" (click)="logout()">{{ t('header.logout') }}</button>
           } @else {
-            <a routerLink="/auth" class="utility-link">{{ t('header.loginRegister') }}</a>
+            <a routerLink="/auth" class="utility-link inline-flex items-center gap-1.5">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+              {{ t('header.loginRegister') }}
+            </a>
           }
-          <span class="inline-flex gap-1">
+          <div class="lang-switch">
             <button type="button" class="lang-button" [class.active]="language.isActive('vi')" (click)="language.useLanguage('vi')">{{ t('header.vi') }}</button>
             <button type="button" class="lang-button" [class.active]="language.isActive('en')" (click)="language.useLanguage('en')">{{ t('header.en') }}</button>
-          </span>
+          </div>
         </div>
+      </div>
+    </div>
 
+    <header class="cinema-header">
+      <!-- Dotline đỏ phân cách utility-row và phần brand-row/nav -->
+      <div class="header-dotline"></div>
+      <div class="mx-auto max-w-7xl px-4">
         <div class="brand-row">
           <a routerLink="/home" class="logo-link" [attr.aria-label]="t('header.homeAria')">
             <span class="logo-text">CINEGO</span>
@@ -45,7 +58,7 @@ import { LanguageService } from '../../core/services/language.service';
           <a routerLink="/movies" class="buy-ticket-chip">{{ t('header.buyNow') }}</a>
         </div>
 
-        <nav aria-label="Main navigation" class="main-nav grid grid-cols-4 gap-1 pt-3 pb-3 max-[900px]:grid-cols-2 max-[640px]:grid-cols-1">
+        <nav aria-label="Main navigation" class="main-nav grid grid-cols-4 gap-1 pt-2 pb-2 max-[900px]:grid-cols-2 max-[640px]:grid-cols-1">
           <!-- Phim -->
           <div class="nav-item group" [class.nav-item--open]="isMenuOpen('movies')" (mouseleave)="closeMenu()">
             <button type="button" class="nav-link" [attr.aria-expanded]="isMenuOpen('movies')" aria-haspopup="menu" (click)="toggleMenu('movies')">
@@ -77,6 +90,7 @@ import { LanguageService } from '../../core/services/language.service';
             <div class="dropdown-menu" [class.dropdown-menu--open]="isMenuOpen('member')">
               <a href="javascript:void(0)" (click)="onDevelop()" class="dropdown-link">{{ t('header.accountCgv') }}</a>
               <a href="javascript:void(0)" (click)="onDevelop()" class="dropdown-link">{{ t('header.memberBenefits') }}</a>
+              <a href="javascript:void(0)" (click)="onDevelop()" class="dropdown-link">{{ t('header.forStaff') }}</a>
             </div>
           </div>
 
@@ -94,6 +108,9 @@ import { LanguageService } from '../../core/services/language.service';
           </div>
         </nav>
       </div>
+
+      <!-- Dotline đỏ phía dưới -->
+      <div class="header-dotline"></div>
     </header>
   `,
   styles: `
@@ -101,75 +118,62 @@ import { LanguageService } from '../../core/services/language.service';
       display: block;
     }
 
+    /* ===== Banner quảng cáo ===== */
+    .ad-banner {
+      display: flex;
+      justify-content: center;
+      background: #fdfaf0;
+    }
+
+    .ad-banner__img {
+      display: block;
+      width: auto;
+      max-width: 100%;
+      height: auto;
+      max-height: 80px;
+    }
+
+    .utility-wrapper {
+      background-color: #fdfaf0;
+      position: relative;
+      z-index: 31;
+    }
+
     .cinema-header {
-      background-color: #f6f0df;
+      background-color: #fdf5e1;
       background-image:
-        radial-gradient(circle at 50% 0, rgba(214, 47, 31, 0.08), transparent 36%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 245, 223, 0.25)),
+        radial-gradient(circle at 50% 0, rgba(214, 47, 31, 0.05), transparent 45%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 245, 223, 0.1)),
         repeating-linear-gradient(
-          90deg,
-          rgba(214, 47, 31, 0.14) 0 0.25rem,
-          transparent 0.25rem 1.9rem
+          0deg,
+          rgba(49, 36, 25, 0.18) 0 1px,
+          transparent 1px 1.85rem
         );
       overflow: visible;
       position: relative;
       z-index: 30;
     }
 
-    .cinema-header::before,
-    .cinema-header::after {
-      background: repeating-linear-gradient(
-        90deg,
-        #d62f1f 0 0.65rem,
-        #fff1dd 0.65rem 1.05rem
-      );
-      content: '';
-      display: block;
-      height: 0.45rem;
-      left: 0;
-      position: absolute;
-      right: 0;
-      z-index: 0;
-    }
-
-    .cinema-header::before {
-      top: 0;
-    }
-
-    .cinema-header::after {
-      bottom: 0;
-    }
-
-    .header-top-dotline {
+    /* Dotline đỏ (dùng cả trên lẫn dưới) */
+    .header-dotline {
       background: radial-gradient(circle, rgba(255,255,255,0.95) 0 0.13rem, transparent 0.14rem) 0 0 / 0.9rem 0.45rem repeat-x, #d62f1f;
       height: 0.45rem;
       position: relative;
       z-index: 1;
     }
 
-    .top-row,
     .utility-row,
     .brand-row {
       position: relative;
       z-index: 1;
     }
 
-    .top-row {
-      align-items: center;
-      display: flex;
-      justify-content: space-between;
-      gap: 1rem;
-      margin-top: 0.45rem;
-    }
-
     .utility-row {
       align-items: center;
-      border-bottom: 1px solid rgba(81, 60, 35, 0.32);
-      border-top: 1px solid rgba(81, 60, 35, 0.32);
       display: flex;
       gap: 1rem;
       justify-content: flex-end;
-      margin-top: 0.6rem;
+      margin-top: 0;
       padding: 0.55rem 0 0.35rem;
     }
 
@@ -223,7 +227,7 @@ import { LanguageService } from '../../core/services/language.service';
       display: flex;
       justify-content: space-between;
       gap: 1rem;
-      padding: 0.85rem 0 0.2rem;
+      padding: 0.5rem 0 0.1rem;
     }
 
     .logo-link {
@@ -237,7 +241,7 @@ import { LanguageService } from '../../core/services/language.service';
       display: inline-block;
       font-size: clamp(2.9rem, 5.6vw, 5.4rem);
       font-weight: 900;
-      letter-spacing: -0.1em;
+      letter-spacing: -0.05em;
       line-height: 1;
       text-transform: uppercase;
       text-shadow: 0 0.08rem 0 rgba(255, 255, 255, 0.6), 0 0.25rem 0.6rem rgba(214, 47, 31, 0.08);
@@ -263,7 +267,7 @@ import { LanguageService } from '../../core/services/language.service';
 
     .main-nav {
       position: relative;
-      z-index: 1;
+      z-index: 10;
     }
 
     .nav-item {
@@ -294,6 +298,8 @@ import { LanguageService } from '../../core/services/language.service';
     }
 
     .nav-link__label {
+      color: #231b14;
+      display: inline-block;
       font-size: 1.2rem;
       font-weight: 900;
       letter-spacing: 0.02em;
@@ -309,7 +315,7 @@ import { LanguageService } from '../../core/services/language.service';
     .dropdown-menu {
       position: absolute;
       top: calc(100% + 0.35rem);
-      left: 0;
+      left: 50%;
       min-width: 200px;
       background: #333333;
       border: 1px solid rgba(255, 255, 255, 0.15);
@@ -318,7 +324,7 @@ import { LanguageService } from '../../core/services/language.service';
       padding: 0.5rem 0;
       opacity: 0;
       visibility: hidden;
-      transform: translateY(10px);
+      transform: translateX(-50%) translateY(10px);
       transition: opacity 200ms ease, transform 200ms ease, visibility 200ms;
       z-index: 80;
     }
@@ -330,7 +336,7 @@ import { LanguageService } from '../../core/services/language.service';
     .nav-item:hover .dropdown-menu {
       opacity: 1;
       visibility: visible;
-      transform: translateY(0);
+      transform: translateX(-50%) translateY(0);
     }
 
     .nav-item::after {
@@ -364,19 +370,32 @@ import { LanguageService } from '../../core/services/language.service';
       transform: translateY(0);
     }
 
+    .lang-switch {
+      display: inline-flex;
+      border-radius: 0.375rem;
+      overflow: hidden;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
     .lang-button {
       background: #9d907d;
       border: 0;
-      border-radius: 0.375rem;
       color: #fff;
       cursor: pointer;
       font-size: 0.78rem;
       font-weight: 700;
-      padding: 0.2rem 0.55rem;
+      padding: 0.25rem 0.6rem;
+      min-width: 40px;
+      text-align: center;
+      transition: background 150ms ease;
     }
 
     .lang-button.active {
       background: #d62f1f;
+    }
+
+    .lang-button:not(.active):hover {
+      background: #8e8578;
     }
 
     @media (max-width: 900px) {

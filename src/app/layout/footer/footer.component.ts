@@ -7,7 +7,29 @@ import { LanguageService } from '../../core/services/language.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <footer class="bg-[#f5efd9] text-[#5e5a53]">
-      <div class="border-y border-[rgba(54,54,54,1)] px-6 py-5">
+      <div class="border-t-2 border-black px-6 py-4">
+        <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-4 gap-y-2 opacity-90 transition-all duration-300">
+          <span class="text-[0.95rem] font-black text-[#8a8a8a] tracking-tight">4DX</span>
+          <span class="text-[#8a8a8a] opacity-30 text-xs">|</span>
+          <span class="text-[0.95rem] font-black text-[#0097ce] tracking-tighter">IMAX</span>
+          <span class="text-[0.85rem] font-black text-[#f4821f] tracking-tight">STARIUM</span>
+          <span class="text-[0.85rem] font-black text-[#333] tracking-tighter uppercase">Gold Class</span>
+          <span class="text-[#8a8a8a] opacity-30 text-xs">|</span>
+          <span class="text-[0.85rem] font-serif font-bold text-black italic tracking-wide">L'AMOUR</span>
+          <span class="text-[#8a8a8a] opacity-30 text-xs">|</span>
+          <span class="text-[0.85rem] font-black text-[#ff4d8d] tracking-tighter uppercase">Sweetbox</span>
+          <span class="text-[#8a8a8a] opacity-30 text-xs">|</span>
+          <span class="text-[0.85rem] font-black text-[#e71a0f] tracking-tight uppercase">Premium Cinema</span>
+          <span class="text-[#8a8a8a] opacity-30 text-xs">|</span>
+          <span class="text-[0.95rem] font-black text-[#8a8a8a] tracking-tight">SCREENX</span>
+          <span class="text-[0.85rem] font-bold text-[#4a3b2b] uppercase">Cine & Forêt</span>
+          <span class="text-[#8a8a8a] opacity-30 text-xs">|</span>
+          <span class="text-[0.85rem] font-bold text-black uppercase">Cine & Living Room</span>
+          <span class="text-[0.85rem] font-bold text-black uppercase underline decoration-1">Cine & Suite</span>
+        </div>
+      </div>
+
+      <div class="border-y-2 border-black px-6 py-5">
         <div class="mx-auto grid max-w-7xl gap-10 md:grid-cols-4">
           <section>
             <h3 class="mb-3 text-lg font-bold text-[#5e5a53]">{{ t('footer.companyName') }}</h3>
@@ -67,7 +89,7 @@ import { LanguageService } from '../../core/services/language.service';
         </div>
       </div>
 
-      <div class="border-b border-[rgba(54,54,54,1)] px-6 py-5">
+      <div class="px-6 py-5">
         <div class="mx-auto grid max-w-7xl gap-4 md:grid-cols-[auto_1fr] md:items-start">
           <div class="text-3xl font-black uppercase tracking-[-0.08em] text-[#808080]">CG</div>
           <div class="space-y-1 text-[0.95rem] leading-6">
@@ -79,6 +101,7 @@ import { LanguageService } from '../../core/services/language.service';
           </div>
         </div>
       </div>
+
 
       <div class="footer-brick"></div>
     </footer>
@@ -111,25 +134,12 @@ import { LanguageService } from '../../core/services/language.service';
     }
 
     .footer-brick {
-      height: 10rem;
-      background-color: #d96d2c;
-      background-image:
-        linear-gradient(90deg, rgba(255,255,255,0.55) 0 2px, transparent 2px),
-        linear-gradient(180deg, rgba(255,255,255,0.15), rgba(0,0,0,0.1)),
-        repeating-linear-gradient(
-          0deg,
-          transparent 0 1.35rem,
-          rgba(255,255,255,0.18) 1.35rem 1.45rem
-        ),
-        repeating-linear-gradient(
-          90deg,
-          #e77f31 0 6.4rem,
-          #de7429 6.4rem 6.45rem,
-          #c85f21 6.45rem 12.9rem
-        );
-      background-size: 6.45rem 1.45rem, 100% 100%, 100% 1.45rem, 100% 100%;
-      background-position: 0 0, 0 0, 0 0, 0 0;
+      height: 120px;
+      background: url('/brick-wall.jpg') repeat-x center bottom;
+      background-size: auto 100%;
     }
+
+
   `
 })
 export class FooterComponent {

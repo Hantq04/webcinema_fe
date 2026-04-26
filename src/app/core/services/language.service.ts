@@ -35,7 +35,8 @@ const translations = {
       onlineStore: 'Quầy Online',
       groupBooking: 'Thuê Rạp & Vé Nhóm',
       egift: 'CineGo eGift',
-      rules: 'CineGo Rules'
+      rules: 'CineGo Rules',
+      forStaff: 'Dành Cho Nhân Viên'
     },
     footer: {
       companyName: 'CineGo Việt Nam',
@@ -226,7 +227,17 @@ const translations = {
       buyNow: 'Buy tickets now',
       homeAria: 'CineGo home',
       vi: 'VN',
-      en: 'EN'
+      en: 'EN',
+      allCinemas: 'All Cinemas',
+      specialCinemas: 'Special Cinemas',
+      threeDCinemas: '3D Cinemas',
+      accountCgv: 'CineGo Account',
+      memberBenefits: 'Benefits',
+      onlineStore: 'Online Store',
+      groupBooking: 'Group Booking & Rental',
+      egift: 'CineGo eGift',
+      rules: 'CineGo Rules',
+      forStaff: 'For Staff'
     },
     footer: {
       companyName: 'CineGo Vietnam',
