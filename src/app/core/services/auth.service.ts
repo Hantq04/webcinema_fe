@@ -26,6 +26,8 @@ export interface AuthSession {
   accessToken: string | null;
   expiresIn: number | null;
   userName: string | null;
+  email: string | null;
+  phoneNumber: string | null;
   role: string | null;
 }
 
@@ -45,6 +47,8 @@ export class AuthService {
 
   readonly isAuthenticated = computed(() => this.session().authenticated);
   readonly currentUserName = computed(() => this.session().userName);
+  readonly currentUserEmail = computed(() => this.session().email);
+  readonly currentUserPhone = computed(() => this.session().phoneNumber);
 
   getAccessToken(): string | null {
     return this.session().accessToken;
@@ -74,6 +78,8 @@ export class AuthService {
       accessToken: null,
       expiresIn: null,
       userName: null,
+      email: null,
+      phoneNumber: null,
       role: null
     });
     localStorage.removeItem(this.sessionKey);
@@ -95,6 +101,8 @@ export class AuthService {
         accessToken: null,
         expiresIn: null,
         userName: null,
+        email: null,
+        phoneNumber: null,
         role: null
       };
     }
@@ -107,6 +115,8 @@ export class AuthService {
         accessToken: null,
         expiresIn: null,
         userName: null,
+        email: null,
+        phoneNumber: null,
         role: null
       };
     }
@@ -118,6 +128,8 @@ export class AuthService {
         accessToken: typeof parsed.accessToken === 'string' ? parsed.accessToken : null,
         expiresIn: typeof parsed.expiresIn === 'number' && Number.isFinite(parsed.expiresIn) ? parsed.expiresIn : null,
         userName: typeof parsed.userName === 'string' ? parsed.userName : null,
+        email: typeof parsed.email === 'string' ? parsed.email : null,
+        phoneNumber: typeof parsed.phoneNumber === 'string' ? parsed.phoneNumber : null,
         role: typeof parsed.role === 'string' ? parsed.role : null
       };
     } catch {
@@ -126,6 +138,8 @@ export class AuthService {
         accessToken: null,
         expiresIn: null,
         userName: null,
+        email: null,
+        phoneNumber: null,
         role: null
       };
     }
@@ -164,11 +178,25 @@ export class AuthService {
       this.firstString(responseResult, ['role', 'userRole']) ??
       this.firstString(responsePayload, ['role', 'userRole']);
 
+    const email =
+      this.firstString(responseObject, ['email', 'emailAddress']) ??
+      this.firstString(responseData, ['email', 'emailAddress']) ??
+      this.firstString(responseResult, ['email', 'emailAddress']) ??
+      this.firstString(responsePayload, ['email', 'emailAddress']);
+
+    const phoneNumber =
+      this.firstString(responseObject, ['phoneNumber', 'phone', 'mobile']) ??
+      this.firstString(responseData, ['phoneNumber', 'phone', 'mobile']) ??
+      this.firstString(responseResult, ['phoneNumber', 'phone', 'mobile']) ??
+      this.firstString(responsePayload, ['phoneNumber', 'phone', 'mobile']);
+
     return {
       authenticated: true,
       accessToken,
       expiresIn,
       userName,
+      email,
+      phoneNumber,
       role
     };
   }

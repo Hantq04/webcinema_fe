@@ -23,7 +23,7 @@ import { LanguageService } from '../../core/services/language.service';
             <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.586 2.586 2 13.172V22h8.828l10.586-10.586a2 2 0 0 0 0-2.828l-6.172-6.172a2 2 0 0 0-2.828 0z"/><path d="m9 13 4 4"/><circle cx="9" cy="17" r="0.5"/><circle cx="13" cy="13" r="0.5"/></svg>
             {{ t('header.news') }}
           </a>
-          <a href="javascript:void(0)" (click)="onDevelop()" class="utility-link inline-flex items-center gap-1.5">
+          <a routerLink="/account" [queryParams]="{ view: 'history' }" class="utility-link inline-flex items-center gap-1.5">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg>
             {{ t('header.myTickets') }}
           </a>
