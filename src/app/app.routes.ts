@@ -23,8 +23,13 @@ export const routes: Routes = [
 				loadChildren: () => import('./features/booking/booking.routes').then((m) => m.bookingRoutes)
 			},
 			{
-				path: 'auth',
+				path: 'customer/account',
 				loadChildren: () => import('./features/auth/auth.routes').then((m) => m.authRoutes)
+			},
+			{
+				path: 'staff/account',
+				loadChildren: () => import('./features/auth/auth.routes').then((m) => m.authRoutes),
+				data: { staff: true }
 			},
 			{
 				path: 'account',
@@ -35,6 +40,10 @@ export const routes: Routes = [
 				loadChildren: () => import('./features/admin/admin.routes').then((m) => m.adminRoutes)
 			}
 		]
+	},
+	{
+		path: 'management',
+		loadChildren: () => import('./features/management/management.routes').then((m) => m.managementRoutes)
 	},
 	{
 		path: '**',

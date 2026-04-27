@@ -64,6 +64,10 @@ export class AuthService {
     return this.http.post<unknown>(this.apiService.apiUrl('/api/v1/user/register'), payload);
   }
 
+  staffRegister(payload: RegisterRequest): Observable<unknown> {
+    return this.http.post<unknown>(this.apiService.apiUrl('/api/v1/user/staff-register'), payload);
+  }
+
   logout(): void {
     this.session.set({
       authenticated: false,

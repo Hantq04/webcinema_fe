@@ -1300,13 +1300,13 @@ export class HomeComponent {
     return slides[this.carouselIndex() % slides.length] ?? slides[0] ?? null;
   });
   protected readonly eventTopCards: readonly EventCard[] = [
-    { id: '1', imageUrl: '/event/qua_tang.png', href: '/auth' },
+    { id: '1', imageUrl: '/event/qua_tang.png', href: '/customer/account/login' },
     { id: '2', imageUrl: '/event/dong_gia.png', href: '/booking' },
     { id: '3', imageUrl: '/event/hoan_ve.jpg', href: '/refund' },
     { id: '4', imageUrl: '/event/birthday_popcorn.png', href: '/account' }
   ];
   protected readonly eventBottomCards: readonly EventCard[] = [
-    { id: 'b1', imageUrl: '/event/qua_keo_li.png', href: '/auth' },
+    { id: 'b1', imageUrl: '/event/qua_keo_li.png', href: '/customer/account/login' },
     { id: 'b2', imageUrl: '/event/kh_23.png', href: '/movies' },
     { id: 'b3', imageUrl: '/event/thue_rap.png', href: '/booking' }
   ];
@@ -1317,7 +1317,7 @@ export class HomeComponent {
     { id: 'theaters', icon: '🎬', titleKey: 'home.ctaHub', subtitleKey: 'home.ctaHubSub', href: '/booking' },
     { id: 'movies', icon: '🍿', titleKey: 'home.ctaMovies', subtitleKey: 'home.ctaMoviesSub', href: '/movies' },
     { id: 'special', icon: '⭐', titleKey: 'home.ctaSpecial', subtitleKey: 'home.ctaSpecialSub', href: '/movies' },
-    { id: 'register', icon: '🎟️', titleKey: 'home.ctaRegister', subtitleKey: 'home.ctaRegisterSub', href: '/auth' }
+    { id: 'register', icon: '🎟️', titleKey: 'home.ctaRegister', subtitleKey: 'home.ctaRegisterSub', href: '/customer/account/login' }
   ] as const;
 
   protected readonly movieTrack = viewChild<ElementRef<HTMLElement>>('movieTrack');

@@ -92,6 +92,6 @@ export class AccountComponent {
 
   protected logout(): void {
     this.auth.logout();
-    void this.router.navigateByUrl('/auth');
+    void this.router.navigateByUrl('/customer/account/login');
   }
 }

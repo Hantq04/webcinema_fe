@@ -1,6 +1,12 @@
 <section class="auth-page">
   <div class="auth-shell">
     <section class="auth-card">
+      @if (staffMode()) {
+        <div class="staff-mode-header">
+          {{ t('auth.staffMode') }}
+        </div>
+      }
+
       <div class="auth-tabs" role="tablist" aria-label="Tài khoản">
         <button type="button" class="auth-tab" [class.active]="activeTab() === 'login'" (click)="selectTab('login')">
           {{ t('auth.loginTab') }}

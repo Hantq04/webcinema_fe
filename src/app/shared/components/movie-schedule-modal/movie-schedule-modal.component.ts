@@ -462,7 +462,7 @@ export class MovieScheduleModalComponent {
 
   protected onSelectShowtime(st: { time: string; scheduleCode: string }, cinema: any): void {
     if (!this.authService.isAuthenticated()) {
-      void this.router.navigate(['/auth']);
+      void this.router.navigate(['/customer/account/login']);
       return;
     }
 

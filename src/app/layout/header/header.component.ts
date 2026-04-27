@@ -34,7 +34,7 @@ import { LanguageService } from '../../core/services/language.service';
             </a>
             <button type="button" class="utility-link utility-link--button" (click)="logout()">{{ t('header.logout') }}</button>
           } @else {
-            <a routerLink="/auth" class="utility-link inline-flex items-center gap-1.5">
+            <a routerLink="/customer/account/login" class="utility-link inline-flex items-center gap-1.5">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
               {{ t('header.loginRegister') }}
             </a>
@@ -97,7 +97,7 @@ import { LanguageService } from '../../core/services/language.service';
             <div class="dropdown-menu" [class.dropdown-menu--open]="isMenuOpen('member')">
               <a href="javascript:void(0)" (click)="onDevelop()" class="dropdown-link">{{ t('header.accountCgv') }}</a>
               <a href="javascript:void(0)" (click)="onDevelop()" class="dropdown-link">{{ t('header.memberBenefits') }}</a>
-              <a href="javascript:void(0)" (click)="onDevelop()" class="dropdown-link">{{ t('header.forStaff') }}</a>
+              <a routerLink="/staff/account/login" class="dropdown-link">{{ t('header.forStaff') }}</a>
             </div>
           </div>
 
@@ -459,7 +459,7 @@ export class HeaderComponent {
   protected readonly t = this.language.t.bind(this.language);
   private readonly openMenu = signal<'movies' | 'booking' | 'member' | 'cultureplex' | null>(null);
 
-  protected readonly memberLink = computed(() => (this.auth.isAuthenticated() ? '/account' : '/auth'));
+  protected readonly memberLink = computed(() => (this.auth.isAuthenticated() ? '/account' : '/customer/account/login'));
 
   constructor() {
     const subscription = this.router.events.pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd)).subscribe(() => {
@@ -483,7 +483,7 @@ export class HeaderComponent {
 
   protected logout(): void {
     this.auth.logout();
-    void this.router.navigate(['/auth']);
+    void this.router.navigate(['/customer/account/login']);
   }
 
   protected onDevelop(event?: Event): void {

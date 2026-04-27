@@ -3,7 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, OnDestroy, OnInit, signal, effect } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, EMPTY, finalize, from, switchMap, tap } from 'rxjs';
 
 import { AuthService, CaptchaChallenge, LoginRequest, RegisterRequest } from '../../core/services/auth.service';
@@ -39,10 +39,12 @@ export class AuthComponent implements OnInit, OnDestroy {
   private readonly formBuilder = inject(FormBuilder);
   private readonly languageService = inject(LanguageService);
   private readonly titleService = inject(Title);
+  private readonly route = inject(ActivatedRoute);
 
   protected readonly t = this.languageService.t.bind(this.languageService);
 
   protected readonly activeTab = signal<AuthTab>('login');
+  protected readonly staffMode = signal(false);
   protected readonly submittingLogin = signal(false);
   protected readonly submittingRegister = signal(false);
   protected readonly captchaLoading = signal(false);
@@ -106,6 +108,18 @@ export class AuthComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const snapshot = this.route.snapshot;
+    // Check staff mode from data (passed from app.routes.ts) or URL path
+    if (snapshot.data['staff'] === true || this.router.url.includes('/staff/account')) {
+      this.staffMode.set(true);
+    }
+
+    // Set active tab from route data (passed from auth.routes.ts)
+    const tab = snapshot.data['tab'] as AuthTab;
+    if (tab) {
+      this.activeTab.set(tab);
+    }
+
     this.loadCaptcha();
     this.updateTitle();
   }
@@ -126,6 +140,9 @@ export class AuthComponent implements OnInit, OnDestroy {
       this.loadCaptcha();
     }
     this.updateTitle();
+
+    const base = this.staffMode() ? '/staff/account' : '/customer/account';
+    void this.router.navigate([base, tab]);
   }
 
   protected refreshCaptcha(): void {
@@ -163,11 +180,25 @@ export class AuthComponent implements OnInit, OnDestroy {
         finalize(() => this.submittingLogin.set(false))
       )
       .subscribe((session) => {
+        if (this.staffMode()) {
+          const role = session.role?.toUpperCase();
+          if (role !== 'STAFF' && role !== 'ADMIN') {
+            this.authService.logout();
+            this.message.set({ type: 'error', text: this.t('auth.staffOnly') });
+            return;
+          }
+        }
+
         this.message.set({
           type: 'success',
           text: session.userName ? `${this.t('auth.loginSuccessPrefix')}${session.userName}` : this.t('auth.loginSuccess')
         });
-        void this.router.navigateByUrl('/');
+
+        if (this.staffMode()) {
+          void this.router.navigateByUrl('/management/dashboard');
+        } else {
+          void this.router.navigateByUrl('/');
+        }
       });
   }
 
@@ -197,8 +228,9 @@ export class AuthComponent implements OnInit, OnDestroy {
     };
 
     this.submittingRegister.set(true);
-    this.authService
-      .register(payload)
+    const registerObs = this.staffMode() ? this.authService.staffRegister(payload) : this.authService.register(payload);
+
+    registerObs
       .pipe(
         catchError((error: unknown) => {
           return this.handleFormError('register', error, this.t('auth.registerError'), () => this.refreshCaptcha());

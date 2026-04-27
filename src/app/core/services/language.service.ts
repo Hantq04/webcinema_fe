@@ -193,7 +193,9 @@ const translations = {
       loginError: 'Đăng nhập không thành công',
       registerError: 'Đăng ký không thành công',
       captchaError: 'Không tải được captcha',
-      captchaReload: 'Vui lòng tải lại captcha.'
+      captchaReload: 'Vui lòng tải lại captcha.',
+      staffOnly: 'Chỉ nhân viên và quản lý được đăng nhập tại đây',
+      staffMode: 'Dành cho nhân viên'
     },
     account: {
       title: 'Thông tin tài khoản',
@@ -406,7 +408,9 @@ const translations = {
       loginError: 'Login failed',
       registerError: 'Registration failed',
       captchaError: 'Unable to load captcha',
-      captchaReload: 'Please reload the captcha.'
+      captchaReload: 'Please reload the captcha.',
+      staffOnly: 'Only staff and managers are allowed to log in here',
+      staffMode: 'For Staff'
     },
     account: {
       title: 'Account information',
