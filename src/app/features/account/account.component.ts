@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, effect } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { AuthService } from '../../core/services/auth.service';
 import { LanguageService } from '../../core/services/language.service';
+import { Title } from '@angular/platform-browser';
 
-export type AccountView = 'general' | 'history';
+export type AccountView = 'general' | 'details' | 'history';
 
 @Component({
   selector: 'app-account',
@@ -20,7 +21,7 @@ export type AccountView = 'general' | 'history';
             <h2 class="sidebar-title">{{ t('account.sidebarTitle') }}</h2>
             <nav class="sidebar-nav">
               <a href="javascript:void(0)" (click)="setView('general')" class="nav-item" [class.active]="activeView() === 'general'">{{ t('account.infoGeneral') }}</a>
-              <a href="javascript:void(0)" (click)="onDevelop()" class="nav-item">{{ t('account.details') }}</a>
+              <a href="javascript:void(0)" (click)="setView('details')" class="nav-item" [class.active]="activeView() === 'details'">{{ t('account.details') }}</a>
               <a href="javascript:void(0)" (click)="onDevelop()" class="nav-item">{{ t('account.paymentSettings') }}</a>
               <a href="javascript:void(0)" (click)="onDevelop()" class="nav-item">{{ t('account.memberCard') }}</a>
               <a href="javascript:void(0)" (click)="onDevelop()" class="nav-item">{{ t('account.rewardPoints') }}</a>
@@ -110,6 +111,85 @@ export type AccountView = 'general' | 'history';
                   </div>
                 </div>
               </div>
+            } @else if (activeView() === 'details') {
+              <div class="content-header black-header">
+                {{ t('account.changeInfoTitle') }}
+              </div>
+              
+              <form class="details-form">
+                <div class="form-grid">
+                  <div class="form-col">
+                    <div class="form-group">
+                      <label>{{ t('account.nameLabel').replace(' :', '') }} <span class="required">*</span></label>
+                      <input type="text" [value]="currentName()">
+                    </div>
+                    <div class="form-group">
+                      <label>{{ t('account.phoneLabel').replace(' :', '') }} <span class="required">*</span></label>
+                      <input type="text" [value]="currentPhone()">
+                    </div>
+                    <div class="form-group">
+                      <label>{{ t('auth.gender') }} <span class="required">*</span></label>
+                      <div class="radio-group">
+                        <label><input type="radio" name="gender" value="male"> {{ t('auth.male') }}</label>
+                        <label><input type="radio" name="gender" value="female"> {{ t('auth.female') }}</label>
+                        <label><input type="radio" name="gender" value="none"> None</label>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label>{{ t('auth.birthDate') }}</label>
+                      <div class="birth-info">NOV 04 2004</div>
+                    </div>
+                    <div class="form-group">
+                      <label>{{ t('account.emailLabel').replace(' :', '') }} <span class="required">*</span></label>
+                      <div class="email-info">{{ currentEmail() }}</div>
+                    </div>
+                    <div class="form-group checkbox-group">
+                      <label>
+                        <input type="checkbox" (change)="toggleChangePassword()"> {{ t('account.changePasswordToggle') }}
+                      </label>
+                    </div>
+
+                    @if (wantsChangePassword()) {
+                      <div class="form-group">
+                        <label>{{ t('auth.newPassword') }} <span class="required">*</span></label>
+                        <input type="password">
+                      </div>
+                      <div class="form-group">
+                        <label>{{ t('auth.confirmNewPassword') }} <span class="required">*</span></label>
+                        <input type="password">
+                      </div>
+                    }
+                  </div>
+
+                  <div class="form-col">
+                    <div class="form-group">
+                      <label>{{ t('account.cityLabel') }} <span class="required">*</span></label>
+                      <select>
+                        <option>Hà Nội</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label>{{ t('account.districtLabel') }} <span class="required">*</span></label>
+                      <select>
+                        <option>Quận Hà Đông</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label>{{ t('account.addressLabel') }} <span class="required">*</span></label>
+                      <input type="text" placeholder="No address Quận Hà Đông">
+                    </div>
+                    <div class="form-group">
+                      <label>{{ t('account.oldPasswordLabel') }} <span class="required">*</span></label>
+                      <input type="password">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-footer">
+                  <button type="button" class="save-btn">{{ t('account.saveButton') }}</button>
+                  <p class="required-hint">{{ t('account.requiredHint') }}</p>
+                </div>
+              </form>
             } @else if (activeView() === 'history') {
               <div class="content-header">
                 {{ t('account.history') }}
@@ -252,6 +332,98 @@ export type AccountView = 'general' | 'history';
       margin-bottom: 1.5rem;
       font-size: 0.95rem;
       text-transform: uppercase;
+    }
+    .black-header {
+      background: #222 !important;
+    }
+    .details-form {
+      background: transparent;
+      padding: 0.5rem 0;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 2rem;
+    }
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      color: #333;
+    }
+    .form-group label .required {
+      color: #d62f1f;
+    }
+    .form-group input[type="text"],
+    .form-group input[type="password"],
+    .form-group select {
+      width: 100%;
+      padding: 0.45rem 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 2px;
+      font-size: 0.9rem;
+      background: white;
+      font-family: inherit;
+    }
+    .radio-group {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin-bottom: 0;
+      font-weight: 600;
+    }
+    .birth-info, .email-info, .card-info {
+      font-size: 0.85rem;
+      color: #333;
+      font-weight: 600;
+    }
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+    }
+    .section-title-alt {
+      font-size: 1rem;
+      font-weight: 800;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #333;
+      padding-bottom: 0.25rem;
+    }
+    .form-footer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .save-btn {
+      background: #e71a0f;
+      color: white;
+      border: none;
+      padding: 0.6rem 2.5rem;
+      font-weight: 800;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+    }
+    .required-hint {
+      color: #d62f1f;
+      font-size: 0.8rem;
+      font-weight: 700;
+      align-self: flex-start;
     }
 
     .user-summary-card {
@@ -555,9 +727,11 @@ export class AccountComponent {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   protected readonly language = inject(LanguageService);
+  private readonly title = inject(Title);
   protected readonly t = this.language.t.bind(this.language);
 
-  protected activeView = signal<AccountView>('general');
+  protected readonly activeView = signal<AccountView>('general');
+  protected readonly wantsChangePassword = signal(false);
 
   constructor() {
     this.route.queryParamMap.subscribe(params => {
@@ -565,6 +739,16 @@ export class AccountComponent {
       if (view) {
         this.activeView.set(view);
       }
+    });
+    
+    effect(() => {
+      const currentView = this.activeView();
+      let viewTitle = '';
+      if (currentView === 'general') viewTitle = this.t('account.infoGeneral');
+      else if (currentView === 'details') viewTitle = this.t('account.details');
+      else viewTitle = this.t('account.history');
+      
+      this.title.setTitle(viewTitle);
     });
   }
 
@@ -587,6 +771,16 @@ export class AccountComponent {
 
   protected setView(view: AccountView): void {
     this.activeView.set(view);
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { view: view },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
+  }
+
+  protected toggleChangePassword(): void {
+    this.wantsChangePassword.update(v => !v);
   }
 
   protected onDevelop(): void {

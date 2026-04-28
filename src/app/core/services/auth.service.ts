@@ -21,6 +21,13 @@ export interface RegisterRequest {
   gender: string;
 }
 
+export interface ChangePasswordRequest {
+  email: string;
+  otp: string;
+  newPassWord: string;
+  confirmPassWord: string;
+}
+
 export interface AuthSession {
   authenticated: boolean;
   accessToken: string | null;
@@ -49,6 +56,7 @@ export class AuthService {
   readonly currentUserName = computed(() => this.session().userName);
   readonly currentUserEmail = computed(() => this.session().email);
   readonly currentUserPhone = computed(() => this.session().phoneNumber);
+  readonly currentUserRole = computed(() => this.session().role);
 
   getAccessToken(): string | null {
     return this.session().accessToken;
@@ -70,6 +78,16 @@ export class AuthService {
 
   staffRegister(payload: RegisterRequest): Observable<unknown> {
     return this.http.post<unknown>(this.apiService.apiUrl('/api/v1/user/staff-register'), payload);
+  }
+
+  forgotPassword(email: string): Observable<unknown> {
+    return this.http.get<unknown>(this.apiService.apiUrl('/api/v1/user/forgot-password'), {
+      params: { email }
+    });
+  }
+
+  changePassword(payload: ChangePasswordRequest): Observable<unknown> {
+    return this.http.put<unknown>(this.apiService.apiUrl('/api/v1/user/reset-password'), payload);
   }
 
   logout(): void {

@@ -1,16 +1,19 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { LanguageService } from '../../../core/services/language.service';
 
 @Component({
   selector: 'app-management-dashboard',
   standalone: true,
-  imports: [],
+  imports: [RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <header class="management-header">
       <div class="header-right">
+        <a routerLink="/home" class="for-users-btn">
+          {{ t('header.forUsers') }}
+        </a>
         <div class="user-info">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
           <span class="user-greeting">{{ t('header.hello') }} {{ auth.currentUserName() }}</span>
@@ -101,6 +104,20 @@ import { LanguageService } from '../../../core/services/language.service';
     }
     .lang-btn.active {
       background-color: #d62f1f;
+    }
+    .for-users-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #3b3127;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    .for-users-btn:hover {
+      color: #d62f1f;
     }
     .dashboard-container {
       display: flex;

@@ -6,7 +6,7 @@ import { Movie, MovieDetail, DailySchedule } from '../../../core/models/movie.mo
 import { MovieService } from '../../../core/services/movie.service';
 import { LanguageService } from '../../../core/services/language.service';
 import { Title, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 
 import { MovieScheduleModalComponent } from '../../../shared/components/movie-schedule-modal/movie-schedule-modal.component';
@@ -173,8 +173,8 @@ import { MovieScheduleModalComponent } from '../../../shared/components/movie-sc
             }
           } @else if (!loading()) {
             <div class="movie-detail-error">
-              <p>Không tìm thấy thông tin phim.</p>
-              <a routerLink="/movies" class="movie-detail-error__link">Quay lại danh sách phim</a>
+              <p>{{ t('movies.notFound') }}</p>
+              <a href="javascript:void(0)" (click)="goBack()" class="movie-detail-error__link">{{ t('movies.goBack') }}</a>
             </div>
           } @else {
             <div class="movie-detail-loading">
@@ -198,6 +198,7 @@ export class MovieDetailComponent {
   private readonly router = inject(Router);
 
   protected readonly t = this.languageService.t.bind(this.languageService);
+  private readonly location = inject(Location);
   protected readonly movie = signal<MovieDetail | null>(null);
   protected readonly loading = signal(true);
   protected readonly isComingSoon = computed(() => {
@@ -212,7 +213,7 @@ export class MovieDetailComponent {
   protected readonly trailerPreview = signal<{ title: string; embedUrl: SafeResourceUrl } | null>(null);
 
   protected readonly isScheduleOpen = signal(false);
-  
+
   // Zoom logic signals
   protected readonly showZoom = signal(false);
   protected readonly lensX = signal(0);
@@ -257,6 +258,10 @@ export class MovieDetailComponent {
     if (rate.startsWith('G')) return 'G';
     if (rate.startsWith('R')) return 'R';
     return (rate.split(/[\s-]/)[0] || '').trim();
+  }
+
+  protected goBack(): void {
+    this.location.back();
   }
 
   protected moviePoster(movie: MovieDetail): string {
@@ -392,23 +397,23 @@ export class MovieDetailComponent {
   protected onMouseMove(event: MouseEvent): void {
     const container = event.currentTarget as HTMLElement;
     const rect = container.getBoundingClientRect();
-    
+
     // Lens size (CSS)
     const LENS_SIZE = 100;
-    
+
     let x = event.clientX - rect.left - LENS_SIZE / 2;
     let y = event.clientY - rect.top - LENS_SIZE / 2;
-    
+
     // Boundary check
     if (x < 0) x = 0;
     if (y < 0) y = 0;
     if (x > rect.width - LENS_SIZE) x = rect.width - LENS_SIZE;
     if (y > rect.height - LENS_SIZE) y = rect.height - LENS_SIZE;
-    
+
     this.lensX.set(x);
     this.lensY.set(y);
     this.showZoom.set(true);
-    
+
     // Calculate zoom position percentage
     const xp = (x / (rect.width - LENS_SIZE)) * 100;
     const yp = (y / (rect.height - LENS_SIZE)) * 100;

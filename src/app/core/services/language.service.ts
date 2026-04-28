@@ -37,7 +37,8 @@ const translations = {
       groupBooking: 'Thuê Rạp & Vé Nhóm',
       egift: 'CineGo eGift',
       rules: 'CineGo Rules',
-      forStaff: 'Dành Cho Nhân Viên'
+      forStaff: 'Dành Cho Nhân Viên',
+      forUsers: 'Dành Cho Người Dùng'
     },
     footer: {
       companyName: 'CineGo Việt Nam',
@@ -110,7 +111,9 @@ const translations = {
       showing: 'Phim Đang Chiếu',
       coming: 'Phim Sắp Chiếu',
       minutes: 'phút',
-      preBook: 'ĐẶT TRƯỚC'
+      preBook: 'ĐẶT TRƯỚC',
+      notFound: 'Không tìm thấy thông tin phim.',
+      goBack: 'Quay lại'
     },
     booking: {
       title: 'Đặt vé CineGo',
@@ -195,7 +198,21 @@ const translations = {
       captchaError: 'Không tải được captcha',
       captchaReload: 'Vui lòng tải lại captcha.',
       staffOnly: 'Chỉ nhân viên và quản lý được đăng nhập tại đây',
-      staffMode: 'Dành cho nhân viên'
+      staffMode: 'Dành cho nhân viên',
+      forgotPasswordTitle: 'Tìm lại mật khẩu',
+      resetPasswordTitle: 'Đổi mật khẩu',
+      otpLabel: 'Nhập mã OTP',
+      newPassword: 'Mật khẩu mới',
+      confirmNewPassword: 'Xác nhận mật khẩu mới',
+      otpSentMessage: 'Mã OTP đã được gửi đến email của bạn. Trường hợp không có vui lòng kiểm tra thư mục spam hoặc thùng rác.',
+      forgotPasswordButton: 'GỬI YÊU CẦU',
+      resetPasswordButton: 'ĐỔI MẬT KHẨU',
+      backToLogin: 'Quay lại đăng nhập',
+      forgotPasswordError: 'Không thể gửi yêu cầu tìm lại mật khẩu',
+      resetPasswordError: 'Đổi mật khẩu không thành công',
+      passwordMismatch: 'Mật khẩu xác nhận không khớp',
+      resetPasswordSuccess: 'Đổi mật khẩu thành công. Vui lòng đăng nhập lại.',
+      requiredOtp: 'Bắt buộc nhập OTP'
     },
     account: {
       title: 'Thông tin tài khoản',
@@ -207,16 +224,16 @@ const translations = {
       loggedIn: 'Đang đăng nhập',
       quickActionLabel: 'Chức năng nhanh',
       quickActionValue: 'Xem tài khoản và quản lý đăng xuất',
-      sidebarTitle: 'TÀI KHOẢN CINEGO',
-      infoGeneral: 'THÔNG TIN CHUNG',
-      details: 'CHI TIẾT TÀI KHOẢN',
-      paymentSettings: 'CÀI ĐẶT MÃ THANH TOÁN',
-      memberCard: 'THẺ THÀNH VIÊN',
-      rewardPoints: 'ĐIỂM THƯỞNG',
-      giftCards: 'THẺ QUÀ TẶNG',
+      sidebarTitle: 'Tài khoản CineGo',
+      infoGeneral: 'Thông tin chung',
+      details: 'Chi tiết tài khoản',
+      paymentSettings: 'Cài đặt mã thanh toán',
+      memberCard: 'Thẻ thành viên',
+      rewardPoints: 'Điểm thưởng',
+      giftCards: 'Thẻ quà tặng',
       voucher: 'VOUCHER',
       coupon: 'COUPON',
-      history: 'LỊCH SỬ GIAO DỊCH',
+      history: 'Lịch sử giao dịch',
       hello: 'Xin chào',
       manageIntro: 'Với trang này, bạn sẽ quản lý được tất cả thông tin tài khoản của mình.',
       tierLabel: 'Cấp Độ Thẻ',
@@ -242,7 +259,18 @@ const translations = {
       statusCompleted: 'Hoàn Tất',
       fromLabel: 'From',
       toLabel: 'To',
-      totalAmount: 'đ'
+      totalAmount: 'đ',
+      changeInfoTitle: 'THAY ĐỔI THÔNG TIN',
+      cityLabel: 'Thành phố/Tỉnh',
+      districtLabel: 'Quận',
+      addressLabel: 'Địa chỉ',
+      oldPasswordLabel: 'Mật khẩu cũ',
+      changePasswordToggle: 'Tôi muốn thay đổi mật khẩu',
+      optionalInfoTitle: 'Thông Tin Tùy Chọn',
+      cardNumberLabel: 'Số thẻ thành viên',
+      favTheaterLabel: 'Rạp yêu thích',
+      saveButton: 'LƯU LẠI',
+      requiredHint: '* Thông tin bắt buộc'
     },
     titles: {
       home: 'CineGo Cinemas Vietnam',
@@ -253,7 +281,9 @@ const translations = {
       bookingCorn: 'Bắp nước',
       bookingPayment: 'Thanh toán',
       moviesShowing: 'Phim đang chiếu',
-      moviesComing: 'Phim sắp chiếu'
+      moviesComing: 'Phim sắp chiếu',
+      forgotpassword: 'Tìm lại mật khẩu',
+      changepassword: 'Đổi mật khẩu'
     }
   },
   en: {
@@ -288,7 +318,8 @@ const translations = {
       groupBooking: 'Group Booking & Rental',
       egift: 'CineGo eGift',
       rules: 'CineGo Rules',
-      forStaff: 'For Staff'
+      forStaff: 'For Staff',
+      forUsers: 'For Users'
     },
     footer: {
       companyName: 'CineGo Vietnam',
@@ -361,7 +392,9 @@ const translations = {
       showing: 'Now Showing',
       coming: 'Coming Soon',
       minutes: 'minutes',
-      preBook: 'PRE-BOOK'
+      preBook: 'PRE-BOOK',
+      notFound: 'Movie information not found.',
+      goBack: 'Go Back'
     },
     booking: {
       title: 'CineGo Booking',
@@ -446,7 +479,21 @@ const translations = {
       captchaError: 'Unable to load captcha',
       captchaReload: 'Please reload the captcha.',
       staffOnly: 'Only staff and managers are allowed to log in here',
-      staffMode: 'For Staff'
+      staffMode: 'For Staff',
+      forgotPasswordTitle: 'Forgot Password',
+      resetPasswordTitle: 'Reset Password',
+      otpLabel: 'OTP Code',
+      newPassword: 'New Password',
+      confirmNewPassword: 'Confirm New Password',
+      otpSentMessage: 'OTP code has been sent to your email. If not found, please check your spam or trash folder.',
+      forgotPasswordButton: 'SUBMIT REQUEST',
+      resetPasswordButton: 'CHANGE PASSWORD',
+      backToLogin: 'Back to Login',
+      forgotPasswordError: 'Unable to send password recovery request',
+      resetPasswordError: 'Password reset failed',
+      passwordMismatch: 'Confirm password does not match',
+      resetPasswordSuccess: 'Password changed successfully. Please login again.',
+      requiredOtp: 'OTP is required'
     },
     account: {
       title: 'Account information',
@@ -458,16 +505,16 @@ const translations = {
       loggedIn: 'Logged in',
       quickActionLabel: 'Quick action',
       quickActionValue: 'View account and manage logout',
-      sidebarTitle: 'CINEGO ACCOUNT',
-      infoGeneral: 'DASHBOARD',
-      details: 'ACCOUNT DETAILS',
-      paymentSettings: 'PAYMENT SETTINGS',
-      memberCard: 'MEMBER CARD',
-      rewardPoints: 'REWARD POINTS',
-      giftCards: 'GIFT CARDS',
-      voucher: 'VOUCHER',
-      coupon: 'COUPON',
-      history: 'TRANSACTION HISTORY',
+      sidebarTitle: 'CineGo Account',
+      infoGeneral: 'General Information',
+      details: 'Account Details',
+      paymentSettings: 'Payment Settings',
+      memberCard: 'Member Card',
+      rewardPoints: 'Reward Points',
+      giftCards: 'Gift Cards',
+      voucher: 'Voucher',
+      coupon: 'Coupon',
+      history: 'Transaction History',
       hello: 'Hello',
       manageIntro: 'With this page, you can manage all your account information.',
       tierLabel: 'Card Tier',
@@ -493,7 +540,18 @@ const translations = {
       statusCompleted: 'Completed',
       fromLabel: 'From',
       toLabel: 'To',
-      totalAmount: 'VND'
+      totalAmount: 'VND',
+      changeInfoTitle: 'CHANGE INFORMATION',
+      cityLabel: 'City/Province',
+      districtLabel: 'District',
+      addressLabel: 'Address',
+      oldPasswordLabel: 'Old Password',
+      changePasswordToggle: 'I want to change password',
+      optionalInfoTitle: 'Optional Information',
+      cardNumberLabel: 'Member card number',
+      favTheaterLabel: 'Favorite cinema',
+      saveButton: 'SAVE',
+      requiredHint: '* Required information'
     },
     titles: {
       home: 'CineGo Cinemas Vietnam',
@@ -504,7 +562,9 @@ const translations = {
       bookingCorn: 'Concessions',
       bookingPayment: 'Payment',
       moviesShowing: 'Now Showing',
-      moviesComing: 'Coming Soon'
+      moviesComing: 'Coming Soon',
+      forgotpassword: 'Forgot Password',
+      changepassword: 'Reset Password'
     }
   }
 } as const;
@@ -524,9 +584,13 @@ export class LanguageService {
   }
 
   useLanguage(language: AppLanguage): void {
+    if (this.language() === language) return;
     this.language.set(language);
     this.persistLanguage(language);
     this.applyLanguage(language);
+    if (typeof window !== 'undefined') {
+      window.location.reload();
+    }
   }
 
   isActive(language: AppLanguage): boolean {

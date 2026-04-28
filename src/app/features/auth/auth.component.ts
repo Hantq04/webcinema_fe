@@ -9,7 +9,7 @@ import { catchError, EMPTY, finalize, from, switchMap, tap } from 'rxjs';
 import { AuthService, CaptchaChallenge, LoginRequest, RegisterRequest } from '../../core/services/auth.service';
 import { LanguageService } from '../../core/services/language.service';
 
-type AuthTab = 'login' | 'register';
+type AuthTab = 'login' | 'register' | 'forgotpassword' | 'changepassword';
 
 interface FlashMessage {
   type: 'success' | 'error' | 'info';
@@ -47,11 +47,15 @@ export class AuthComponent implements OnInit, OnDestroy {
   protected readonly staffMode = signal(false);
   protected readonly submittingLogin = signal(false);
   protected readonly submittingRegister = signal(false);
+  protected readonly submittingForgotPassword = signal(false);
+  protected readonly submittingResetPassword = signal(false);
   protected readonly captchaLoading = signal(false);
   protected readonly captcha = signal<CaptchaChallenge | null>(null);
   protected readonly message = signal<FlashMessage | null>(null);
   protected readonly loginServerErrors = signal<Record<string, string>>({});
   protected readonly registerServerErrors = signal<Record<string, string>>({});
+  protected readonly forgotServerErrors = signal<Record<string, string>>({});
+  protected readonly resetServerErrors = signal<Record<string, string>>({});
 
   protected readonly loginForm = this.formBuilder.group({
     userName: [''],
@@ -74,6 +78,16 @@ export class AuthComponent implements OnInit, OnDestroy {
     confirmIdentity: [false, [Validators.requiredTrue]],
     confirmEmailBirth: [false, [Validators.requiredTrue]],
     acceptTerms: [false, [Validators.requiredTrue]]
+  });
+
+  protected readonly forgotPasswordForm = this.formBuilder.group({
+    email: ['', [Validators.required, Validators.email]]
+  });
+
+  protected readonly resetPasswordForm = this.formBuilder.group({
+    otp: ['', [Validators.required]],
+    newPassWord: ['', [Validators.required, Validators.minLength(6)]],
+    confirmPassWord: ['', [Validators.required]]
   });
 
   protected readonly dayOptions = Array.from({ length: 31 }, (_, index) => String(index + 1));
@@ -122,6 +136,15 @@ export class AuthComponent implements OnInit, OnDestroy {
 
     this.loadCaptcha();
     this.updateTitle();
+
+    // Check for message in history state (e.g. from forgot password flow)
+    const state = history.state as { flashMessage?: string; flashType?: 'success' | 'error' | 'info' };
+    if (state?.flashMessage) {
+      this.message.set({ 
+        type: state.flashType || 'info', 
+        text: state.flashMessage 
+      });
+    }
   }
 
   ngOnDestroy(): void {
@@ -130,11 +153,13 @@ export class AuthComponent implements OnInit, OnDestroy {
     }
   }
 
-  protected selectTab(tab: AuthTab): void {
+  protected selectTab(tab: AuthTab, message: FlashMessage | null = null): void {
     this.activeTab.set(tab);
-    this.message.set(null);
+    this.message.set(message);
     this.loginServerErrors.set({});
     this.registerServerErrors.set({});
+    this.forgotServerErrors.set({});
+    this.resetServerErrors.set({});
 
     if ((tab === 'login' || tab === 'register') && !this.captcha()) {
       this.loadCaptcha();
@@ -142,7 +167,9 @@ export class AuthComponent implements OnInit, OnDestroy {
     this.updateTitle();
 
     const base = this.staffMode() ? '/staff/account' : '/customer/account';
-    void this.router.navigate([base, tab]);
+    void this.router.navigate([base, tab], {
+      state: message ? { flashMessage: message.text, flashType: message.type } : undefined
+    });
   }
 
   protected refreshCaptcha(): void {
@@ -251,12 +278,78 @@ export class AuthComponent implements OnInit, OnDestroy {
       });
   }
 
+  protected submitForgotPassword(): void {
+    this.message.set(null);
+    this.forgotServerErrors.set({});
+    this.forgotPasswordForm.markAllAsTouched();
+
+    if (this.forgotPasswordForm.invalid) return;
+
+    const email = this.forgotPasswordForm.getRawValue().email?.trim() ?? '';
+    this.submittingForgotPassword.set(true);
+
+    this.authService.forgotPassword(email)
+      .pipe(
+        catchError((error: unknown) => {
+          return this.handleFormError('forgotpassword', error, this.t('auth.forgotPasswordError'));
+        }),
+        finalize(() => this.submittingForgotPassword.set(false))
+      )
+      .subscribe(() => {
+        this.selectTab('changepassword', {
+          type: 'info',
+          text: this.t('auth.otpSentMessage')
+        });
+        this.resetPasswordForm.patchValue({ otp: '' });
+      });
+  }
+
+  protected submitResetPassword(): void {
+    this.message.set(null);
+    this.resetServerErrors.set({});
+    this.resetPasswordForm.markAllAsTouched();
+
+    if (this.resetPasswordForm.invalid) return;
+
+    const rawValue = this.resetPasswordForm.getRawValue();
+    const email = this.forgotPasswordForm.getRawValue().email?.trim() ?? '';
+
+    if (rawValue.newPassWord !== rawValue.confirmPassWord) {
+      this.message.set({ type: 'error', text: this.t('auth.passwordMismatch') });
+      return;
+    }
+
+    const payload = {
+      email,
+      otp: rawValue.otp?.trim() ?? '',
+      newPassWord: rawValue.newPassWord?.trim() ?? '',
+      confirmPassWord: rawValue.confirmPassWord?.trim() ?? ''
+    };
+
+    this.submittingResetPassword.set(true);
+    this.authService.changePassword(payload)
+      .pipe(
+        catchError((error: unknown) => {
+          return this.handleFormError('changepassword', error, this.t('auth.resetPasswordError'));
+        }),
+        finalize(() => this.submittingResetPassword.set(false))
+      )
+      .subscribe(() => {
+        this.message.set({ type: 'success', text: this.t('auth.resetPasswordSuccess') });
+        this.selectTab('login');
+      });
+  }
+
   protected nextPromo(): void {
     this.activePromoIndex = (this.activePromoIndex + 1) % this.promoSlides.length;
   }
 
   private updateTitle(): void {
-    const key = this.activeTab() === 'login' ? 'titles.login' : 'titles.register';
+    const tab = this.activeTab();
+    const key = tab === 'login' ? 'titles.login'
+      : tab === 'register' ? 'titles.register'
+      : tab === 'forgotpassword' ? 'titles.forgotpassword'
+      : 'titles.changepassword';
     this.titleService.setTitle(this.t(key));
   }
 
@@ -313,6 +406,10 @@ export class AuthComponent implements OnInit, OnDestroy {
   protected serverFieldError(form: AuthTab, fieldName: string): string {
     if (form === 'login') {
       return this.loginServerErrors()[fieldName] ?? '';
+    } else if (form === 'forgotpassword') {
+      return this.forgotServerErrors()[fieldName] ?? '';
+    } else if (form === 'changepassword') {
+      return this.resetServerErrors()[fieldName] ?? '';
     }
 
     return this.registerServerErrors()[fieldName] ?? '';
@@ -359,6 +456,12 @@ export class AuthComponent implements OnInit, OnDestroy {
 
     if (form === 'login') {
       this.loginServerErrors.set(mappedErrors);
+      return;
+    } else if (form === 'forgotpassword') {
+      this.forgotServerErrors.set(mappedErrors);
+      return;
+    } else if (form === 'changepassword') {
+      this.resetServerErrors.set(mappedErrors);
       return;
     }
 

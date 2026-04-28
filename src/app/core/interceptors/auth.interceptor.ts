@@ -10,7 +10,13 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
 	const languageService = inject(LanguageService);
 	const token = authService.getAccessToken();
 	const acceptLanguage = languageService.currentLanguage();
-	const shouldSkipAuthHeader = request.url.includes('/api/v1/user/login') || request.url.includes('/api/v1/captcha');
+	const shouldSkipAuthHeader =
+		request.url.includes('/api/v1/user/login') ||
+		request.url.includes('/api/v1/user/register') ||
+		request.url.includes('/api/v1/user/staff-register') ||
+		request.url.includes('/api/v1/captcha') ||
+		request.url.includes('/api/v1/user/forgot-password') ||
+		request.url.includes('/api/v1/user/reset-password');
 	const headers: Record<string, string> = {
 		'Accept-Language': acceptLanguage
 	};

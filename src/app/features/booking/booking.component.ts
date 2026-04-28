@@ -531,9 +531,7 @@ export class BookingComponent implements OnDestroy {
       ).subscribe({
         next: (paymentUrl) => {
           if (paymentUrl) {
-            window.open(paymentUrl, '_blank');
-            alert('Đã mở trang thanh toán ở tab mới. Vui lòng hoàn tất thanh toán.');
-            void this.router.navigateByUrl('/');
+            window.location.href = paymentUrl;
           } else {
             alert('Không lấy được link thanh toán');
           }

@@ -32,7 +32,7 @@ interface EventCard {
             @if (eventBannerSlides().length > 0) {
               <div class="event-banner__track" [style.transform]="'translateX(-' + (eventBannerIndex() * 100) + '%)'">
                 @for (slide of eventBannerSlides(); track slide.id) {
-                  <a href="javascript:void(0)" (click)="onEventClick()" class="event-banner__link">
+                  <a href="javascript:void(0)" (click)="onEventClick(slide)" class="event-banner__link">
                     <img
                       class="event-banner__image"
                       [src]="slide.imageUrl"
@@ -1390,8 +1390,12 @@ export class HomeComponent {
       });
   }
 
-  protected onEventClick(): void {
-    alert('Thông tin đang được cập nhật');
+  protected onEventClick(slide?: any): void {
+    if (slide && slide.title) {
+      void this.router.navigate(['/movies', slide.title]);
+    } else {
+      alert('Thông tin đang được cập nhật');
+    }
   }
 
   protected updateScrollState(): void {

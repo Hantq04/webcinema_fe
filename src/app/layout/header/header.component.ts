@@ -85,7 +85,6 @@ import { LanguageService } from '../../core/services/language.service';
             <div class="dropdown-menu" [class.dropdown-menu--open]="isMenuOpen('booking')">
               <a routerLink="/booking" class="dropdown-link">{{ t('header.allCinemas') }}</a>
               <a href="javascript:void(0)" (click)="onDevelop()" class="dropdown-link">{{ t('header.specialCinemas') }}</a>
-              <a href="javascript:void(0)" (click)="onDevelop()" class="dropdown-link">{{ t('header.threeDCinemas') }}</a>
             </div>
           </div>
 
@@ -95,9 +94,8 @@ import { LanguageService } from '../../core/services/language.service';
               <span class="nav-link__label">{{ t('header.member') }}</span>
             </button>
             <div class="dropdown-menu" [class.dropdown-menu--open]="isMenuOpen('member')">
-              <a href="javascript:void(0)" (click)="onDevelop()" class="dropdown-link">{{ t('header.accountCgv') }}</a>
               <a href="javascript:void(0)" (click)="onDevelop()" class="dropdown-link">{{ t('header.memberBenefits') }}</a>
-              <a routerLink="/staff/account/login" class="dropdown-link">{{ t('header.forStaff') }}</a>
+              <a href="javascript:void(0)" (click)="onStaffClick($event)" class="dropdown-link">{{ t('header.forStaff') }}</a>
             </div>
           </div>
 
@@ -484,6 +482,20 @@ export class HeaderComponent {
   protected logout(): void {
     this.auth.logout();
     void this.router.navigate(['/customer/account/login']);
+  }
+
+  protected onStaffClick(event: Event): void {
+    event.preventDefault();
+    if (this.auth.isAuthenticated()) {
+      const role = this.auth.currentUserRole()?.toUpperCase();
+      if (role === 'STAFF' || role === 'ADMIN') {
+        void this.router.navigate(['/management/dashboard']);
+      } else {
+        alert('Tính năng này chỉ dành cho nhân viên và quản lý');
+      }
+    } else {
+      void this.router.navigate(['/staff/account/login']);
+    }
   }
 
   protected onDevelop(event?: Event): void {

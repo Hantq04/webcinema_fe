@@ -7,15 +7,17 @@
         </div>
       }
 
-      <div class="auth-tabs" role="tablist" aria-label="Tài khoản">
-        <button type="button" class="auth-tab" [class.active]="activeTab() === 'login'" (click)="selectTab('login')">
-          {{ t('auth.loginTab') }}
-        </button>
-        <button type="button" class="auth-tab" [class.active]="activeTab() === 'register'"
-          (click)="selectTab('register')">
-          {{ t('auth.registerTab') }}
-        </button>
-      </div>
+      @if (activeTab() === 'login' || activeTab() === 'register') {
+        <div class="auth-tabs" role="tablist" aria-label="Tài khoản">
+          <button type="button" class="auth-tab" [class.active]="activeTab() === 'login'" (click)="selectTab('login')">
+            {{ t('auth.loginTab') }}
+          </button>
+          <button type="button" class="auth-tab" [class.active]="activeTab() === 'register'"
+            (click)="selectTab('register')">
+            {{ t('auth.registerTab') }}
+          </button>
+        </div>
+      }
 
       @if (message(); as flash) {
       <div class="flash" [class.flash-success]="flash.type === 'success'" [class.flash-error]="flash.type === 'error'"
@@ -82,9 +84,9 @@
           {{ submittingLogin() ? '...' : t('auth.loginButton') }}
         </button>
 
-        <a class="forgot-link" href="#">{{ t('auth.forgotPassword') }}</a>
+        <a class="forgot-link" href="javascript:void(0)" (click)="selectTab('forgotpassword')">{{ t('auth.forgotPassword') }}</a>
       </form>
-      } @else {
+      } @else if (activeTab() === 'register') {
       <form class="auth-form auth-form-register" [formGroup]="registerForm" (ngSubmit)="submitRegister()" novalidate>
         <label class="field">
           <span>{{ t('auth.name') }}<span class="required-mark">*</span></span>
@@ -234,6 +236,72 @@
         <button type="submit" class="submit-button" [disabled]="submittingRegister()">
           {{ submittingRegister() ? '...' : t('auth.registerButton') }}
         </button>
+      </form>
+      } @else if (activeTab() === 'forgotpassword') {
+      <form class="auth-form" [formGroup]="forgotPasswordForm" (ngSubmit)="submitForgotPassword()" novalidate>
+        <div class="form-title">{{ t('auth.forgotPasswordTitle') }}</div>
+
+        <label class="field">
+          <span>{{ t('auth.email') }}</span>
+          <input type="email" formControlName="email" [placeholder]="t('auth.email')" autocomplete="email" />
+          @if (forgotPasswordForm.controls.email.touched && forgotPasswordForm.controls.email.invalid) {
+          <small class="field-error">{{ forgotPasswordForm.controls.email.hasError('email') ? t('auth.invalidEmail') : t('auth.requiredEmail') }}</small>
+          }
+          @if (serverFieldError('forgotpassword', 'email')) {
+          <small class="field-error">{{ serverFieldError('forgotpassword', 'email') }}</small>
+          }
+        </label>
+
+        <button type="submit" class="submit-button" [disabled]="submittingForgotPassword()">
+          {{ submittingForgotPassword() ? '...' : t('auth.forgotPasswordButton') }}
+        </button>
+
+        <a class="forgot-link" href="javascript:void(0)" (click)="selectTab('login')">{{ t('auth.backToLogin') }}</a>
+      </form>
+      } @else if (activeTab() === 'changepassword') {
+      <form class="auth-form" [formGroup]="resetPasswordForm" (ngSubmit)="submitResetPassword()" novalidate>
+        <div class="form-title">{{ t('auth.resetPasswordTitle') }}</div>
+
+        <label class="field">
+          <span>{{ t('auth.otpLabel') }}</span>
+          <input type="text" formControlName="otp" [placeholder]="t('auth.otpLabel')" autocomplete="off" />
+          @if (resetPasswordForm.controls.otp.touched && resetPasswordForm.controls.otp.invalid) {
+          <small class="field-error">{{ t('auth.requiredOtp') }}</small>
+          }
+          @if (serverFieldError('changepassword', 'otp')) {
+          <small class="field-error">{{ serverFieldError('changepassword', 'otp') }}</small>
+          }
+        </label>
+
+        <label class="field">
+          <span>{{ t('auth.newPassword') }}</span>
+          <input type="password" formControlName="newPassWord" [placeholder]="t('auth.newPassword')"
+            autocomplete="new-password" />
+          @if (resetPasswordForm.controls.newPassWord.touched && resetPasswordForm.controls.newPassWord.invalid) {
+          <small class="field-error">{{ t('auth.requiredPassword') }}</small>
+          }
+          @if (serverFieldError('changepassword', 'newPassWord')) {
+          <small class="field-error">{{ serverFieldError('changepassword', 'newPassWord') }}</small>
+          }
+        </label>
+
+        <label class="field">
+          <span>{{ t('auth.confirmNewPassword') }}</span>
+          <input type="password" formControlName="confirmPassWord" [placeholder]="t('auth.confirmNewPassword')"
+            autocomplete="new-password" />
+          @if (resetPasswordForm.controls.confirmPassWord.touched && resetPasswordForm.controls.confirmPassWord.invalid) {
+          <small class="field-error">{{ t('auth.requiredPassword') }}</small>
+          }
+          @if (serverFieldError('changepassword', 'confirmPassWord')) {
+          <small class="field-error">{{ serverFieldError('changepassword', 'confirmPassWord') }}</small>
+          }
+        </label>
+
+        <button type="submit" class="submit-button" [disabled]="submittingResetPassword()">
+          {{ submittingResetPassword() ? '...' : t('auth.resetPasswordButton') }}
+        </button>
+
+        <a class="forgot-link" href="javascript:void(0)" (click)="selectTab('login')">{{ t('auth.backToLogin') }}</a>
       </form>
       }
     </section>
