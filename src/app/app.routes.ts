@@ -23,6 +23,11 @@ export const routes: Routes = [
 				loadChildren: () => import('./features/booking/booking.routes').then((m) => m.bookingRoutes)
 			},
 			{
+				path: 'cinox/site',
+				title: 'Site',
+				loadComponent: () => import('./features/cinema-site/cinema-site.component').then((m) => m.CinemaSiteComponent) // All cinemas page
+			},
+			{
 				path: 'customer/account',
 				loadChildren: () => import('./features/auth/auth.routes').then((m) => m.authRoutes)
 			},

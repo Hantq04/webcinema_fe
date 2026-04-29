@@ -21,6 +21,19 @@ export interface RegisterRequest {
   gender: string;
 }
 
+export interface UserProfile {
+  email: string | null;
+  name: string | null;
+  phoneNumber: string | null;
+  address: string | null;
+  city: string | null;
+  district: string | null;
+  gender: string | null;
+  birthDate: string | null;
+  avatarUrl: string | null;
+  point: number | null;
+}
+
 export interface ChangePasswordRequest {
   email: string;
   otp: string;
@@ -88,6 +101,20 @@ export class AuthService {
 
   changePassword(payload: ChangePasswordRequest): Observable<unknown> {
     return this.http.put<unknown>(this.apiService.apiUrl('/api/v1/user/reset-password'), payload);
+  }
+
+  getUserProfile(userName: string): Observable<UserProfile> {
+    return this.http.get<{ data: UserProfile }>(this.apiService.apiUrl('/api/v1/user/profile'), {
+      params: { userName }
+    }).pipe(map(res => res.data));
+  }
+
+  updateProfile(formData: FormData): Observable<unknown> {
+    return this.http.put<unknown>(this.apiService.apiUrl('/api/v1/user/update-profile'), formData);
+  }
+
+  changeUserPassword(payload: any): Observable<unknown> {
+    return this.http.put<unknown>(this.apiService.apiUrl('/api/v1/user/change-password'), payload);
   }
 
   logout(): void {

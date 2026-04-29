@@ -1,8 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject, signal, effect } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
-import { AuthService } from '../../core/services/auth.service';
+import { AuthService, UserProfile } from '../../core/services/auth.service';
 import { LanguageService } from '../../core/services/language.service';
+import { LocationService, Province, District } from '../../core/services/location.service';
+import { DecimalPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 
 export type AccountView = 'general' | 'details' | 'history';
@@ -10,7 +13,7 @@ export type AccountView = 'general' | 'details' | 'history';
 @Component({
   selector: 'app-account',
   standalone: true,
-  imports: [],
+  imports: [DecimalPipe, FormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="account-page">
@@ -43,9 +46,14 @@ export type AccountView = 'general' | 'details' | 'history';
                 <div class="user-profile-section">
                   <div class="avatar-container">
                     <div class="avatar-circle">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="#888"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                      @if (profile()?.avatarUrl) {
+                        <img [src]="profile()?.avatarUrl" alt="Avatar" class="avatar-img">
+                      } @else {
+                        <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="#888"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                      }
                     </div>
-                    <button class="change-btn" (click)="onDevelop()">{{ t('account.change') }}</button>
+                    <input type="file" #avatarInput (change)="onAvatarSelected($event)" style="display: none" accept="image/*">
+                    <button class="change-btn" (click)="avatarInput.click()">{{ t('account.change') }}</button>
                   </div>
                   <div class="user-greeting">
                     <h3>{{ t('account.hello') }} {{ currentName() }},</h3>
@@ -62,7 +70,7 @@ export type AccountView = 'general' | 'details' | 'history';
                     </div>
                     <div class="stat-detail">
                       <div class="detail-row"><span>{{ t('account.totalSpend') }}</span> <span>0 đ</span></div>
-                      <div class="detail-row"><span>{{ t('account.cgvPoints') }}</span> <span>0 P</span></div>
+                      <div class="detail-row"><span>{{ t('account.cgvPoints') }}</span> <span>{{ currentPoints() | number }} P</span></div>
                     </div>
                   </div>
                   <div class="stat-box count-box">
@@ -121,42 +129,42 @@ export type AccountView = 'general' | 'details' | 'history';
                   <div class="form-col">
                     <div class="form-group">
                       <label>{{ t('account.nameLabel').replace(' :', '') }} <span class="required">*</span></label>
-                      <input type="text" [value]="currentName()">
+                      <input type="text" [(ngModel)]="editProfile.name" name="name">
                     </div>
                     <div class="form-group">
                       <label>{{ t('account.phoneLabel').replace(' :', '') }} <span class="required">*</span></label>
-                      <input type="text" [value]="currentPhone()">
+                      <input type="text" [(ngModel)]="editProfile.phoneNumber" name="phoneNumber">
                     </div>
                     <div class="form-group">
                       <label>{{ t('auth.gender') }} <span class="required">*</span></label>
                       <div class="radio-group">
-                        <label><input type="radio" name="gender" value="male"> {{ t('auth.male') }}</label>
-                        <label><input type="radio" name="gender" value="female"> {{ t('auth.female') }}</label>
-                        <label><input type="radio" name="gender" value="none"> None</label>
+                        <label><input type="radio" name="gender" value="Nam" [(ngModel)]="editProfile.gender"> {{ t('auth.male') }}</label>
+                        <label><input type="radio" name="gender" value="Nữ" [(ngModel)]="editProfile.gender"> {{ t('auth.female') }}</label>
+                        <label><input type="radio" name="gender" value="None" [(ngModel)]="editProfile.gender"> None</label>
                       </div>
                     </div>
                     <div class="form-group">
                       <label>{{ t('auth.birthDate') }}</label>
-                      <div class="birth-info">NOV 04 2004</div>
+                      <div class="birth-info">{{ formatBirthDate(profile()?.birthDate) }}</div>
                     </div>
                     <div class="form-group">
                       <label>{{ t('account.emailLabel').replace(' :', '') }} <span class="required">*</span></label>
-                      <div class="email-info">{{ currentEmail() }}</div>
+                      <input type="email" [(ngModel)]="editProfile.email" name="email">
                     </div>
                     <div class="form-group checkbox-group">
                       <label>
-                        <input type="checkbox" (change)="toggleChangePassword()"> {{ t('account.changePasswordToggle') }}
+                        <input type="checkbox" (change)="toggleChangePassword()" [checked]="wantsChangePassword()"> {{ t('account.changePasswordToggle') }}
                       </label>
                     </div>
-
+ 
                     @if (wantsChangePassword()) {
                       <div class="form-group">
                         <label>{{ t('auth.newPassword') }} <span class="required">*</span></label>
-                        <input type="password">
+                        <input type="password" [(ngModel)]="passwordChange.newPassword" name="newPassword">
                       </div>
                       <div class="form-group">
                         <label>{{ t('auth.confirmNewPassword') }} <span class="required">*</span></label>
-                        <input type="password">
+                        <input type="password" [(ngModel)]="passwordChange.confirmPassword" name="confirmPassword">
                       </div>
                     }
                   </div>
@@ -164,29 +172,35 @@ export type AccountView = 'general' | 'details' | 'history';
                   <div class="form-col">
                     <div class="form-group">
                       <label>{{ t('account.cityLabel') }} <span class="required">*</span></label>
-                      <select>
-                        <option>Hà Nội</option>
+                      <select name="city" (change)="onProvinceChange($event)">
+                        <option [value]="null">Vui lòng chọn...</option>
+                        @for (p of provinces(); track p.code) {
+                          <option [value]="p.code" [selected]="isProvinceSelected(p)">{{ p.name }}</option>
+                        }
                       </select>
                     </div>
                     <div class="form-group">
                       <label>{{ t('account.districtLabel') }} <span class="required">*</span></label>
-                      <select>
-                        <option>Quận Hà Đông</option>
+                      <select name="district" (change)="onDistrictChange($event)">
+                        <option [value]="null">Vui lòng chọn...</option>
+                        @for (d of districts(); track d.code) {
+                          <option [value]="d.code" [selected]="isDistrictSelected(d)">{{ d.name }}</option>
+                        }
                       </select>
                     </div>
                     <div class="form-group">
                       <label>{{ t('account.addressLabel') }} <span class="required">*</span></label>
-                      <input type="text" placeholder="No address Quận Hà Đông">
+                      <input type="text" [(ngModel)]="editProfile.address" name="address">
                     </div>
                     <div class="form-group">
                       <label>{{ t('account.oldPasswordLabel') }} <span class="required">*</span></label>
-                      <input type="password">
+                      <input type="password" [(ngModel)]="passwordChange.oldPassword" name="oldPassword">
                     </div>
                   </div>
                 </div>
 
                 <div class="form-footer">
-                  <button type="button" class="save-btn">{{ t('account.saveButton') }}</button>
+                  <button type="button" class="save-btn" (click)="onSave()">{{ t('account.saveButton') }}</button>
                   <p class="required-hint">{{ t('account.requiredHint') }}</p>
                 </div>
               </form>
@@ -724,6 +738,7 @@ export type AccountView = 'general' | 'details' | 'history';
 })
 export class AccountComponent {
   private readonly auth = inject(AuthService);
+  private readonly locationService = inject(LocationService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   protected readonly language = inject(LanguageService);
@@ -732,8 +747,40 @@ export class AccountComponent {
 
   protected readonly activeView = signal<AccountView>('general');
   protected readonly wantsChangePassword = signal(false);
+  protected readonly profile = signal<UserProfile | null>(null);
+  protected readonly provinces = signal<Province[]>([]);
+  protected readonly districts = signal<District[]>([]);
+
+  protected editProfile = {
+    name: '',
+    phoneNumber: '',
+    email: '',
+    address: '',
+    city: '',
+    district: '',
+    gender: 'None',
+    birthDate: ''
+  };
+
+  protected passwordChange = {
+    oldPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  };
+
+  private selectedAvatar: File | null = null;
 
   constructor() {
+    this.locationService.getProvinces().subscribe(data => this.provinces.set(data));
+
+    const userName = this.auth.currentUserName();
+    if (userName) {
+      this.auth.getUserProfile(userName).subscribe(p => {
+        this.profile.set(p);
+        this.syncEditProfile(p);
+        this.loadInitialDistricts(p);
+      });
+    }
     this.route.queryParamMap.subscribe(params => {
       const view = params.get('view') as AccountView;
       if (view) {
@@ -753,20 +800,75 @@ export class AccountComponent {
   }
 
   protected currentName(): string {
-    return this.auth.currentUserName() || this.t('header.member');
+    return this.profile()?.name || this.auth.currentUserName() || this.t('header.member');
   }
 
   protected currentEmail(): string {
-    return this.auth.currentUserEmail() || 'N/A';
+    return this.profile()?.email || this.auth.currentUserEmail() || 'N/A';
   }
 
   protected currentPhone(): string {
-    return this.auth.currentUserPhone() || 'N/A';
+    return this.profile()?.phoneNumber || this.auth.currentUserPhone() || 'N/A';
+  }
+
+  protected currentPoints(): number {
+    return this.profile()?.point || 0;
+  }
+
+  protected formatBirthDate(date: string | null | undefined): string {
+    if (!date) return 'N/A';
+    try {
+      const d = new Date(date);
+      if (isNaN(d.getTime())) return date;
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const yyyy = d.getFullYear();
+      return `${dd}/${mm}/${yyyy}`;
+    } catch {
+      return date;
+    }
   }
 
   protected logout(): void {
     this.auth.logout();
     void this.router.navigateByUrl('/customer/account/login');
+  }
+
+  protected onProvinceChange(event: Event): void {
+    const code = Number((event.target as HTMLSelectElement).value);
+    if (code) {
+      this.locationService.getDistricts(code).subscribe(data => this.districts.set(data));
+    } else {
+      this.districts.set([]);
+    }
+  }
+
+  protected onDistrictChange(event: Event): void {
+    // Logic for district change if needed
+  }
+
+  protected isProvinceSelected(p: Province): boolean {
+    const city = this.profile()?.city;
+    if (!city) return false;
+    return p.name.includes(city) || city.includes(p.name);
+  }
+
+  protected isDistrictSelected(d: District): boolean {
+    const dist = this.profile()?.district;
+    if (!dist) return false;
+    return d.name.includes(dist) || dist.includes(d.name);
+  }
+
+  private loadInitialDistricts(p: UserProfile): void {
+    if (p.city) {
+      // Find province code by name
+      const province = this.provinces().find(prov => 
+        prov.name.includes(p.city!) || p.city!.includes(prov.name)
+      );
+      if (province) {
+        this.locationService.getDistricts(province.code).subscribe(data => this.districts.set(data));
+      }
+    }
   }
 
   protected setView(view: AccountView): void {
@@ -781,6 +883,77 @@ export class AccountComponent {
 
   protected toggleChangePassword(): void {
     this.wantsChangePassword.update(v => !v);
+  }
+
+  protected onAvatarSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedAvatar = input.files[0];
+    }
+  }
+
+  protected onSave(): void {
+    const formData = new FormData();
+    formData.append('email', this.editProfile.email);
+    formData.append('name', this.editProfile.name);
+    formData.append('phoneNumber', this.editProfile.phoneNumber);
+    formData.append('address', this.editProfile.address);
+    formData.append('city', this.editProfile.city);
+    formData.append('district', this.editProfile.district);
+    formData.append('gender', this.editProfile.gender);
+    formData.append('birthDate', this.editProfile.birthDate);
+    
+    if (this.selectedAvatar) {
+      formData.append('file', this.selectedAvatar);
+    }
+
+    this.auth.updateProfile(formData).subscribe({
+      next: () => {
+        if (this.wantsChangePassword()) {
+          this.auth.changeUserPassword(this.passwordChange).subscribe({
+            next: () => {
+              alert(this.t('account.updatedSuccessfully'));
+              this.refreshProfile();
+            },
+            error: (err) => alert(err.error?.message || 'Lỗi cập nhật mật khẩu')
+          });
+        } else {
+          alert(this.t('account.updatedSuccessfully'));
+          this.refreshProfile();
+        }
+      },
+      error: (err) => alert(err.error?.message || 'Lỗi cập nhật thông tin')
+    });
+  }
+
+  private syncEditProfile(p: UserProfile): void {
+    let normalizedGender = 'None';
+    if (p.gender) {
+      const g = p.gender.toLowerCase();
+      if (g === 'nam' || g === 'male') normalizedGender = 'Nam';
+      else if (g === 'nữ' || g === 'female') normalizedGender = 'Nữ';
+    }
+
+    this.editProfile = {
+      name: p.name || '',
+      phoneNumber: p.phoneNumber || '',
+      email: p.email || '',
+      address: p.address || '',
+      city: p.city || '',
+      district: p.district || '',
+      gender: normalizedGender,
+      birthDate: p.birthDate || ''
+    };
+  }
+
+  private refreshProfile(): void {
+    const userName = this.auth.currentUserName();
+    if (userName) {
+      this.auth.getUserProfile(userName).subscribe(p => {
+        this.profile.set(p);
+        this.syncEditProfile(p);
+      });
+    }
   }
 
   protected onDevelop(): void {

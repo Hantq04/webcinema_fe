@@ -97,6 +97,47 @@ const translations = {
       title: 'Quản trị CineGo',
       description: 'Cấu hình rạp, phim, khuyến mãi và báo cáo.'
     },
+    management: {
+      dashboard: 'Dashboard',
+      movies: 'Phim',
+      showtimes: 'Suất chiếu',
+      cinemas: 'Rạp & Phòng',
+      seats: 'Ghế ngồi',
+      bookings: 'Đặt vé',
+      invoices: 'Hóa đơn',
+      foodBeverages: 'Bắp nước',
+      promotions: 'Khuyến mãi',
+      customers: 'Khách hàng',
+      staff: 'Nhân viên',
+      reports: 'Báo cáo',
+      settings: 'Cài đặt',
+      search: 'Tìm kiếm...',
+      devMessage: 'Tính năng đang được phát triển',
+      forUsers: 'Dành cho người dùng',
+      dashboardOverview: 'Tổng quan hệ thống',
+      today: 'Hôm nay',
+      revenueToday: 'Doanh thu hôm nay',
+      ticketsSold: 'Vé đã bán hôm nay',
+      activeMovies: 'Phim đang chiếu',
+      seatOccupancy: 'Tỷ lệ lấp đầy ghế',
+      revenueLast7Days: 'Doanh thu 7 ngày qua',
+      topSellingMovies: 'Phim bán chạy nhất',
+      viewAll: 'Xem tất cả',
+      tickets: 'Vé',
+      recentBookings: 'Đặt vé gần đây',
+      customer: 'Khách hàng',
+      movie: 'Phim',
+      dateAndTime: 'Ngày & Giờ',
+      total: 'Tổng cộng',
+      status: 'Trạng thái',
+      paid: 'Đã thanh toán',
+      pending: 'Chờ thanh toán',
+      cancelled: 'Đã hủy',
+      foodBeverage7Days: 'Bắp nước (7 ngày)',
+      totalRevenue: 'Tổng doanh thu',
+      sold: 'đã bán',
+      activePromotions: 'Khuyến mãi đang chạy'
+    },
     movies: {
       title: 'Phim CineGo',
       description: 'Danh sách phim đang chiếu và sắp chiếu.',
@@ -378,6 +419,47 @@ const translations = {
       title: 'CineGo Admin',
       description: 'Configure theaters, movies, promotions, and reports.'
     },
+    management: {
+      dashboard: 'Dashboard',
+      movies: 'Movies',
+      showtimes: 'Showtimes',
+      cinemas: 'Cinemas & Rooms',
+      seats: 'Seats',
+      bookings: 'Bookings',
+      invoices: 'Invoices',
+      foodBeverages: 'Food & Beverages',
+      promotions: 'Promotions',
+      customers: 'Customers',
+      staff: 'Staff',
+      reports: 'Reports',
+      settings: 'Settings',
+      search: 'Search...',
+      devMessage: 'Feature is under development',
+      forUsers: 'For Users',
+      dashboardOverview: 'Dashboard Overview',
+      today: 'Today',
+      revenueToday: 'Revenue Today',
+      ticketsSold: 'Tickets Sold Today',
+      activeMovies: 'Active Movies',
+      seatOccupancy: 'Seat Occupancy',
+      revenueLast7Days: 'Revenue Last 7 Days',
+      topSellingMovies: 'Top Selling Movies',
+      viewAll: 'View All',
+      tickets: 'Tickets',
+      recentBookings: 'Recent Bookings',
+      customer: 'Customer',
+      movie: 'Movie',
+      dateAndTime: 'Date & Time',
+      total: 'Total',
+      status: 'Status',
+      paid: 'Paid',
+      pending: 'Pending',
+      cancelled: 'Cancelled',
+      foodBeverage7Days: 'Food & Beverage (7 Days)',
+      totalRevenue: 'Total Revenue',
+      sold: 'sold',
+      activePromotions: 'Active Promotions'
+    },
     movies: {
       title: 'CineGo Movies',
       description: 'List of now-playing and coming-soon movies.',
@@ -607,18 +689,20 @@ export class LanguageService {
           ? 'home'
           : key.startsWith('admin.')
             ? 'admin'
-            : key.startsWith('movies.')
-              ? 'movies'
-              : key.startsWith('booking.')
-                ? 'booking'
-                : key.startsWith('shared.')
-                  ? 'shared'
-                  : key.startsWith('account.')
-                    ? 'account'
-                    : key.startsWith('titles.')
-                      ? 'titles'
-                      : 'auth';
-    const normalizedKey = key.replace(/^header\.|^footer\.|^home\.|^admin\.|^movies\.|^booking\.|^shared\.|^auth\.|^account\.|^titles\./, '');
+            : key.startsWith('management.')
+              ? 'management'
+              : key.startsWith('movies.')
+                ? 'movies'
+                : key.startsWith('booking.')
+                  ? 'booking'
+                  : key.startsWith('shared.')
+                    ? 'shared'
+                    : key.startsWith('account.')
+                      ? 'account'
+                      : key.startsWith('titles.')
+                        ? 'titles'
+                        : 'auth';
+    const normalizedKey = key.replace(/^header\.|^footer\.|^home\.|^admin\.|^management\.|^movies\.|^booking\.|^shared\.|^auth\.|^account\.|^titles\./, '');
     const currentTranslations = translations[language][group] as Record<string, string>;
     return currentTranslations[normalizedKey] ?? key;
   }

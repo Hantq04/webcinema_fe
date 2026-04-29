@@ -83,7 +83,7 @@ import { LanguageService } from '../../core/services/language.service';
               <span class="nav-link__label">{{ t('header.cinema') }}</span>
             </button>
             <div class="dropdown-menu" [class.dropdown-menu--open]="isMenuOpen('booking')">
-              <a routerLink="/booking" class="dropdown-link">{{ t('header.allCinemas') }}</a>
+              <a routerLink="/cinox/site" class="dropdown-link">{{ t('header.allCinemas') }}</a>
               <a href="javascript:void(0)" (click)="onDevelop()" class="dropdown-link">{{ t('header.specialCinemas') }}</a>
             </div>
           </div>

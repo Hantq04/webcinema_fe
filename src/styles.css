@@ -20,3 +20,56 @@ body {
 a {
 	color: inherit;
 }
+
+/* Management Theme Variables */
+:root {
+  --m-bg-primary: #f8fafc;
+  --m-bg-surface: #ffffff;
+  --m-bg-surface-hover: #f1f5f9;
+  --m-border-color: #e2e8f0;
+  --m-text-primary: #0f172a;
+  --m-text-secondary: #64748b;
+  --m-brand-color: #d62f1f;
+  --m-brand-light: rgba(214, 47, 31, 0.08);
+  --m-text-muted: #94a3b8;
+  --m-success-bg: #f0fdf4;
+  --m-success-text: #16a34a;
+  --m-info-bg: #eff6ff;
+  --m-info-text: #2563eb;
+  --m-warning-bg: #fffbeb;
+  --m-warning-text: #d97706;
+  --m-danger-bg: #fef2f2;
+  --m-danger-text: #dc2626;
+  --m-purple-bg: #fdf4ff;
+  --m-purple-text: #c026d3;
+  --m-orange-bg: #fff7ed;
+  --m-orange-text: #ea580c;
+  --m-gold-text: #f59e0b;
+  --m-bronze-text: #b45309;
+}
+
+body.dark-theme {
+  --m-bg-primary: #0f172a;
+  --m-bg-surface: #1e293b;
+  --m-bg-surface-hover: #334155;
+  --m-border-color: #334155;
+  --m-text-primary: #f8fafc;
+  --m-text-secondary: #94a3b8;
+  --m-brand-color: #f87171;
+  --m-brand-light: rgba(248, 113, 113, 0.15);
+  --m-text-muted: #64748b;
+  --m-success-bg: rgba(22, 163, 74, 0.15);
+  --m-success-text: #4ade80;
+  --m-info-bg: rgba(37, 99, 235, 0.15);
+  --m-info-text: #60a5fa;
+  --m-warning-bg: rgba(217, 119, 6, 0.15);
+  --m-warning-text: #fbbf24;
+  --m-danger-bg: rgba(220, 38, 38, 0.15);
+  --m-danger-text: #f87171;
+  --m-purple-bg: rgba(192, 38, 211, 0.15);
+  --m-purple-text: #e879f9;
+  --m-orange-bg: rgba(234, 88, 12, 0.15);
+  --m-orange-text: #fb923c;
+  --m-gold-text: #fbbf24;
+  --m-bronze-text: #d97706;
+}

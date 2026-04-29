@@ -193,16 +193,29 @@ interface EventCard {
 
           <div class="event-section__banner">
             <div class="event-banner-ribbon">
-              <span class="event-banner-ribbon__icon">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 12l-6-6v4H4v4h10v4l6-6z"/></svg>
-              </span>
-              <span class="event-banner-ribbon__text">Thành Viên CGV | Tin Mới & Ưu Đãi</span>
+              <button type="button" class="event-ribbon-tab" [class.active]="selectedEventTab() === 'member'" (click)="selectedEventTab.set('member')">
+                @if (selectedEventTab() === 'member') {
+                  <span class="event-finger-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 12l-6-6v4H3v4h12v4l6-6z"/></svg>
+                  </span>
+                }
+                Thành Viên CGV
+              </button>
+              <span class="event-ribbon-divider">|</span>
+              <button type="button" class="event-ribbon-tab" [class.active]="selectedEventTab() === 'news'" (click)="selectedEventTab.set('news')">
+                @if (selectedEventTab() === 'news') {
+                  <span class="event-finger-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 12l-6-6v4H3v4h12v4l6-6z"/></svg>
+                  </span>
+                }
+                Tin Mới & Ưu Đãi
+              </button>
             </div>
           </div>
 
           <div class="event-section__row-wrapper">
             <div class="event-section__grid event-section__grid--top">
-              @for (card of eventTopCards; track card.id) {
+              @for (card of eventTopCards(); track card.id) {
                 <div class="event-card-frame">
                   <a href="javascript:void(0)" (click)="onEventClick()" class="event-card-img">
                     <img [src]="card.imageUrl" [alt]="card.id" loading="lazy" />
@@ -523,8 +536,7 @@ interface EventCard {
       color: #fff;
       display: inline-flex;
       align-items: center;
-      gap: 0.6rem;
-      padding: 0.5rem 3.5rem;
+      padding: 0.5rem 2.5rem;
       font-size: 0.95rem;
       font-weight: 700;
       clip-path: polygon(0 0, 18px 50%, 0 100%, 100% 100%, calc(100% - 18px) 50%, 100% 0);
@@ -532,9 +544,39 @@ interface EventCard {
       z-index: 10;
     }
 
-    .event-banner-ribbon__icon {
-      width: 1.4rem;
-      height: 1.4rem;
+    .event-ribbon-tab {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: inherit;
+      font-weight: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.2rem 0.5rem;
+      transition: opacity 0.2s;
+    }
+
+    .event-ribbon-tab:not(.active) {
+      opacity: 0.85;
+    }
+
+    .event-ribbon-tab:hover {
+      opacity: 1;
+    }
+
+    .event-ribbon-divider {
+      margin: 0 0.5rem;
+      opacity: 0.6;
+    }
+
+    .event-finger-icon {
+      width: 1.2rem;
+      height: 1.2rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .event-section__row-wrapper {
@@ -1299,12 +1341,26 @@ export class HomeComponent {
 
     return slides[this.carouselIndex() % slides.length] ?? slides[0] ?? null;
   });
-  protected readonly eventTopCards: readonly EventCard[] = [
+  protected readonly selectedEventTab = signal<'member' | 'news'>('member');
+
+  protected readonly memberCards: EventCard[] = [
     { id: '1', imageUrl: '/event/qua_tang.png', href: '/customer/account/login' },
     { id: '2', imageUrl: '/event/dong_gia.png', href: '/booking' },
     { id: '3', imageUrl: '/event/hoan_ve.jpg', href: '/refund' },
     { id: '4', imageUrl: '/event/birthday_popcorn.png', href: '/account' }
   ];
+
+  protected readonly newsCards: EventCard[] = [
+    { id: 'n1', imageUrl: '/event/news/scb_cgv.jpg', href: '/events' },
+    { id: 'n2', imageUrl: '/event/news/bat_tan.png', href: '/events' },
+    { id: 'n3', imageUrl: '/event/news/khai_vi.jpg', href: '/events' },
+    { id: 'n4', imageUrl: '/event/news/75000.jpg', href: '/events' }
+  ];
+
+  protected readonly eventTopCards = computed(() => 
+    this.selectedEventTab() === 'member' ? this.memberCards : this.newsCards
+  );
+
   protected readonly eventBottomCards: readonly EventCard[] = [
     { id: 'b1', imageUrl: '/event/qua_keo_li.png', href: '/customer/account/login' },
     { id: 'b2', imageUrl: '/event/kh_23.png', href: '/movies' },
