@@ -98,6 +98,7 @@ const translations = {
       description: 'Cấu hình rạp, phim, khuyến mãi và báo cáo.'
     },
     management: {
+      menu: 'Menu',
       dashboard: 'Dashboard',
       movies: 'Phim',
       showtimes: 'Suất chiếu',
@@ -462,6 +463,7 @@ const translations = {
       description: 'Configure theaters, movies, promotions, and reports.'
     },
     management: {
+      menu: 'Menu',
       dashboard: 'Dashboard',
       movies: 'Movies',
       showtimes: 'Showtimes',

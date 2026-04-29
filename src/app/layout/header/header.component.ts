@@ -489,6 +489,9 @@ export class HeaderComponent {
     if (this.auth.isAuthenticated()) {
       const role = this.auth.currentUserRole()?.toUpperCase();
       if (role === 'STAFF' || role === 'ADMIN') {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.removeItem('management_sidebar_collapsed');
+        }
         void this.router.navigate(['/management/dashboard']);
       } else {
         alert('Tính năng này chỉ dành cho nhân viên và quản lý');

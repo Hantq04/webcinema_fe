@@ -32,9 +32,10 @@
   height: 64px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 1.25rem;
+  justify-content: flex-start;
+  padding: 0 1.75rem;
   border-bottom: 1px solid var(--m-border-color);
+  position: relative;
 }
 
 .management-container.collapsed .sidebar-header {
@@ -42,9 +43,14 @@
   padding: 0;
 }
 
+.management-container.collapsed .toggle-btn {
+  position: static;
+}
+
 .logo-container {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
 }
 
 .logo-text {
@@ -67,6 +73,14 @@
   border-radius: 8px;
 }
 
+.menu-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--m-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 .toggle-btn {
   background: none;
   border: none;
@@ -78,6 +92,8 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
+  position: absolute;
+  right: 1.25rem;
 }
 
 .toggle-btn:hover {
@@ -88,6 +104,7 @@
 .sidebar-nav {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 1rem 0.75rem;
   display: flex;
   flex-direction: column;
@@ -97,7 +114,8 @@
 .nav-item {
   display: flex;
   align-items: center;
-  padding: 0.75rem 1rem;
+  padding: 0 1rem;
+  height: 45px;
   border-radius: 8px;
   color: var(--m-text-secondary);
   text-decoration: none;
@@ -133,7 +151,40 @@
 .nav-divider {
   height: 1px;
   background-color: var(--m-border-color);
-  margin: 1rem 0.5rem;
+  margin: 0.5rem 0.5rem;
+}
+
+.sidebar-footer {
+  padding: 1.5rem 1.75rem;
+  border-top: 1px solid var(--m-border-color);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: var(--m-bg-surface);
+}
+
+.management-container.collapsed .sidebar-footer {
+  padding: 1rem 0;
+  justify-content: center;
+}
+
+.management-container.collapsed .sidebar-footer .logo-container {
+  justify-content: center;
+}
+
+.logo-footer-link {
+  text-decoration: none;
+  display: block;
+  width: 100%;
+  transition: transform 0.2s ease;
+}
+
+.management-container.collapsed .logo-footer-link:hover {
+  transform: scale(1.05);
+}
+
+.management-container.collapsed .logo-footer-link:active {
+  transform: scale(0.95);
 }
 
 /* Main Content Wrapper */
@@ -141,7 +192,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-width: 0; /* Important for flex child truncation */
+  min-width: 0;
+  /* Important for flex child truncation */
 }
 
 /* Top Header Styling */

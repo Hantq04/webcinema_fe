@@ -14,10 +14,7 @@ import { NgIf, isPlatformBrowser } from '@angular/common';
       <!-- Sidebar -->
       <aside class="sidebar">
         <div class="sidebar-header">
-          <div class="logo-container">
-            <span class="logo-text" *ngIf="!isCollapsed()">CINEGO</span>
-            <span class="logo-icon" *ngIf="isCollapsed()">C</span>
-          </div>
+          <span class="menu-label" *ngIf="!isCollapsed()">{{ t('management.menu') }}</span>
           <button class="toggle-btn" (click)="toggleSidebar()">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M3 12h18M3 6h18M3 18h18" *ngIf="isCollapsed()"/>
@@ -83,6 +80,15 @@ import { NgIf, isPlatformBrowser } from '@angular/common';
             <span class="nav-label" *ngIf="!isCollapsed()">{{ t('management.settings') }}</span>
           </a>
         </nav>
+
+        <div class="sidebar-footer">
+          <a routerLink="/management/dashboard" class="logo-footer-link">
+            <div class="logo-container">
+              <span class="logo-text" *ngIf="!isCollapsed()">CINEGO</span>
+              <span class="logo-icon" *ngIf="isCollapsed()">C</span>
+            </div>
+          </a>
+        </div>
       </aside>
 
       <!-- Main Content Area -->
@@ -165,11 +171,23 @@ export class ManagementLayoutComponent implements OnInit {
         document.body.classList.remove('dark-theme');
         document.body.classList.remove('dark');
       }
+
+      // Load sidebar state
+      const savedCollapsed = localStorage.getItem('management_sidebar_collapsed');
+      if (savedCollapsed !== null) {
+        this.isCollapsed.set(savedCollapsed === 'true');
+      }
     }
   }
 
   toggleSidebar() {
-    this.isCollapsed.update(v => !v);
+    this.isCollapsed.update(v => {
+      const newValue = !v;
+      if (isPlatformBrowser(this.platformId)) {
+        localStorage.setItem('management_sidebar_collapsed', String(newValue));
+      }
+      return newValue;
+    });
   }
 
   toggleTheme() {

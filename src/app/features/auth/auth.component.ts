@@ -222,6 +222,9 @@ export class AuthComponent implements OnInit, OnDestroy {
         });
 
         if (this.staffMode()) {
+          if (typeof localStorage !== 'undefined') {
+            localStorage.removeItem('management_sidebar_collapsed');
+          }
           void this.router.navigateByUrl('/management/dashboard');
         } else {
           void this.router.navigateByUrl('/');
