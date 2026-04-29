@@ -9,7 +9,7 @@
   margin: 0 auto;
   background: #fdfcf0;
   border: 4px solid #f4efe3;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   font-family: Arial, sans-serif;
   color: #333;
 }
@@ -119,6 +119,13 @@
   transition: all 0.2s;
   padding: 0;
   letter-spacing: -0.5px;
+  border-radius: 2px;
+}
+
+.seat-x-icon {
+  width: 14px;
+  height: 14px;
+  color: #888;
 }
 
 .seat-btn:hover:not(:disabled) {
@@ -143,9 +150,15 @@
 
 /* Seat States */
 .seat-btn--booked {
-  background: #bbb;
-  border-color: #bbb;
+  background: #94a3b8;
+  border-color: #94a3b8;
   color: #fff;
+  cursor: not-allowed;
+}
+
+.seat-btn--unavailable {
+  background: #e0e0e0;
+  border-color: #e0e0e0;
   cursor: not-allowed;
 }
 
@@ -180,12 +193,33 @@
   display: inline-block;
 }
 
-.legend-checked { background: #b11500; }
-.legend-booked { background: #bbb; }
-.legend-unavailable { background: #e0e0e0; }
-.legend-standard { border: 1px solid #01c73c; }
-.legend-vip { border: 1px solid #f71708; }
-.legend-sweetbox { background: #f13c8f; border-radius: 2px; }
+.legend-checked {
+  background: #b11500;
+}
+
+.legend-booked {
+  background: #94a3b8;
+}
+
+.legend-unavailable {
+  background: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.legend-standard {
+  border: 1px solid #01c73c;
+}
+
+.legend-vip {
+  border: 1px solid #f71708;
+}
+
+.legend-sweetbox {
+  background: #f13c8f;
+  border-radius: 2px;
+}
 
 
 /* Footer */
@@ -346,7 +380,7 @@
   width: 90%;
   max-width: 450px;
   border-radius: 8px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
   overflow: hidden;
 }
 
@@ -404,8 +438,13 @@
   font-weight: bold;
 }
 
-.btn-modal-cancel:hover { background: #d1d1d1; }
-.btn-modal-confirm:hover { background: #d1170d; }
+.btn-modal-cancel:hover {
+  background: #d1d1d1;
+}
+
+.btn-modal-confirm:hover {
+  background: #d1170d;
+}
 
 /* Food Selection */
 .food-selection {
@@ -585,8 +624,13 @@
 }
 
 /* Placeholder icons */
-.method-icon.vnpay { background-image: url('https://vnpay.vn/wp-content/uploads/2020/07/vnpay-logo.png'); }
-.method-icon.momo { background-image: url('https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png'); }
+.method-icon.vnpay {
+  background-image: url('https://vnpay.vn/wp-content/uploads/2020/07/vnpay-logo.png');
+}
+
+.method-icon.momo {
+  background-image: url('https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png');
+}
 
 .payment-sidebar {
   flex: 1;

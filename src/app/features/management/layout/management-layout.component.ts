@@ -159,9 +159,11 @@ export class ManagementLayoutComponent implements OnInit {
       if (savedTheme === 'dark') {
         this.isDarkMode.set(true);
         document.body.classList.add('dark-theme');
+        document.body.classList.add('dark');
       } else {
         this.isDarkMode.set(false);
         document.body.classList.remove('dark-theme');
+        document.body.classList.remove('dark');
       }
     }
   }
@@ -175,9 +177,11 @@ export class ManagementLayoutComponent implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       if (this.isDarkMode()) {
         document.body.classList.add('dark-theme');
+        document.body.classList.add('dark');
         localStorage.setItem('management_theme', 'dark');
       } else {
         document.body.classList.remove('dark-theme');
+        document.body.classList.remove('dark');
         localStorage.setItem('management_theme', 'light');
       }
     }

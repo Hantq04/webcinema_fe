@@ -10,6 +10,8 @@ export interface SeatResponse {
   status: string; // Available, Held, Occupied
   room: string;
   seatType: string; // Standard, VIP, Sweet Box
+  priceTicket?: number;
+  notes?: string;
 }
 
 export interface SeatByScheduleDTO {
@@ -32,6 +34,10 @@ export interface UpdateSeatPayload {
   number: number;
   roomName: string;
   roomCode: string;
+  status?: string;
+  seatType?: string;
+  priceTicket?: number;
+  notes?: string;
 }
 
 @Injectable({
@@ -73,6 +79,30 @@ export class SeatService {
       }),
       catchError((err) => {
         console.error('Error fetching seats by schedule', err);
+        return of([]);
+      })
+    );
+  }
+
+  getSeatsByRoom(roomCode: string): Observable<SeatResponse[]> {
+    const params = new HttpParams().set('roomCode', roomCode);
+    return this.http.get<any>(this.apiService.apiUrl('/api/v1/seat/get-by-room'), { params }).pipe(
+      map(response => {
+        if (response && response.data) {
+          if (Array.isArray(response.data)) {
+            return response.data as SeatResponse[];
+          }
+          if (response.data.seats && Array.isArray(response.data.seats)) {
+            return response.data.seats as SeatResponse[];
+          }
+        }
+        if (Array.isArray(response)) {
+          return response as SeatResponse[];
+        }
+        return [];
+      }),
+      catchError((err) => {
+        console.error('Error fetching seats by room', err);
         return of([]);
       })
     );

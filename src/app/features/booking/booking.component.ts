@@ -50,12 +50,17 @@ import { Router } from '@angular/router';
                               [class.seat-btn--standard]="seat.seatType === 'Standard'"
                               [class.seat-btn--vip]="seat.seatType === 'VIP'"
                               [class.seat-btn--sweetbox]="seat.seatType === 'Sweet Box'"
-                              [class.seat-btn--booked]="seat.status !== 'AVAILABLE'"
+                              [class.seat-btn--booked]="seat.status === 'BOOKED'"
+                              [class.seat-btn--unavailable]="seat.status === 'UNAVAILABLE'"
                               [class.seat-btn--selected]="isSeatSelected(seat)"
                               (click)="toggleSeat(seat)"
                               [disabled]="seat.status !== 'AVAILABLE'"
                               >
-                        <span class="seat-number">{{ seat.line }}{{ seat.number }}</span>
+                        @if (seat.status === 'UNAVAILABLE') {
+                          <svg xmlns="http://www.w3.org/2000/svg" class="seat-x-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        } @else {
+                          <span class="seat-number">{{ seat.line }}{{ seat.number }}</span>
+                        }
                       </button>
                     }
                   </div>
@@ -64,9 +69,14 @@ import { Router } from '@angular/router';
             </div>
 
             <div class="seat-legend">
-              <div class="legend-item"><span class="legend-color legend-checked"></span> Checked</div>
-              <div class="legend-item"><span class="legend-color legend-booked"></span> {{ t('booking.legendSelected') }}</div>
-              <div class="legend-item"><span class="legend-color legend-unavailable"></span> {{ t('booking.legendUnavailable') }}</div>
+              <div class="legend-item"><span class="legend-color legend-checked"></span> {{ t('booking.legendSelected') }}</div>
+              <div class="legend-item"><span class="legend-color legend-booked"></span> {{ t('booking.legendBooked') || 'Đã đặt' }}</div>
+              <div class="legend-item">
+                <span class="legend-color legend-unavailable">
+                  <svg xmlns="http://www.w3.org/2000/svg" style="width:10px; height:10px; color:#999;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </span> 
+                {{ t('booking.legendUnavailable') }}
+              </div>
               <div class="legend-item"><span class="legend-color legend-standard"></span> {{ t('booking.legendStandard') }}</div>
               <div class="legend-item"><span class="legend-color legend-vip"></span> {{ t('booking.legendVip') }}</div>
               <div class="legend-item"><span class="legend-color legend-sweetbox"></span> {{ t('booking.legendSweetbox') }}</div>
