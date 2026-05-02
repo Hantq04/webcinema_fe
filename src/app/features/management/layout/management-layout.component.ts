@@ -28,7 +28,7 @@ import { NgIf, isPlatformBrowser } from '@angular/common';
             <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
             <span class="nav-label" *ngIf="!isCollapsed()">{{ t('management.dashboard') }}</span>
           </a>
-          <a href="javascript:void(0)" (click)="showAlert($event)" class="nav-item">
+          <a routerLink="/management/movies" routerLinkActive="active" class="nav-item">
             <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M17 3v18"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>
             <span class="nav-label" *ngIf="!isCollapsed()">{{ t('management.movies') }}</span>
           </a>
@@ -36,7 +36,7 @@ import { NgIf, isPlatformBrowser } from '@angular/common';
             <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             <span class="nav-label" *ngIf="!isCollapsed()">{{ t('management.showtimes') }}</span>
           </a>
-          <a href="javascript:void(0)" (click)="showAlert($event)" class="nav-item">
+          <a routerLink="/management/cinemas" routerLinkActive="active" class="nav-item">
             <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-3"/><path d="M9 9v2"/><path d="M9 13v2"/></svg>
             <span class="nav-label" *ngIf="!isCollapsed()">{{ t('management.cinemas') }}</span>
           </a>

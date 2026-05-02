@@ -17,6 +17,14 @@ export const managementRoutes: Routes = [
       {
         path: 'seats',
         loadComponent: () => import('./seats/management-seats.component').then((m) => m.ManagementSeatsComponent)
+      },
+      {
+        path: 'cinemas',
+        loadComponent: () => import('./cinemas/management-cinemas.component').then((m) => m.ManagementCinemasComponent)
+      },
+      {
+        path: 'movies',
+        loadComponent: () => import('./movies/management-movies.component').then((m) => m.ManagementMoviesComponent)
       }
     ]
   }

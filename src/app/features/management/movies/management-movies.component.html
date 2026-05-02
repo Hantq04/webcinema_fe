@@ -1,0 +1,563 @@
+<div class="p-6 max-w-[1500px] mx-auto space-y-6">
+  <!-- Top Action Bar -->
+  <header
+    class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+    <div class="flex flex-col md:flex-row items-start md:items-center gap-4 w-full xl:w-auto">
+      <h1 class="text-xl font-bold text-slate-800 dark:text-white whitespace-nowrap">{{ t('management.movieManagement')
+        }}</h1>
+
+      <div class="h-8 w-px bg-slate-200 dark:bg-slate-700 hidden md:block"></div>
+
+      <!-- Tabs / Quick Filters -->
+      <div class="flex flex-wrap gap-2 w-full md:w-auto">
+        <button class="px-4 py-2 rounded-lg text-sm font-medium transition-colors border"
+          [ngClass]="activeTab() === 'ALL' ? 'bg-slate-800 text-white border-slate-800 dark:bg-rose-600 dark:border-rose-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-700'"
+          (click)="setTab('ALL')">
+          {{ t('management.allMovies') }}
+        </button>
+        <button class="px-4 py-2 rounded-lg text-sm font-medium transition-colors border"
+          [ngClass]="activeTab() === 'NOW_SHOWING' ? 'bg-slate-800 text-white border-slate-800 dark:bg-rose-600 dark:border-rose-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-700'"
+          (click)="setTab('NOW_SHOWING')">
+          {{ t('management.nowShowing') }}
+        </button>
+        <button class="px-4 py-2 rounded-lg text-sm font-medium transition-colors border"
+          [ngClass]="activeTab() === 'HOT' ? 'bg-rose-600 text-white border-rose-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-700'"
+          (click)="setTab('HOT')">
+          🔥 {{ t('management.hotNowShowing') }}
+        </button>
+        <button class="px-4 py-2 rounded-lg text-sm font-medium transition-colors border"
+          [ngClass]="activeTab() === 'COMING_SOON' ? 'bg-slate-800 text-white border-slate-800 dark:bg-rose-600 dark:border-rose-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-700'"
+          (click)="setTab('COMING_SOON')">
+          {{ t('management.comingSoon') }}
+        </button>
+        <button class="px-4 py-2 rounded-lg text-sm font-medium transition-colors border"
+          [ngClass]="activeTab() === 'TOP_SALES' ? 'bg-amber-500 text-white border-amber-500' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-700'"
+          (click)="setTab('TOP_SALES')">
+          🏆 {{ t('management.topSales') }}
+        </button>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 w-full xl:w-auto shrink-0">
+      <!-- Search Input -->
+      <div class="relative w-full md:w-64">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg class="h-4 w-4 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <input type="text"
+          class="pl-10 w-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-all"
+          placeholder="Tìm kiếm phim..." [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)">
+      </div>
+
+      <button
+        class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors shadow-sm whitespace-nowrap"
+        (click)="openAddModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        {{ t('management.addMovie') }}
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <div class="flex flex-col lg:flex-row gap-6 h-[calc(100vh-180px)] min-h-[600px]">
+
+    <!-- Left Panel: Movie List -->
+    <div
+      class="w-full lg:w-1/3 xl:w-2/5 flex flex-col bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden shrink-0">
+      <div
+        class="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex justify-between items-center">
+        <h2 class="font-semibold text-slate-800 dark:text-white flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-rose-500" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+          </svg>
+          Danh sách phim
+        </h2>
+        <span
+          class="text-xs font-bold bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-1 rounded-full">{{
+          totalElements() }}</span>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-3 space-y-3">
+        <!-- Skeleton Loading -->
+        <div *ngIf="isLoadingList()" class="space-y-3">
+          <div *ngFor="let i of [1,2,3,4]"
+            class="animate-pulse flex p-3 border border-slate-100 dark:border-slate-800 rounded-xl gap-4">
+            <div class="h-24 w-16 bg-slate-200 dark:bg-slate-700 rounded-lg shrink-0"></div>
+            <div class="flex-1 space-y-2 py-1">
+              <div class="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
+              <div class="h-3 bg-slate-100 dark:bg-slate-800 rounded w-1/2"></div>
+              <div class="h-3 bg-slate-100 dark:bg-slate-800 rounded w-1/4 mt-4"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!isLoadingList() && filteredMovies().length === 0"
+          class="flex flex-col items-center justify-center h-40 text-slate-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2 opacity-50" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+          </svg>
+          <span class="text-sm">Không tìm thấy phim nào.</span>
+        </div>
+
+        <!-- Movie Cards -->
+        <div *ngFor="let movie of filteredMovies()"
+          class="group p-3 rounded-xl border cursor-pointer transition-all hover:shadow-md flex gap-4 relative overflow-hidden"
+          [ngClass]="{
+            'border-rose-500 ring-1 ring-rose-500 bg-rose-50/50 dark:bg-rose-900/10': selectedMovieCode() === movie.code,
+            'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-rose-300 dark:hover:border-rose-600': selectedMovieCode() !== movie.code
+          }" (click)="selectMovie(movie.code)">
+
+          <img [src]="resolveImageUrl(movie)" alt="Poster"
+            class="w-16 h-24 object-cover rounded-lg shadow-sm shrink-0 bg-slate-100 dark:bg-slate-800">
+
+          <div class="flex-1 min-w-0 py-1 flex flex-col">
+            <h3 class="font-bold text-sm text-slate-800 dark:text-white leading-tight truncate mb-1"
+              [class.text-rose-600]="selectedMovieCode() === movie.code" [title]="movie.name">{{ movie.name }}</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 truncate mb-2">{{ movie.nameEn }}</p>
+
+            <div class="mt-auto flex items-center gap-2">
+              <span
+                class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600">{{
+                movie.code }}</span>
+              <span *ngIf="movie.rate"
+                class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800">{{
+                movie.rate }}</span>
+              <span *ngIf="movie.movieDuration" class="text-[10px] text-slate-500 flex items-center gap-0.5">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {{ movie.movieDuration }}'
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination Footer -->
+      <div
+        class="p-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-between items-center"
+        *ngIf="totalPages() > 1">
+        <button
+          class="p-1.5 rounded bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-slate-50 disabled:opacity-50"
+          (click)="prevPage()" [disabled]="currentPage() === 0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <span class="text-xs font-medium text-slate-600 dark:text-slate-400">Trang {{ currentPage() + 1 }} / {{
+          totalPages() }}</span>
+        <button
+          class="p-1.5 rounded bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-slate-50 disabled:opacity-50"
+          (click)="nextPage()" [disabled]="currentPage() >= totalPages() - 1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Panel: Movie Detail -->
+    <div
+      class="flex-1 flex flex-col bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden relative">
+      <!-- Empty State -->
+      <div *ngIf="!selectedMovieDetail() && !isLoadingDetail()"
+        class="absolute inset-0 z-10 bg-slate-50/50 dark:bg-slate-900/50 flex flex-col items-center justify-center text-slate-400 p-6 text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4 opacity-30" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="1">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+        </svg>
+        <span class="text-lg font-medium">Vui lòng chọn một bộ phim từ danh sách để xem chi tiết.</span>
+      </div>
+
+      <div *ngIf="isLoadingDetail()"
+        class="absolute inset-0 z-20 bg-white/80 dark:bg-slate-900/80 flex items-center justify-center backdrop-blur-sm">
+        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-rose-600"></div>
+      </div>
+
+      <ng-container *ngIf="selectedMovieDetail() as detail">
+        <!-- Header Actions -->
+        <div
+          class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-end gap-2 bg-slate-50/50 dark:bg-slate-800/30 shrink-0">
+          <button
+            class="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-blue-500 hover:text-blue-600 dark:hover:border-blue-400 dark:hover:text-blue-400 text-slate-600 dark:text-slate-300 rounded text-sm font-medium flex items-center gap-1.5 transition-colors shadow-sm"
+            (click)="openEditModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
+            {{ t('management.editMovie') }}
+          </button>
+          <button
+            class="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-red-500 hover:text-red-600 dark:hover:border-red-400 dark:hover:text-red-400 text-slate-600 dark:text-slate-300 rounded text-sm font-medium flex items-center gap-1.5 transition-colors shadow-sm"
+            (click)="openDeleteModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            {{ t('management.deleteMovie') }}
+          </button>
+        </div>
+
+        <!-- Detail Content -->
+        <div class="flex-1 overflow-y-auto p-6">
+          <div class="flex flex-col md:flex-row gap-6 mb-8">
+            <img [src]="resolveImageUrl(detail)" alt="Poster"
+              class="w-48 h-[280px] object-cover rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 shrink-0 mx-auto md:mx-0">
+
+            <div class="flex-1 space-y-4">
+              <div>
+                <h2 class="text-3xl font-black text-slate-800 dark:text-white leading-tight">{{ detail.name }}</h2>
+                <p class="text-lg text-slate-500 dark:text-slate-400 font-medium">{{ detail.nameEn }}</p>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-3">
+                <span
+                  class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded border border-slate-200 dark:border-slate-700 tracking-wider text-sm">
+                  {{ detail.rate }}
+                </span>
+                <span
+                  class="px-2.5 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 font-bold rounded border border-blue-100 dark:border-blue-800 text-sm flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {{ detail.movieDuration || detail.durationMinutes || detail.duration || 'N/A' }} phút
+                </span>
+                <span
+                  class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 font-bold rounded border border-emerald-100 dark:border-emerald-800 text-sm flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  {{ detail.premiereDate | date:'dd/MM/yyyy' }}
+                </span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-3 text-sm">
+                <div><span class="text-slate-400">{{ t('management.director') }}:</span> <span
+                    class="font-medium text-slate-800 dark:text-slate-200 ml-1">{{ detail.director }}</span></div>
+                <div><span class="text-slate-400">{{ t('management.language') }}:</span> <span
+                    class="font-medium text-slate-800 dark:text-slate-200 ml-1">{{ detail.language }} / {{
+                    detail.subtitle }}</span></div>
+                <div class="sm:col-span-2"><span class="text-slate-400">{{ t('management.actor') }}:</span> <span
+                    class="font-medium text-slate-800 dark:text-slate-200 ml-1">{{ detail.actor }}</span></div>
+                <div class="sm:col-span-2">
+                  <span class="text-slate-400">{{ t('management.movieType') }}:</span>
+                  <span class="font-medium text-slate-800 dark:text-slate-200 ml-1">
+                    {{ detail.movieType ? detail.movieType.join(', ') : 'N/A' }}
+                  </span>
+                </div>
+              </div>
+
+              <div *ngIf="detail.trailer" class="pt-2">
+                <a [href]="detail.trailer" target="_blank"
+                  class="inline-flex items-center gap-1.5 text-sm font-medium text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Xem Trailer
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-6">
+            <div>
+              <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-2">{{ t('management.movieDescription') }}
+              </h3>
+              <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed whitespace-pre-wrap">{{
+                detail.description }}</p>
+            </div>
+            <div *ngIf="detail.descriptionEn">
+              <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-2">{{ t('management.movieDescriptionEn') }}
+              </h3>
+              <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed whitespace-pre-wrap italic">{{
+                detail.descriptionEn }}</p>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- Form Modal (Create / Edit) -->
+  <div *ngIf="showFormModal()"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm" role="dialog">
+    <div
+      class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col max-h-[95vh]">
+      <div
+        class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 shrink-0">
+        <h2 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-rose-500" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+          </svg>
+          {{ isEditMode() ? t('management.editMovie') : t('management.addMovie') }}
+        </h2>
+        <button type="button"
+          class="text-slate-400 hover:text-slate-500 bg-white dark:bg-slate-800 rounded-full p-1 border border-slate-200 dark:border-slate-700 shadow-sm"
+          (click)="showFormModal.set(false)">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50 dark:bg-slate-900/50">
+        <form [formGroup]="movieForm" class="space-y-6">
+
+          <div *ngIf="isEditMode()"
+            class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Mã
+              phim (Read-only)</label>
+            <input type="text" formControlName="code"
+              class="w-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 text-slate-500 rounded-lg py-2.5 px-3 outline-none font-mono text-sm cursor-not-allowed shadow-inner">
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div
+              class="space-y-4 bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+              <h3
+                class="font-bold text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-700 pb-2">
+                Thông tin chung</h3>
+
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{
+                  t('management.movieName') }} <span class="text-rose-500">*</span></label>
+                <input type="text" formControlName="name"
+                  class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
+                  [class.border-red-500]="movieForm.get('name')?.invalid && movieForm.get('name')?.touched">
+                <p *ngIf="movieForm.get('name')?.invalid && movieForm.get('name')?.touched"
+                  class="text-xs text-red-500 mt-1">Yêu cầu từ 3-50 ký tự.</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{
+                  t('management.movieNameEn') }} <span class="text-rose-500">*</span></label>
+                <input type="text" formControlName="nameEn"
+                  class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
+                  [class.border-red-500]="movieForm.get('nameEn')?.invalid && movieForm.get('nameEn')?.touched">
+                <p *ngIf="movieForm.get('nameEn')?.invalid && movieForm.get('nameEn')?.touched"
+                  class="text-xs text-red-500 mt-1">Yêu cầu từ 3-50 ký tự.</p>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{
+                    t('management.movieDuration') }} <span class="text-rose-500">*</span></label>
+                  <input type="number" formControlName="movieDuration"
+                    class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
+                    [class.border-red-500]="movieForm.get('movieDuration')?.invalid && movieForm.get('movieDuration')?.touched">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{
+                    t('management.premiereDate') }} <span class="text-rose-500">*</span></label>
+                  <input type="date" formControlName="premiereDate"
+                    class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
+                    [class.border-red-500]="movieForm.get('premiereDate')?.invalid && movieForm.get('premiereDate')?.touched">
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="space-y-4 bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+              <h3
+                class="font-bold text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-700 pb-2">
+                Đoàn làm phim & Định dạng</h3>
+
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{
+                  t('management.director') }} <span class="text-rose-500">*</span></label>
+                <input type="text" formControlName="director"
+                  class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
+                  [class.border-red-500]="movieForm.get('director')?.invalid && movieForm.get('director')?.touched">
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{
+                  t('management.actor') }} <span class="text-rose-500">*</span></label>
+                <input type="text" formControlName="actor"
+                  class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
+                  [class.border-red-500]="movieForm.get('actor')?.invalid && movieForm.get('actor')?.touched">
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{
+                    t('management.language') }} <span class="text-rose-500">*</span></label>
+                  <input type="text" formControlName="language" placeholder="Tiếng Việt"
+                    class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
+                    [class.border-red-500]="movieForm.get('language')?.invalid && movieForm.get('language')?.touched">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{
+                    t('management.subtitle') }} <span class="text-rose-500">*</span></label>
+                  <input type="text" formControlName="subtitle" placeholder="Phụ đề tiếng Anh"
+                    class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
+                    [class.border-red-500]="movieForm.get('subtitle')?.invalid && movieForm.get('subtitle')?.touched">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div
+              class="space-y-4 bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+              <h3
+                class="font-bold text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-700 pb-2">
+                Phân loại & Media</h3>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{
+                    t('management.rate') }} <span class="text-rose-500">*</span></label>
+                  <select formControlName="rate"
+                    class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
+                    [class.border-red-500]="movieForm.get('rate')?.invalid && movieForm.get('rate')?.touched">
+                    <option value="" disabled>-- Chọn --</option>
+                    <option *ngFor="let r of rates()" [value]="r.code" 
+                            [title]="isEn() ? (r.rateNameEn || r.descriptionEn) : (r.rateName || r.descriptionVi)">
+                      {{ r.code }}
+                    </option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{
+                    t('management.banner') }} <span class="text-rose-500">*</span></label>
+                  <select formControlName="bannerId"
+                    class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
+                    [class.border-red-500]="movieForm.get('bannerId')?.invalid && movieForm.get('bannerId')?.touched">
+                    <option value="" disabled>-- Chọn --</option>
+                    <option *ngFor="let b of banners()" [value]="b.id">{{ b.title }}</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">{{
+                  t('management.movieType') }} <span class="text-rose-500">*</span></label>
+                <div class="flex flex-wrap gap-2">
+                  <div *ngFor="let type of movieTypes()"
+                    class="px-3 py-1.5 rounded-full border text-sm cursor-pointer transition-colors select-none"
+                    [ngClass]="hasMovieType(type.id) ? 'bg-rose-100 border-rose-300 text-rose-700 dark:bg-rose-900/40 dark:border-rose-600 dark:text-rose-300' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700'"
+                    (click)="toggleMovieType(type.id)">
+                    {{ isEn() ? type.movieTypeNameEn : type.movieTypeNameVi }}
+                  </div>
+                </div>
+                <p *ngIf="movieForm.get('movieTypeIds')?.invalid && movieForm.get('movieTypeIds')?.touched"
+                  class="text-xs text-red-500 mt-2">Vui lòng chọn ít nhất 1 thể loại.</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{
+                  t('management.trailer') }} <span class="text-rose-500">*</span></label>
+                <input type="text" formControlName="trailer" placeholder="https://youtube.com/..."
+                  class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
+                  [class.border-red-500]="movieForm.get('trailer')?.invalid && movieForm.get('trailer')?.touched">
+                <p *ngIf="movieForm.get('trailer')?.invalid && movieForm.get('trailer')?.touched"
+                  class="text-xs text-red-500 mt-1">Phải là URL hợp lệ.</p>
+              </div>
+            </div>
+
+            <div
+              class="space-y-4 bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+              <h3
+                class="font-bold text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-700 pb-2">
+                Nội dung</h3>
+
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{
+                  t('management.movieDescription') }} <span class="text-rose-500">*</span></label>
+                <textarea formControlName="description" rows="4"
+                  class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow resize-none"
+                  [class.border-red-500]="movieForm.get('description')?.invalid && movieForm.get('description')?.touched"></textarea>
+                <p *ngIf="movieForm.get('description')?.invalid && movieForm.get('description')?.touched"
+                  class="text-xs text-red-500 mt-1">Yêu cầu từ 6-5000 ký tự.</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{
+                  t('management.movieDescriptionEn') }} <span class="text-rose-500">*</span></label>
+                <textarea formControlName="descriptionEn" rows="4"
+                  class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow resize-none"
+                  [class.border-red-500]="movieForm.get('descriptionEn')?.invalid && movieForm.get('descriptionEn')?.touched"></textarea>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div
+        class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3 shrink-0">
+        <button type="button"
+          class="px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm"
+          (click)="showFormModal.set(false)">{{ t('management.seatCancel') }}</button>
+        <button type="button"
+          class="px-6 py-2.5 bg-rose-600 text-white font-medium rounded-xl hover:bg-rose-700 shadow-md transition-colors flex items-center gap-2"
+          (click)="submitForm()">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          {{ t('management.seatSave') }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirm Modal -->
+  <div *ngIf="showDeleteModal()"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+    <div
+      class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden text-center transform transition-all">
+      <div class="p-6 pt-8 space-y-4">
+        <div
+          class="mx-auto w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-6 shadow-inner">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-slate-800 dark:text-white">Xóa bộ phim này?</h3>
+        <p class="text-sm text-slate-500 dark:text-slate-400 px-4">{{ t('management.confirmDeleteMovie') }}</p>
+        <p class="font-medium text-slate-800 dark:text-slate-200 mt-2 p-2 bg-slate-50 dark:bg-slate-800 rounded">{{
+          deleteMovieName() }}</p>
+      </div>
+      <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 flex justify-center gap-3">
+        <button
+          class="px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-700 dark:text-slate-300 font-medium flex-1 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+          (click)="showDeleteModal.set(false)">{{ t('management.seatCancel') }}</button>
+        <button
+          class="px-5 py-2.5 bg-red-600 hover:bg-red-700 rounded-xl text-white font-medium flex-1 shadow-md transition-colors"
+          (click)="submitDelete()">{{ t('management.deleteMovie') }}</button>
+      </div>
+    </div>
+  </div>
+</div>

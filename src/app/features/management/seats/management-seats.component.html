@@ -5,8 +5,8 @@
 
     <div class="flex items-center gap-3">
       <button
-        class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
-        (click)="openRefreshModal()">
+        class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        (click)="openRefreshModal()" [disabled]="!selectedRoomCode()">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
           stroke-width="2">
           <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
@@ -16,7 +16,7 @@
       </button>
 
       <button
-        class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-sm font-medium flex items-center gap-2 transition-colors shadow-sm"
+        class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-sm font-medium flex items-center gap-2 transition-colors shadow-sm disabled:bg-slate-200 dark:disabled:bg-slate-800 disabled:text-slate-400 dark:disabled:text-slate-500 disabled:cursor-not-allowed disabled:shadow-none"
         (click)="openGenerateModal()" [disabled]="!selectedRoomCode()">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
           stroke-width="2">
@@ -29,9 +29,11 @@
   </header>
 
   <!-- Filter Section -->
-  <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-wrap gap-4 items-end relative z-20">
+  <div
+    class="bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-wrap gap-4 items-end relative z-20">
     <div class="flex-1 min-w-[200px]">
-      <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">{{ t('management.seatArea') }}</label>
+      <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">{{
+        t('management.seatArea') }}</label>
       <div class="relative w-full">
         <div
           class="w-full border border-slate-200 dark:border-slate-700 rounded-lg py-2 px-3 text-sm flex justify-between items-center cursor-pointer bg-white dark:bg-slate-800 transition-colors hover:border-rose-300 dark:hover:border-rose-500"
@@ -53,8 +55,8 @@
           class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg max-h-60 overflow-y-auto py-1 z-50">
           <div *ngFor="let addr of addresses()"
             class="px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 dark:hover:text-rose-400 cursor-pointer transition-colors flex items-center justify-between"
-            [class.bg-rose-50]="selectedAddress() === addr" [class.dark:bg-rose-900/40]="selectedAddress() === addr" [class.text-rose-600]="selectedAddress() === addr"
-            [class.font-medium]="selectedAddress() === addr"
+            [class.bg-rose-50]="selectedAddress() === addr" [class.dark:bg-rose-900/40]="selectedAddress() === addr"
+            [class.text-rose-600]="selectedAddress() === addr" [class.font-medium]="selectedAddress() === addr"
             (click)="onAddressChange(addr); isAddressDropdownOpen.set(false)">
             {{ addr }}
             <svg *ngIf="selectedAddress() === addr" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-rose-500"
@@ -71,7 +73,8 @@
     </div>
 
     <div class="flex-1 min-w-[200px]">
-      <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">{{ t('management.cinemaLabel') }}</label>
+      <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">{{
+        t('management.cinemaLabel') }}</label>
       <div class="relative w-full">
         <div class="w-full border rounded-lg py-2 px-3 text-sm flex justify-between items-center transition-colors"
           [ngClass]="{
@@ -96,8 +99,8 @@
           class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg max-h-60 overflow-y-auto py-1 z-50">
           <div *ngFor="let cinema of cinemas()"
             class="px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 dark:hover:text-rose-400 cursor-pointer transition-colors flex items-center justify-between"
-            [class.bg-rose-50]="selectedCinema() === cinema" [class.dark:bg-rose-900/40]="selectedCinema() === cinema" [class.text-rose-600]="selectedCinema() === cinema"
-            [class.font-medium]="selectedCinema() === cinema"
+            [class.bg-rose-50]="selectedCinema() === cinema" [class.dark:bg-rose-900/40]="selectedCinema() === cinema"
+            [class.text-rose-600]="selectedCinema() === cinema" [class.font-medium]="selectedCinema() === cinema"
             (click)="onCinemaChange(cinema); isCinemaDropdownOpen.set(false)">
             {{ cinema }}
             <svg *ngIf="selectedCinema() === cinema" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-rose-500"
@@ -114,8 +117,10 @@
   </div>
 
   <!-- Seat Map Section -->
-  <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden relative">
-    <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex flex-wrap justify-between items-center gap-4 bg-slate-50/50 dark:bg-slate-800/30">
+  <div
+    class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden relative">
+    <div
+      class="p-6 border-b border-slate-100 dark:border-slate-800 flex flex-wrap justify-between items-center gap-4 bg-slate-50/50 dark:bg-slate-800/30">
       <h2 class="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-rose-600" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2">
@@ -126,7 +131,8 @@
 
       <!-- Room Dropdown -->
       <div class="flex items-center gap-3 relative" *ngIf="rooms().length > 0">
-        <label class="text-sm font-medium text-slate-600 dark:text-slate-300 hidden sm:block">{{ t('management.seatRoom') }}:</label>
+        <label class="text-sm font-medium text-slate-600 dark:text-slate-300 hidden sm:block">{{
+          t('management.seatRoom') }}:</label>
 
 
         <div class="relative w-36">
@@ -149,8 +155,8 @@
             class="absolute top-full right-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg max-h-60 overflow-y-auto py-1 z-50">
             <div *ngFor="let room of rooms()"
               class="px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 dark:hover:text-rose-400 cursor-pointer transition-colors flex items-center justify-between"
-              [class.bg-rose-50]="selectedRoomCode() === room" [class.dark:bg-rose-900/40]="selectedRoomCode() === room" [class.text-rose-600]="selectedRoomCode() === room"
-              [class.font-bold]="selectedRoomCode() === room"
+              [class.bg-rose-50]="selectedRoomCode() === room" [class.dark:bg-rose-900/40]="selectedRoomCode() === room"
+              [class.text-rose-600]="selectedRoomCode() === room" [class.font-bold]="selectedRoomCode() === room"
               (click)="onRoomChange(room); isRoomDropdownOpen.set(false)">
               {{ room }}
             </div>
@@ -185,8 +191,10 @@
                   'bg-[#94a3b8] border-[#94a3b8] text-white': isStatus(seat.status, ['OCCUPIED', 'Occupied', 'Đã đặt']),
                   'bg-gray-200 dark:bg-slate-700 border-gray-200 dark:border-slate-700 text-gray-400 dark:text-slate-500 cursor-not-allowed': isStatus(seat.status, ['UNAVAILABLE', 'Unavailable', 'Bảo trì', 'Maintenance', 'Disabled', 'Khóa'])
                 }">
-                <span *ngIf="isStatus(seat.status, ['AVAILABLE', 'Available', 'Ghế trống'])">{{ seat.line }}{{ seat.number }}</span>
-                <span *ngIf="isStatus(seat.status, ['OCCUPIED', 'Occupied', 'Đã đặt'])" class="text-white opacity-80">{{ seat.line }}{{ seat.number }}</span>
+                <span *ngIf="isStatus(seat.status, ['AVAILABLE', 'Available', 'Ghế trống'])">{{ seat.line }}{{
+                  seat.number }}</span>
+                <span *ngIf="isStatus(seat.status, ['OCCUPIED', 'Occupied', 'Đã đặt'])" class="text-white opacity-80">{{
+                  seat.line }}{{ seat.number }}</span>
 
                 <svg
                   *ngIf="isStatus(seat.status, ['UNAVAILABLE', 'Unavailable', 'Maintenance', 'Bảo trì', 'Disabled', 'Khóa'])"
@@ -218,20 +226,24 @@
           class="border-t border-slate-200 dark:border-slate-800 mt-8 pt-8 flex flex-wrap justify-center gap-8 bg-amber-50/30 dark:bg-slate-800/40 p-6 rounded-xl">
           <div class="flex items-center gap-2">
             <div class="w-5 h-5 rounded-sm bg-[#94a3b8] shadow-sm"></div>
-            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">{{ t('management.seatOccupied') }}</span>
+            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">{{ t('management.seatOccupied')
+              }}</span>
           </div>
           <div class="flex items-center gap-2">
             <div class="w-5 h-5 rounded-sm bg-gray-200 dark:bg-slate-700 shadow-sm flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-slate-400" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="3">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
             </div>
-            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">{{ t('management.seatUnavailable') }}</span>
+            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">{{ t('management.seatUnavailable')
+              }}</span>
           </div>
           <div class="flex items-center gap-2">
             <div class="w-5 h-5 rounded-sm bg-white dark:bg-transparent border border-emerald-500 shadow-sm"></div>
-            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">{{ t('management.seatStandard') }}</span>
+            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">{{ t('management.seatStandard')
+              }}</span>
           </div>
           <div class="flex items-center gap-2">
             <div class="w-5 h-5 rounded-sm bg-white dark:bg-transparent border border-red-500 shadow-sm"></div>
@@ -239,7 +251,8 @@
           </div>
           <div class="flex items-center gap-2">
             <div class="w-5 h-5 rounded-sm bg-pink-500 shadow-sm"></div>
-            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">{{ t('management.seatSweetBox') }}</span>
+            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">{{ t('management.seatSweetBox')
+              }}</span>
           </div>
         </div>
       </ng-container>
@@ -252,8 +265,10 @@
             <line x1="3" y1="9" x2="21" y2="9" />
             <line x1="9" y1="21" x2="9" y2="9" />
           </svg>
-          <p class="text-lg font-medium text-slate-600 dark:text-slate-400 mb-2">{{ t('management.noMapData') || 'Chưa có sơ đồ ghế' }}</p>
-          <p class="text-sm mb-6">{{ t('management.noMapDataDesc') || 'Vui lòng chọn phòng chiếu hoặc tạo mới ghế cho phòng này.' }}</p>
+          <p class="text-lg font-medium text-slate-600 dark:text-slate-400 mb-2">{{ t('management.noMapData') || 'Chưa
+            có sơ đồ ghế' }}</p>
+          <p class="text-sm mb-6">{{ t('management.noMapDataDesc') || 'Vui lòng chọn phòng chiếu hoặc tạo mới ghế cho
+            phòng này.' }}</p>
           <button *ngIf="selectedRoomCode()"
             class="px-6 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-medium transition-colors shadow-sm"
             (click)="openGenerateModal()">
@@ -268,10 +283,12 @@
 
   <!-- Edit Modal (Centered style) -->
   <div *ngIf="showEditModal()"
-    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 dark:bg-slate-950/70 backdrop-blur-sm" role="dialog"
-    aria-modal="true">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
-      <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 dark:bg-slate-950/70 backdrop-blur-sm"
+    role="dialog" aria-modal="true">
+    <div
+      class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div
+        class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
         <h2 class="text-lg font-semibold text-slate-800 dark:text-white">{{ t('management.seatModalEditTitle') }}</h2>
         <button type="button" class="text-slate-400 hover:text-slate-500 focus:outline-none"
           (click)="showEditModal.set(false)">
@@ -286,22 +303,25 @@
         <!-- Position info -->
         <div class="grid grid-cols-2 gap-4 pb-5 border-b border-slate-100 dark:border-slate-800">
           <div>
-            <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{ t('management.seatLine') }}</label>
+            <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{ t('management.seatLine')
+              }}</label>
             <input type="text"
               class="w-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 rounded-lg py-2 px-3 outline-none cursor-not-allowed"
               [ngModel]="editData().line" readonly>
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{ t('management.seatNumber') }}</label>
+            <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{
+              t('management.seatNumber') }}</label>
             <input type="number"
               class="w-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 rounded-lg py-2 px-3 outline-none cursor-not-allowed"
               [ngModel]="editData().number" readonly>
           </div>
         </div>
- 
+
         <!-- Configuration -->
         <div>
-          <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{ t('management.seatType') }}</label>
+          <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{ t('management.seatType')
+            }}</label>
           <select
             class="w-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 rounded-lg py-2 px-3 outline-none cursor-not-allowed"
             [ngModel]="editData().seatType" disabled>
@@ -313,46 +333,50 @@
         </div>
 
         <div>
-          <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{ t('management.status') }}</label>
+          <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{ t('management.status')
+            }}</label>
           <div class="relative w-full">
             <div
               class="w-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 px-3 flex justify-between items-center cursor-pointer transition-all hover:border-rose-400"
               (click)="isStatusDropdownOpen.set(!isStatusDropdownOpen())">
-              <span>{{ editData().status === 'AVAILABLE' ? t('management.seatAvailable') : (editData().status === 'OCCUPIED' ? t('management.seatOccupied') : t('management.seatUnavailable')) }}</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform" [class.rotate-180]="isStatusDropdownOpen()" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+              <span>{{ editData().status === 'AVAILABLE' ? t('management.seatAvailable') : (editData().status ===
+                'OCCUPIED' ? t('management.seatOccupied') : t('management.seatUnavailable')) }}</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform"
+                [class.rotate-180]="isStatusDropdownOpen()" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                  clip-rule="evenodd" />
               </svg>
             </div>
 
             <!-- Dropdown Options -->
             <div *ngIf="isStatusDropdownOpen()"
               class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-[60] overflow-hidden py-1">
-              <div
-                class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer"
+              <div class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer"
                 [class.text-rose-600]="editData().status === 'AVAILABLE'"
                 (click)="editData.set({ ...editData(), status: 'AVAILABLE' }); isStatusDropdownOpen.set(false)">
                 {{ t('management.seatAvailable') }} (Available)
               </div>
-              <div
-                class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer"
+              <div class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer"
                 [class.text-rose-600]="editData().status === 'OCCUPIED'"
                 (click)="editData.set({ ...editData(), status: 'OCCUPIED' }); isStatusDropdownOpen.set(false)">
                 {{ t('management.seatOccupied') }} (Occupied)
               </div>
-              <div
-                class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer"
+              <div class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer"
                 [class.text-rose-600]="editData().status === 'UNAVAILABLE'"
                 (click)="editData.set({ ...editData(), status: 'UNAVAILABLE' }); isStatusDropdownOpen.set(false)">
                 {{ t('management.seatUnavailable') }} (Unavailable)
               </div>
             </div>
             <!-- Click outside to close -->
-            <div *ngIf="isStatusDropdownOpen()" class="fixed inset-0 z-50" (click)="isStatusDropdownOpen.set(false)"></div>
+            <div *ngIf="isStatusDropdownOpen()" class="fixed inset-0 z-50" (click)="isStatusDropdownOpen.set(false)">
+            </div>
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{ t('management.seatNotes') }}</label>
+          <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{ t('management.seatNotes')
+            }}</label>
           <textarea
             class="w-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none resize-none"
             rows="3" [ngModel]="editData().notes" (ngModelChange)="editData.set({ ...editData(), notes: $event })"
@@ -367,7 +391,8 @@
         </div>
       </div>
 
-      <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3">
+      <div
+        class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3">
         <button type="button"
           class="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
           (click)="showEditModal.set(false)">{{ t('management.seatCancel') }}</button>
@@ -379,11 +404,14 @@
   </div>
 
   <!-- Generate Modal -->
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 dark:bg-slate-950/70 backdrop-blur-sm"
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 dark:bg-slate-950/70 backdrop-blur-sm"
     *ngIf="showGenerateModal()">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-xl overflow-hidden">
-      <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900">
-        <h3 class="text-lg font-semibold text-slate-800 dark:text-white">{{ t('management.seatModalGenerateTitle') }}</h3>
+      <div
+        class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900">
+        <h3 class="text-lg font-semibold text-slate-800 dark:text-white">{{ t('management.seatModalGenerateTitle') }}
+        </h3>
         <button class="text-slate-400 hover:text-slate-600 focus:outline-none" (click)="showGenerateModal.set(false)">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
             stroke-width="2">
@@ -395,57 +423,70 @@
       <div class="p-6 space-y-4 bg-white dark:bg-slate-900">
         <p class="text-sm text-slate-600 dark:text-slate-400">{{ t('management.seatModalGenerateDesc') }}</p>
         <div>
-          <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{ t('management.seatModalRoomName') }}</label>
-          <input type="text" class="w-full border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg py-2 px-3 outline-none"
+          <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{
+            t('management.seatModalRoomName') }}</label>
+          <input type="text"
+            class="w-full border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg py-2 px-3 outline-none"
             [ngModel]="generateData().roomName" readonly disabled>
         </div>
         <div>
-          <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{ t('management.seatModalRoomCode') }}</label>
-          <input type="text" class="w-full border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg py-2 px-3 outline-none"
+          <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{
+            t('management.seatModalRoomCode') }}</label>
+          <input type="text"
+            class="w-full border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg py-2 px-3 outline-none"
             [ngModel]="generateData().roomCode" readonly disabled>
         </div>
       </div>
-      <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3">
+      <div
+        class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3">
         <button
           class="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-medium hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
           (click)="showGenerateModal.set(false)">{{ t('management.seatCancel') }}</button>
-        <button class="px-6 py-2 bg-rose-600 rounded-lg text-white font-medium hover:bg-rose-700 shadow-sm transition-colors"
+        <button
+          class="px-6 py-2 bg-rose-600 rounded-lg text-white font-medium hover:bg-rose-700 shadow-sm transition-colors"
           (click)="submitGenerate()">{{ t('management.seatSave') }}</button>
       </div>
     </div>
   </div>
 
   <!-- Delete Modal -->
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 dark:bg-slate-950/70 backdrop-blur-sm"
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 dark:bg-slate-950/70 backdrop-blur-sm"
     *ngIf="showDeleteModal()">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-sm shadow-xl overflow-hidden text-center">
       <div class="p-6 pt-8 space-y-4">
         <div class="mx-auto w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor" stroke-width="2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600 dark:text-red-400" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round"
               d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
         </div>
         <h3 class="text-lg font-bold text-slate-800 dark:text-white">{{ t('management.seatModalDeleteTitle') }}</h3>
-        <p class="text-sm text-slate-500 dark:text-slate-400">{{ t('management.seatModalDeleteDesc') }} (ID: {{ deleteId() }})</p>
+        <p class="text-sm text-slate-500 dark:text-slate-400">{{ t('management.seatModalDeleteDesc') }} (ID: {{
+          deleteId() }})</p>
       </div>
-      <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex justify-center gap-3">
+      <div
+        class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex justify-center gap-3">
         <button
           class="px-5 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 font-medium hover:bg-slate-50 dark:hover:bg-slate-700 flex-1 transition-colors"
           (click)="showDeleteModal.set(false)">{{ t('management.seatCancel') }}</button>
-        <button class="px-5 py-2 bg-red-600 rounded-lg text-white font-medium hover:bg-red-700 shadow-sm flex-1 transition-colors"
+        <button
+          class="px-5 py-2 bg-red-600 rounded-lg text-white font-medium hover:bg-red-700 shadow-sm flex-1 transition-colors"
           (click)="submitDelete()">{{ t('management.seatDelete') }}</button>
       </div>
     </div>
   </div>
 
   <!-- Refresh Modal -->
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 dark:bg-slate-950/70 backdrop-blur-sm"
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 dark:bg-slate-950/70 backdrop-blur-sm"
     *ngIf="showRefreshModal()">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-xl overflow-hidden">
-      <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900">
-        <h3 class="text-lg font-semibold text-slate-800 dark:text-white">{{ t('management.seatModalRefreshTitle') }}</h3>
+      <div
+        class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900">
+        <h3 class="text-lg font-semibold text-slate-800 dark:text-white">{{ t('management.seatModalRefreshTitle') }}
+        </h3>
         <button class="text-slate-400 hover:text-slate-600 focus:outline-none" (click)="showRefreshModal.set(false)">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
             stroke-width="2">
@@ -454,22 +495,45 @@
           </svg>
         </button>
       </div>
-      <div class="p-6 space-y-4 bg-white dark:bg-slate-900">
-        <p class="text-sm text-slate-600 dark:text-slate-400">{{ t('management.seatModalRefreshDesc') }}</p>
-        <div>
-          <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{ t('management.seatModalTradingCode') }}</label>
-          <input type="text"
-            class="w-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 px-3 outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
-            [placeholder]="t('management.seatModalTradingCode')" [ngModel]="refreshTradingCode()"
-            (ngModelChange)="refreshTradingCode.set($event)">
+      <div class="p-8 space-y-6 bg-white dark:bg-slate-900">
+        <div
+          class="flex items-center gap-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-xl">
+          <div
+            class="flex-shrink-0 w-10 h-10 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <p class="text-sm leading-relaxed text-blue-800 dark:text-blue-200 font-medium">
+            {{ t('management.seatModalRefreshDesc') }}
+          </p>
+        </div>
+
+        <div class="flex flex-col items-center justify-center text-center py-2">
+          <div class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-widest font-bold mb-1">{{
+            t('management.seatRoom') }}</div>
+          <div class="text-lg font-black text-rose-600">{{ selectedRoomCode() }}</div>
         </div>
       </div>
-      <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3">
+      <div
+        class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3">
         <button
           class="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-medium hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
-          (click)="showRefreshModal.set(false)">{{ t('management.seatCancel') }}</button>
-        <button class="px-6 py-2 bg-rose-600 rounded-lg text-white font-medium hover:bg-rose-700 shadow-sm transition-colors"
-          (click)="submitRefresh()">{{ t('management.seatSave') }}</button>
+          (click)="showRefreshModal.set(false)" [disabled]="isRefreshing()">{{ t('management.seatCancel') }}</button>
+        <button
+          class="px-6 py-2 bg-rose-600 rounded-lg text-white font-medium hover:bg-rose-700 shadow-sm transition-colors flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+          (click)="submitRefresh()" [disabled]="isRefreshing()">
+          <svg *ngIf="isRefreshing()" class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg"
+            fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+            </path>
+          </svg>
+          {{ isRefreshing() ? t('shared.loading') : t('management.seatRefresh') }}
+        </button>
       </div>
     </div>
   </div>

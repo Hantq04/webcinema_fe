@@ -83,7 +83,7 @@ export class ManagementSeatsComponent implements OnInit {
     notes: ''
   });
   deleteId = signal<number>(0);
-  refreshTradingCode = signal('');
+  isRefreshing = signal(false);
   isStatusDropdownOpen = signal(false);
 
   ngOnInit(): void {
@@ -274,14 +274,23 @@ export class ManagementSeatsComponent implements OnInit {
   }
 
   openRefreshModal() {
-    this.refreshTradingCode.set('');
     this.showRefreshModal.set(true);
   }
 
   submitRefresh() {
-    this.seatService.refreshSeatStatus(this.refreshTradingCode()).subscribe(() => {
-      this.showRefreshModal.set(false);
-      this.refreshSeats();
+    const roomCode = this.selectedRoomCode();
+    if (!roomCode) return;
+
+    this.isRefreshing.set(true);
+    this.seatService.refreshSeatStatus(roomCode).subscribe({
+      next: () => {
+        this.isRefreshing.set(false);
+        this.showRefreshModal.set(false);
+        this.refreshSeats();
+      },
+      error: () => {
+        this.isRefreshing.set(false);
+      }
     });
   }
 

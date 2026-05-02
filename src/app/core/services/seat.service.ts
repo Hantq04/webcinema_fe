@@ -121,8 +121,8 @@ export class SeatService {
     return this.http.delete<any>(this.apiService.apiUrl('/api/v1/seat/delete'), { params });
   }
 
-  refreshSeatStatus(tradingCode: string): Observable<any> {
-    const params = new HttpParams().set('code', tradingCode);
+  refreshSeatStatus(roomCode: string): Observable<any> {
+    const params = new HttpParams().set('roomCode', roomCode);
     return this.http.put<any>(this.apiService.apiUrl('/api/v1/seat/refresh'), null, { params });
   }
 }

@@ -1,0 +1,416 @@
+<div class="p-6 max-w-[1400px] mx-auto space-y-6">
+  <!-- Top Action Bar -->
+  <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full md:w-auto">
+      <h1 class="text-xl font-bold text-slate-800 dark:text-white whitespace-nowrap">{{ t('management.cinemaManagement') }}</h1>
+      
+      <div class="h-8 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
+
+      <!-- Area Filter -->
+      <div class="relative w-full sm:w-64">
+        <div
+          class="w-full border border-slate-200 dark:border-slate-700 rounded-lg py-2 px-3 text-sm flex justify-between items-center cursor-pointer bg-slate-50 dark:bg-slate-800 transition-colors hover:border-rose-300 dark:hover:border-rose-500"
+          [class.ring-2]="isAddressDropdownOpen()" [class.ring-rose-500]="isAddressDropdownOpen()"
+          (click)="toggleAddressDropdown()">
+          <span [class.text-slate-400]="!selectedAddress()" [class.text-slate-800]="selectedAddress()"
+            [class.dark:text-white]="selectedAddress()" class="font-medium truncate">
+            {{ selectedAddress() || t('management.selectArea') }}
+          </span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform shrink-0"
+            [class.rotate-180]="isAddressDropdownOpen()" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+              clip-rule="evenodd" />
+          </svg>
+        </div>
+
+        <div *ngIf="isAddressDropdownOpen()"
+          class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg max-h-60 overflow-y-auto py-1 z-50">
+          <div class="px-4 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer italic"
+            (click)="onAddressChange(''); isAddressDropdownOpen.set(false)">
+            -- Tất cả khu vực --
+          </div>
+          <div *ngFor="let addr of addresses()"
+            class="px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 dark:hover:text-rose-400 cursor-pointer transition-colors flex items-center justify-between"
+            [class.bg-rose-50]="selectedAddress() === addr" [class.dark:bg-rose-900/40]="selectedAddress() === addr" [class.text-rose-600]="selectedAddress() === addr"
+            [class.font-medium]="selectedAddress() === addr"
+            (click)="onAddressChange(addr); isAddressDropdownOpen.set(false)">
+            {{ addr }}
+            <svg *ngIf="selectedAddress() === addr" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-rose-500 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </div>
+        <div *ngIf="isAddressDropdownOpen()" class="fixed inset-0 z-40" (click)="isAddressDropdownOpen.set(false)"></div>
+      </div>
+
+      <!-- Search -->
+      <div class="relative w-full sm:w-64">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg class="h-4 w-4 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <input type="text"
+          class="pl-10 w-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-all"
+          [placeholder]="t('management.searchCinemaOrRoom')"
+          [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)">
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 w-full md:w-auto shrink-0">
+      <button class="flex-1 md:flex-none px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-rose-300 hover:text-rose-600 dark:hover:border-rose-500 dark:hover:text-rose-400 text-slate-700 dark:text-slate-200 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all shadow-sm"
+        (click)="openAddRoomModal()" [disabled]="!selectedCinema()" [class.opacity-50]="!selectedCinema()" [class.cursor-not-allowed]="!selectedCinema()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        {{ t('management.addRoom') }}
+      </button>
+
+      <button class="flex-1 md:flex-none px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors shadow-sm"
+        (click)="openAddCinemaModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        {{ t('management.addCinema') }}
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="flex flex-col lg:flex-row gap-6 h-[calc(100vh-180px)] min-h-[600px]">
+    
+    <!-- Left Panel: Cinema List -->
+    <div class="w-full lg:w-1/3 xl:w-1/4 flex flex-col bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden shrink-0">
+      <div class="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex justify-between items-center">
+        <h2 class="font-semibold text-slate-800 dark:text-white flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+          Danh sách rạp
+        </h2>
+        <span class="text-xs font-bold bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-1 rounded-full">{{ filteredCinemas().length }}</span>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-3 space-y-3">
+        <!-- Skeleton Loading -->
+        <div *ngIf="isLoadingCinemas()" class="space-y-3">
+          <div *ngFor="let i of [1,2,3]" class="animate-pulse flex flex-col p-4 border border-slate-100 dark:border-slate-800 rounded-xl gap-3">
+            <div class="h-4 bg-slate-200 dark:bg-slate-700 rounded w-2/3"></div>
+            <div class="h-3 bg-slate-100 dark:bg-slate-800 rounded w-1/2"></div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!isLoadingCinemas() && filteredCinemas().length === 0" class="flex flex-col items-center justify-center h-40 text-slate-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+          <span class="text-sm">{{ t('management.noCinemas') }}</span>
+        </div>
+
+        <!-- Cinema Cards -->
+        <div *ngFor="let cinema of filteredCinemas()" 
+          class="group p-4 rounded-xl border cursor-pointer transition-all hover:shadow-md relative overflow-hidden"
+          [ngClass]="{
+            'border-rose-500 ring-1 ring-rose-500 bg-rose-50/50 dark:bg-rose-900/10': selectedCinema()?.code === cinema.code,
+            'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-rose-300 dark:hover:border-rose-600': selectedCinema()?.code !== cinema.code
+          }"
+          (click)="selectCinema(cinema)">
+          
+          <div class="flex justify-between items-start mb-2 pr-6">
+            <h3 class="font-bold text-slate-800 dark:text-white leading-tight" [class.text-rose-600]="selectedCinema()?.code === cinema.code">{{ cinema.nameOfCinema }}</h3>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap" [ngClass]="getBadgeClass(cinema.status)">
+              {{ cinema.status || 'Active' }}
+            </span>
+          </div>
+          
+          <div class="text-xs text-slate-500 dark:text-slate-400 space-y-1">
+            <div class="flex items-center gap-1.5">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+              {{ cinema.code }}
+            </div>
+            <div class="flex items-center gap-1.5">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+              <span class="truncate">{{ cinema.address }}</span>
+            </div>
+            <div class="flex items-center gap-1.5" *ngIf="cinema.totalRooms !== undefined">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+              {{ cinema.totalRooms }} {{ t('management.totalRooms') | lowercase }}
+            </div>
+          </div>
+
+          <!-- Quick Actions (Hover) -->
+          <div class="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button class="p-1.5 bg-white dark:bg-slate-700 text-slate-500 hover:text-blue-600 rounded shadow-sm border border-slate-200 dark:border-slate-600"
+              (click)="openEditCinemaModal(cinema); $event.stopPropagation()" title="{{ t('management.seatEdit') }}">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+            </button>
+            <button class="p-1.5 bg-white dark:bg-slate-700 text-slate-500 hover:text-rose-600 rounded shadow-sm border border-slate-200 dark:border-slate-600"
+              (click)="openDeleteCinemaModal(cinema.code); $event.stopPropagation()" title="{{ t('management.seatDelete') }}">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel: Room List -->
+    <div class="flex-1 flex flex-col bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden relative">
+      <!-- Empty State for Cinema Selection -->
+      <div *ngIf="!selectedCinema()" class="absolute inset-0 z-10 bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-[2px] flex flex-col items-center justify-center text-slate-400">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+        </svg>
+        <span class="text-lg font-medium">{{ t('management.selectCinemaToViewRooms') }}</span>
+      </div>
+
+      <div class="p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex justify-between items-center shrink-0">
+        <div>
+          <h2 class="text-lg font-bold text-slate-800 dark:text-white">{{ selectedCinema()?.nameOfCinema || 'Chi tiết rạp' }}</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+            <span>{{ filteredRooms().length }} {{ t('management.totalRooms') | lowercase }}</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-6 bg-slate-50 dark:bg-slate-900/30">
+        <!-- Skeleton Loading -->
+        <div *ngIf="isLoadingRooms()" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div *ngFor="let i of [1,2,3]" class="animate-pulse h-32 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700"></div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="selectedCinema() && !isLoadingRooms() && filteredRooms().length === 0" class="flex flex-col items-center justify-center h-full text-slate-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-3 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+          </svg>
+          <span class="text-sm font-medium">{{ t('management.noRooms') }}</span>
+          <button class="mt-4 px-4 py-2 bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400 rounded-lg text-sm font-medium hover:bg-rose-100 dark:hover:bg-rose-900/50 transition-colors"
+            (click)="openAddRoomModal()">
+            {{ t('management.addRoom') }}
+          </button>
+        </div>
+
+        <!-- Room Cards Grid -->
+        <div *ngIf="filteredRooms().length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div *ngFor="let room of filteredRooms()" class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5 hover:shadow-md transition-shadow relative group">
+            
+            <div class="flex justify-between items-start mb-3">
+              <div>
+                <h3 class="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2">
+                  {{ room.code }}
+                  <span *ngIf="room.type === 'VIP'" class="bg-amber-100 text-amber-700 text-[10px] px-1.5 py-0.5 rounded font-black">VIP</span>
+                  <span *ngIf="room.type === 'IMAX'" class="bg-blue-100 text-blue-700 text-[10px] px-1.5 py-0.5 rounded font-black">IMAX</span>
+                </h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400">{{ room.name }}</p>
+              </div>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap" [ngClass]="getBadgeClass(room.status)">
+                {{ room.status || 'Active' }}
+              </span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-y-2 text-sm text-slate-600 dark:text-slate-300 mb-4 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700">
+              <div class="flex flex-col">
+                <span class="text-[10px] text-slate-400 uppercase tracking-wider font-bold mb-0.5">{{ t('management.capacity') }}</span>
+                <span class="font-medium flex items-center gap-1.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                  {{ room.capacity }}
+                </span>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-[10px] text-slate-400 uppercase tracking-wider font-bold mb-0.5">{{ t('management.roomType') }}</span>
+                <span class="font-medium">{{ room.type || 'Standard' }}</span>
+              </div>
+            </div>
+
+            <!-- Card Actions -->
+            <div class="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-700">
+              <button class="text-xs font-medium text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 flex items-center gap-1"
+                routerLink="/management/seats" [queryParams]="{ room: room.code }">
+                {{ t('management.seatManagement') }}
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+              </button>
+
+              <div class="flex items-center gap-2">
+                <button class="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-700 rounded transition-colors"
+                  (click)="openEditRoomModal(room)" title="{{ t('management.seatEdit') }}">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                </button>
+                <button class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 rounded transition-colors"
+                  (click)="openDeleteRoomModal(room.code)" title="{{ t('management.seatDelete') }}">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modals -->
+
+  <!-- Cinema Form Modal -->
+  <div *ngIf="showCinemaModal()" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm" role="dialog">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
+        <h2 class="text-lg font-semibold text-slate-800 dark:text-white">
+          {{ isEditCinemaMode() ? t('management.seatEdit') + ' rạp' : t('management.addCinema') }}
+        </h2>
+        <button type="button" class="text-slate-400 hover:text-slate-500" (click)="showCinemaModal.set(false)">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-6">
+        <form [formGroup]="cinemaForm" class="space-y-4">
+          <div *ngIf="isEditCinemaMode()">
+            <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{ t('management.cinemaCode') }}</label>
+            <input type="text" formControlName="code" class="w-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-500 rounded-lg py-2 px-3 outline-none cursor-not-allowed">
+            <p class="text-[10px] text-slate-400 mt-1">Mã rạp được hệ thống tạo tự động.</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{ t('management.cinemaName') }} *</label>
+            <input type="text" formControlName="nameOfCinema" class="w-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 px-3 outline-none focus:ring-2 focus:ring-rose-500"
+              [class.border-red-500]="cinemaForm.get('nameOfCinema')?.invalid && cinemaForm.get('nameOfCinema')?.touched">
+            <p *ngIf="cinemaForm.get('nameOfCinema')?.invalid && cinemaForm.get('nameOfCinema')?.touched" class="text-xs text-red-500 mt-1">
+              Tên rạp phải từ 3 đến 20 ký tự.
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{ t('management.address') }} *</label>
+            <input type="text" formControlName="address" class="w-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 px-3 outline-none focus:ring-2 focus:ring-rose-500"
+              [class.border-red-500]="cinemaForm.get('address')?.invalid && cinemaForm.get('address')?.touched">
+            <p *ngIf="cinemaForm.get('address')?.invalid && cinemaForm.get('address')?.touched" class="text-xs text-red-500 mt-1">
+              Địa chỉ phải từ 4 đến 30 ký tự.
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{ t('management.description') }}</label>
+            <textarea formControlName="description" rows="3" class="w-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 px-3 outline-none focus:ring-2 focus:ring-rose-500 resize-none"
+              [class.border-red-500]="cinemaForm.get('description')?.invalid && cinemaForm.get('description')?.touched"></textarea>
+            <p *ngIf="cinemaForm.get('description')?.invalid && cinemaForm.get('description')?.touched" class="text-xs text-red-500 mt-1">
+              Mô tả phải từ 6 đến 50 ký tự.
+            </p>
+          </div>
+        </form>
+      </div>
+
+      <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3 shrink-0">
+        <button type="button" class="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-medium rounded-lg hover:bg-slate-50 transition-colors" (click)="showCinemaModal.set(false)">{{ t('management.seatCancel') }}</button>
+        <button type="button" class="px-6 py-2 bg-rose-600 text-white font-medium rounded-lg hover:bg-rose-700 shadow-sm transition-colors" (click)="submitCinema()">{{ t('management.seatSave') }}</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Room Form Modal -->
+  <div *ngIf="showRoomModal()" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm" role="dialog">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
+        <h2 class="text-lg font-semibold text-slate-800 dark:text-white">
+          {{ isEditRoomMode() ? t('management.seatEdit') + ' phòng chiếu' : t('management.addRoom') }}
+        </h2>
+        <button type="button" class="text-slate-400 hover:text-slate-500" (click)="showRoomModal.set(false)">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-6">
+        <form [formGroup]="roomForm" class="space-y-4">
+          <div>
+            <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{ t('management.cinemaName') }}</label>
+            <input type="text" formControlName="cinemaName" class="w-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-500 rounded-lg py-2 px-3 outline-none font-bold">
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Mã phòng *</label>
+              <input type="text" formControlName="code" class="w-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 px-3 outline-none focus:ring-2 focus:ring-rose-500 disabled:bg-slate-50 disabled:text-slate-400"
+                [class.border-red-500]="roomForm.get('code')?.invalid && roomForm.get('code')?.touched">
+              <p *ngIf="roomForm.get('code')?.invalid && roomForm.get('code')?.touched" class="text-xs text-red-500 mt-1">2-5 ký tự.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{ t('management.roomType') }} *</label>
+              <select formControlName="type" class="w-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 px-3 outline-none focus:ring-2 focus:ring-rose-500">
+                <option value="STANDARD">Standard</option>
+                <option value="VIP">VIP</option>
+                <option value="SWEETBOX">Sweet Box</option>
+                <option value="IMAX">IMAX</option>
+                <option value="4DX">4DX</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{ t('management.roomName') }} *</label>
+              <input type="text" formControlName="name" class="w-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 px-3 outline-none focus:ring-2 focus:ring-rose-500"
+                [class.border-red-500]="roomForm.get('name')?.invalid && roomForm.get('name')?.touched">
+              <p *ngIf="roomForm.get('name')?.invalid && roomForm.get('name')?.touched" class="text-xs text-red-500 mt-1">3-20 ký tự.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{ t('management.capacity') }} *</label>
+              <input type="number" formControlName="capacity" class="w-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 px-3 outline-none focus:ring-2 focus:ring-rose-500"
+                [class.border-red-500]="roomForm.get('capacity')?.invalid && roomForm.get('capacity')?.touched">
+              <p *ngIf="roomForm.get('capacity')?.invalid && roomForm.get('capacity')?.touched" class="text-xs text-red-500 mt-1">50-400 ghế.</p>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{ t('management.description') }}</label>
+            <textarea formControlName="description" rows="2" class="w-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 px-3 outline-none focus:ring-2 focus:ring-rose-500 resize-none"
+              [class.border-red-500]="roomForm.get('description')?.invalid && roomForm.get('description')?.touched"></textarea>
+             <p *ngIf="roomForm.get('description')?.invalid && roomForm.get('description')?.touched" class="text-xs text-red-500 mt-1">6-50 ký tự.</p>
+          </div>
+        </form>
+      </div>
+
+      <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3 shrink-0">
+        <button type="button" class="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-medium rounded-lg hover:bg-slate-50 transition-colors" (click)="showRoomModal.set(false)">{{ t('management.seatCancel') }}</button>
+        <button type="button" class="px-6 py-2 bg-rose-600 text-white font-medium rounded-lg hover:bg-rose-700 shadow-sm transition-colors" (click)="submitRoom()">{{ t('management.seatSave') }}</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirm Modals -->
+  <div *ngIf="showDeleteCinemaModal()" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-sm shadow-xl overflow-hidden text-center">
+      <div class="p-6 pt-8 space-y-4">
+        <div class="mx-auto w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-800 dark:text-white">Xóa rạp chiếu?</h3>
+        <p class="text-sm text-slate-500 dark:text-slate-400">{{ t('management.confirmDeleteCinema') }}</p>
+      </div>
+      <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 flex justify-center gap-3">
+        <button class="px-5 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 font-medium flex-1" (click)="showDeleteCinemaModal.set(false)">{{ t('management.seatCancel') }}</button>
+        <button class="px-5 py-2 bg-red-600 rounded-lg text-white font-medium flex-1 shadow-sm" (click)="submitDeleteCinema()">{{ t('management.seatDelete') }}</button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showDeleteRoomModal()" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-sm shadow-xl overflow-hidden text-center">
+      <div class="p-6 pt-8 space-y-4">
+        <div class="mx-auto w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-800 dark:text-white">Xóa phòng chiếu?</h3>
+        <p class="text-sm text-slate-500 dark:text-slate-400">{{ t('management.confirmDeleteRoom') }}</p>
+      </div>
+      <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 flex justify-center gap-3">
+        <button class="px-5 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 font-medium flex-1" (click)="showDeleteRoomModal.set(false)">{{ t('management.seatCancel') }}</button>
+        <button class="px-5 py-2 bg-red-600 rounded-lg text-white font-medium flex-1 shadow-sm" (click)="submitDeleteRoom()">{{ t('management.seatDelete') }}</button>
+      </div>
+    </div>
+  </div>
+</div>

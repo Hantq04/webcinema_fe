@@ -1,0 +1,26 @@
+/* Custom styles can be added here if Tailwind utility classes are not sufficient */
+/* Scrollbar styling for panels */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.3);
+  border-radius: 20px;
+}
+
+.dark .overflow-y-auto::-webkit-scrollbar-thumb {
+  background-color: rgba(71, 85, 105, 0.4);
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.5);
+}
+
+.dark .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(71, 85, 105, 0.6);
+}
