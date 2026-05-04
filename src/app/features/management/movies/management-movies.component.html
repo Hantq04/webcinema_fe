@@ -441,8 +441,8 @@
                     class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
                     [class.border-red-500]="movieForm.get('rate')?.invalid && movieForm.get('rate')?.touched">
                     <option value="" disabled>-- Chọn --</option>
-                    <option *ngFor="let r of rates()" [value]="r.code" 
-                            [title]="isEn() ? (r.rateNameEn || r.descriptionEn) : (r.rateName || r.descriptionVi)">
+                    <option *ngFor="let r of rates()" [value]="r.code"
+                      [title]="isEn() ? (r.rateNameEn || r.descriptionEn) : (r.rateName || r.descriptionVi)">
                       {{ r.code }}
                     </option>
                   </select>

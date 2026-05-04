@@ -25,6 +25,14 @@ export const managementRoutes: Routes = [
       {
         path: 'movies',
         loadComponent: () => import('./movies/management-movies.component').then((m) => m.ManagementMoviesComponent)
+      },
+      {
+        path: 'schedules',
+        loadComponent: () => import('./schedules/management-schedules.component').then((m) => m.ManagementSchedulesComponent)
+      },
+      {
+        path: 'bills',
+        loadComponent: () => import('./bills/management-bills.component').then((m) => m.ManagementBillsComponent)
       }
     ]
   }

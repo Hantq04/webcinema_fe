@@ -32,7 +32,7 @@ import { NgIf, isPlatformBrowser } from '@angular/common';
             <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M17 3v18"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>
             <span class="nav-label" *ngIf="!isCollapsed()">{{ t('management.movies') }}</span>
           </a>
-          <a href="javascript:void(0)" (click)="showAlert($event)" class="nav-item">
+          <a routerLink="/management/schedules" routerLinkActive="active" class="nav-item">
             <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             <span class="nav-label" *ngIf="!isCollapsed()">{{ t('management.showtimes') }}</span>
           </a>
@@ -48,7 +48,7 @@ import { NgIf, isPlatformBrowser } from '@angular/common';
             <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg>
             <span class="nav-label" *ngIf="!isCollapsed()">{{ t('management.bookings') }}</span>
           </a>
-          <a href="javascript:void(0)" (click)="showAlert($event)" class="nav-item">
+          <a routerLink="/management/bills" routerLinkActive="active" class="nav-item">
             <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
             <span class="nav-label" *ngIf="!isCollapsed()">{{ t('management.invoices') }}</span>
           </a>
