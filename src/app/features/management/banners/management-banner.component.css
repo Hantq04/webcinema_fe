@@ -1,0 +1,20 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: var(--m-bg-primary);
+}
+
+.animate-in {
+  animation: animate-in 0.2s ease-out;
+}
+
+@keyframes animate-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}

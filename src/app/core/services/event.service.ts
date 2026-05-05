@@ -17,4 +17,12 @@ export class EventService {
       catchError(() => of([]))
     );
   }
+
+  saveEvent(formData: FormData): Observable<any> {
+    return this.http.post(this.apiService.apiUrl('/api/v1/event/save'), formData);
+  }
+
+  deleteEvent(name: string): Observable<any> {
+    return this.http.delete(this.apiService.apiUrl(`/api/v1/event/delete?name=${name}`));
+  }
 }

@@ -37,6 +37,18 @@ export const managementRoutes: Routes = [
       {
         path: 'food-beverages',
         loadComponent: () => import('./food-beverages/management-food-beverages.component').then((m) => m.ManagementFoodBeveragesComponent)
+      },
+      {
+        path: 'promotions',
+        loadComponent: () => import('./promotions/management-promotion.component').then((m) => m.ManagementPromotionComponent)
+      },
+      {
+        path: 'banners',
+        loadComponent: () => import('./banners/management-banner.component').then((m) => m.ManagementBannerComponent)
+      },
+      {
+        path: 'events',
+        loadComponent: () => import('./events/management-event.component').then((m) => m.ManagementEventComponent)
       }
     ]
   }

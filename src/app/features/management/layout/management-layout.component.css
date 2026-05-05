@@ -48,30 +48,24 @@
   position: static;
 }
 
-.logo-container {
+.header-left-group {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  gap: 2rem;
 }
 
-.logo-text {
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: var(--m-brand-color);
-  letter-spacing: 0.05em;
+.header-logo-link {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
 }
 
-.logo-icon {
+.header-logo-text {
   font-size: 1.5rem;
-  font-weight: 800;
+  font-weight: 900;
   color: var(--m-brand-color);
-  background: var(--m-brand-light);
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
+  letter-spacing: 0.1em;
+  text-shadow: 0 2px 4px rgba(214, 47, 31, 0.1);
 }
 
 .menu-label {
@@ -233,36 +227,42 @@
 }
 
 .sidebar-footer {
-  padding: 1.5rem 1.75rem;
+  padding: 1rem 0.5rem;
   border-top: 1px solid var(--m-border-color);
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
   background-color: var(--m-bg-surface);
 }
 
-.management-container.collapsed .sidebar-footer {
-  padding: 1rem 0;
-  justify-content: center;
-}
-
-.management-container.collapsed .sidebar-footer .logo-container {
-  justify-content: center;
-}
-
-.logo-footer-link {
+.logout-nav-item {
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  height: 45px;
+  border-radius: 8px;
+  color: var(--m-text-secondary);
   text-decoration: none;
-  display: block;
-  width: 100%;
-  transition: transform 0.2s ease;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
-.management-container.collapsed .logo-footer-link:hover {
-  transform: scale(1.05);
+.management-container.collapsed .logout-nav-item {
+  justify-content: center;
+  padding: 0;
 }
 
-.management-container.collapsed .logo-footer-link:active {
-  transform: scale(0.95);
+.logout-nav-item:hover {
+  background-color: var(--m-brand-light);
+  color: var(--m-brand-color);
+}
+
+.logout-nav-item .nav-icon {
+  margin-right: 0; /* Align with other nav items */
+}
+
+.management-container:not(.collapsed) .logout-nav-item .nav-icon {
+  margin-right: 0.75rem;
 }
 
 /* Main Content Wrapper */
