@@ -33,6 +33,10 @@ export const managementRoutes: Routes = [
       {
         path: 'bills',
         loadComponent: () => import('./bills/management-bills.component').then((m) => m.ManagementBillsComponent)
+      },
+      {
+        path: 'food-beverages',
+        loadComponent: () => import('./food-beverages/management-food-beverages.component').then((m) => m.ManagementFoodBeveragesComponent)
       }
     ]
   }

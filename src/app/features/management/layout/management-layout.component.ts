@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, signal, OnInit, PLATFORM_ID } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject, signal, OnInit, PLATFORM_ID, HostListener } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { LanguageService } from '../../../core/services/language.service';
 import { NgIf, isPlatformBrowser } from '@angular/common';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-management-layout',
@@ -52,14 +53,35 @@ import { NgIf, isPlatformBrowser } from '@angular/common';
             <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
             <span class="nav-label" *ngIf="!isCollapsed()">{{ t('management.invoices') }}</span>
           </a>
-          <a href="javascript:void(0)" (click)="showAlert($event)" class="nav-item">
-            <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 9A6 6 0 0 0 6 9h12A6 6 0 0 0 12 9z"/><path d="M6 20V10"/><path d="M12 20V10"/><path d="M6 20h12"/></svg>
-            <span class="nav-label" *ngIf="!isCollapsed()">{{ t('management.foodBeverages') }}</span>
-          </a>
-          <a href="javascript:void(0)" (click)="showAlert($event)" class="nav-item">
-            <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a2 2 0 0 1-2.83 0l-8.97-8.97a2 2 0 0 1 0-2.82l9.19-9.19a2 2 0 0 1 2.82 0l8.98 8.97a2 2 0 0 1 0 2.82z"/><path d="M7 7h.01"/></svg>
-            <span class="nav-label" *ngIf="!isCollapsed()">{{ t('management.promotions') }}</span>
-          </a>
+
+          <div class="nav-item-wrapper others-wrapper">
+            <a href="javascript:void(0)" class="nav-item" [class.active]="isOthersActive()" [class.popover-active]="isOthersPopoverOpen() && !isOthersActive()" (click)="toggleOthersPopover($event)" style="cursor: pointer;">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+              <span class="nav-label" *ngIf="!isCollapsed()">{{ t('management.others') }}</span>
+            </a>
+
+            <div class="hover-submenu" 
+                 [class.show]="isOthersPopoverOpen()"
+                 [style.top.px]="submenuTop()"
+                 [style.left.px]="isCollapsed() ? 85 : 265">
+              <a routerLink="/management/food-beverages" routerLinkActive="active" class="hover-submenu-item">
+                <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 9A6 6 0 0 0 6 9h12A6 6 0 0 0 12 9z"/><path d="M6 20V10"/><path d="M12 20V10"/><path d="M6 20h12"/></svg>
+                <span class="nav-label">{{ t('management.foodBeverages') }}</span>
+              </a>
+              <a href="javascript:void(0)" routerLinkActive="active" (click)="showAlert($event)" class="hover-submenu-item">
+                <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a2 2 0 0 1-2.83 0l-8.97-8.97a2 2 0 0 1 0-2.82l9.19-9.19a2 2 0 0 1 2.82 0l8.98 8.97a2 2 0 0 1 0 2.82z"/><path d="M7 7h.01"/></svg>
+                <span class="nav-label">{{ t('management.promotions') }}</span>
+              </a>
+              <a href="javascript:void(0)" routerLinkActive="active" (click)="showAlert($event)" class="hover-submenu-item">
+                <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>
+                <span class="nav-label">{{ t('management.banners') }}</span>
+              </a>
+              <a href="javascript:void(0)" routerLinkActive="active" (click)="showAlert($event)" class="hover-submenu-item">
+                <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg>
+                <span class="nav-label">{{ t('management.events') }}</span>
+              </a>
+            </div>
+          </div>
           
           <div class="nav-divider"></div>
           
@@ -153,6 +175,8 @@ import { NgIf, isPlatformBrowser } from '@angular/common';
 export class ManagementLayoutComponent implements OnInit {
   isCollapsed = signal(false);
   isDarkMode = signal(false);
+  isOthersPopoverOpen = signal(false);
+  submenuTop = signal(0);
   protected readonly auth = inject(AuthService);
   protected readonly language = inject(LanguageService);
   protected readonly router = inject(Router);
@@ -178,6 +202,27 @@ export class ManagementLayoutComponent implements OnInit {
         this.isCollapsed.set(savedCollapsed === 'true');
       }
     }
+  }
+
+  isOthersActive(): boolean {
+    const subRoutes = ['/management/food-beverages', '/management/promotions', '/management/banners', '/management/events'];
+    return subRoutes.some(route => this.router.url.includes(route));
+  }
+
+  @HostListener('document:click')
+  onDocumentClick() {
+    this.isOthersPopoverOpen.set(false);
+  }
+
+  toggleOthersPopover(event: Event) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    const element = event.currentTarget as HTMLElement;
+    const rect = element.getBoundingClientRect();
+    this.submenuTop.set(rect.top);
+
+    this.isOthersPopoverOpen.update(v => !v);
   }
 
   toggleSidebar() {
