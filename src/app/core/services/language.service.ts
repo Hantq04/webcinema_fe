@@ -260,7 +260,21 @@ const translations = {
         minLength: 'Cần ít nhất {{min}} ký tự',
         maxLength: 'Tối đa {{max}} ký tự',
         invalidUrl: 'URL không hợp lệ'
-      }
+      },
+      promotionFood: 'Bắp nước',
+      promotionTicket: 'Vé',
+      rankStandard: 'Phổ thông',
+      rankVip: 'VIP',
+      statusSuccess: 'Thành công',
+      statusPending: 'Chờ thanh toán',
+      statusFailure: 'Thất bại',
+      statusExpired: 'Hết hạn',
+      statusPaid: 'Đã thanh toán',
+      statusHold: 'Đang giữ chỗ',
+      statusCancelled: 'Đã hủy',
+      statusEnded: 'Kết thúc',
+      statusNowShowing: 'Đang chiếu',
+      statusComingSoon: 'Sắp chiếu'
     },
     movies: {
       title: 'Phim CineGo',
@@ -707,7 +721,21 @@ const translations = {
         minLength: 'Minimum {{min}} characters required',
         maxLength: 'Maximum {{max}} characters allowed',
         invalidUrl: 'Invalid URL'
-      }
+      },
+      promotionFood: 'Food & Beverages',
+      promotionTicket: 'Ticket',
+      rankStandard: 'Standard',
+      rankVip: 'VIP',
+      statusSuccess: 'Success',
+      statusPending: 'Pending',
+      statusFailure: 'Failure',
+      statusExpired: 'Expired',
+      statusPaid: 'Paid',
+      statusHold: 'Hold',
+      statusCancelled: 'Cancelled',
+      statusEnded: 'Ended',
+      statusNowShowing: 'Now Showing',
+      statusComingSoon: 'Coming Soon'
     },
     movies: {
       title: 'CineGo Movies',

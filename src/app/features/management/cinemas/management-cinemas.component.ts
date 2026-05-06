@@ -26,6 +26,7 @@ export class ManagementCinemasComponent implements OnInit {
   addresses = signal<string[]>([]);
   selectedAddress = signal<string>('');
   isAddressDropdownOpen = signal(false);
+  isRoomTypeDropdownOpen = signal(false);
   searchQuery = signal<string>('');
 
   // Data State

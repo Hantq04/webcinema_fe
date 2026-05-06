@@ -58,6 +58,14 @@ export class ManagementSchedulesComponent implements OnInit {
   deleteMovieId = signal<number>(0);
   backendErrorMsg = signal<string | null>(null);
 
+  // Dropdown UI state
+  isFilterAddressOpen = signal(false);
+  isFilterCinemaOpen = signal(false);
+  isFormMovieOpen = signal(false);
+  isFormAddressOpen = signal(false);
+  isFormCinemaOpen = signal(false);
+  isFormRoomOpen = signal(false);
+
   constructor() {
     this.scheduleForm = this.fb.group({
       code: [{ value: '', disabled: true }],
@@ -215,6 +223,10 @@ export class ManagementSchedulesComponent implements OnInit {
       if (m) match = match && Boolean(s.movie?.toLowerCase().includes(m));
 
       return match;
+    }).sort((a, b) => {
+      const timeA = a.startAt ? new Date(a.startAt.replace(' ', 'T')).getTime() : 0;
+      const timeB = b.startAt ? new Date(b.startAt.replace(' ', 'T')).getTime() : 0;
+      return timeB - timeA;
     });
   });
 
@@ -283,11 +295,27 @@ export class ManagementSchedulesComponent implements OnInit {
       return;
     }
 
-    const payload = this.scheduleForm.getRawValue();
-    // Reformat date back to backend format if needed, or keep T
-    if (payload.startAt && payload.startAt.includes('T')) {
-      // Backend often accepts T or we can convert it to space
-      // Let's keep it as T since spring boot usually parses ISO datetime
+    const rawValue = this.scheduleForm.getRawValue();
+
+    // Format date: YYYY-MM-DDTHH:mm -> YYYY-MM-DD HH:mm:ss
+    let formattedDate = rawValue.startAt;
+    if (formattedDate) {
+      formattedDate = formattedDate.replace('T', ' ');
+      if (formattedDate.length === 16) {
+        formattedDate += ':00';
+      }
+    }
+
+    // Construct payload based on backend expectation
+    const payload: any = {
+      movieName: rawValue.movieName,
+      roomName: rawValue.cinemaName, // Backend expects cinema name in roomName field
+      roomCode: rawValue.roomCode,
+      startAt: formattedDate
+    };
+
+    if (this.isEditMode()) {
+      payload.code = rawValue.code;
     }
 
     const obs$ = this.isEditMode()
@@ -343,5 +371,25 @@ export class ManagementSchedulesComponent implements OnInit {
 
   closeDeleteModal() {
     this.showDeleteModal.set(false);
+  }
+
+  getScheduleStatus(s: ScheduleResponse | null): { label: string, class: string } {
+    if (!s) return { label: '', class: '' };
+    
+    const now = new Date().getTime();
+    const start = s.startAt ? new Date(s.startAt.replace(' ', 'T')).getTime() : 0;
+    const end = s.endAt ? new Date(s.endAt.replace(' ', 'T')).getTime() : 0;
+
+    if (!s.active || now > end) {
+      return { label: this.t('management.statusEnded'), class: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400' };
+    }
+
+    if (now >= start && now <= end) {
+      return { label: this.t('management.statusNowShowing'), class: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' };
+    } else if (now < start) {
+      return { label: this.t('management.statusComingSoon'), class: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' };
+    } else {
+      return { label: this.t('management.statusEnded'), class: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400' };
+    }
   }
 }

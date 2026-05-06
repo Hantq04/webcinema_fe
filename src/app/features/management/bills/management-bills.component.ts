@@ -28,6 +28,7 @@ export class ManagementBillsComponent implements OnInit {
   // Filters
   searchQuery = signal<string>('');
   filterStatus = signal<string>('');
+  isStatusDropdownOpen = signal(false);
 
   // Modals & Selection
   selectedBillCode = signal<string | null>(null);
@@ -298,5 +299,21 @@ export class ManagementBillsComponent implements OnInit {
         }
       });
     }
+  }
+
+  getStatusName(code: string): string {
+    const s = this.statuses().find(x => x.code === code);
+    if (s) return this.isEn() ? s.descriptionEn : s.descriptionVi;
+    
+    const mapping: any = {
+      'SUCCESS': this.t('management.statusSuccess'),
+      'PENDING': this.t('management.statusPending'),
+      'FAILURE': this.t('management.statusFailure'),
+      'EXPIRED': this.t('management.statusExpired'),
+      'PAID': this.t('management.statusPaid'),
+      'HOLD': this.t('management.statusHold'),
+      'CANCELLED': this.t('management.statusCancelled')
+    };
+    return mapping[code] || code;
   }
 }

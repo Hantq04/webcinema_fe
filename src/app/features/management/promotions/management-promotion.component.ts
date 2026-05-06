@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import { LanguageService } from '../../../core/services/language.service';
 import { PromotionService } from '../../../core/services/promotion.service';
-import { PromotionResponse } from '../../../core/models/promotion.model';
+import { PromotionResponse, PromotionRequest } from '../../../core/models/promotion.model';
 
 @Component({
   selector: 'app-management-promotion',
@@ -30,6 +30,9 @@ export class ManagementPromotionComponent implements OnInit {
   promotionForm: FormGroup;
   promotionToDelete = signal<PromotionResponse | null>(null);
 
+  isTypeDropdownOpen = signal(false);
+  isRankDropdownOpen = signal(false);
+
   filteredPromotions = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
     if (!q) return this.promotions();
@@ -42,13 +45,13 @@ export class ManagementPromotionComponent implements OnInit {
 
   constructor() {
     this.promotionForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
+      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
       percent: [null, [Validators.required]],
       quantity: [null, [Validators.required]],
       promotionType: ['', [Validators.required]],
       startTime: ['', [Validators.required]],
       endTime: ['', [Validators.required]],
-      description: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(50)]],
+      description: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(500)]],
       nameRankCustomer: ['', [Validators.required]]
     });
   }
@@ -79,7 +82,27 @@ export class ManagementPromotionComponent implements OnInit {
       return;
     }
 
-    const payload = this.promotionForm.value;
+    const val = this.promotionForm.value;
+    
+    // Format dates: YYYY-MM-DDTHH:mm -> YYYY-MM-DD HH:mm:ss
+    const formatDate = (dateStr: string) => {
+      if (!dateStr) return '';
+      let formatted = dateStr.replace('T', ' ');
+      if (formatted.length === 16) formatted += ':00';
+      return formatted;
+    };
+
+    const payload: PromotionRequest = {
+      name: val.name,
+      percent: val.percent,
+      quantity: val.quantity,
+      promotionType: val.promotionType,
+      startTime: formatDate(val.startTime),
+      endTime: formatDate(val.endTime),
+      description: val.description,
+      nameRankCustomer: val.nameRankCustomer
+    };
+
     this.promotionService.savePromotion(payload).subscribe({
       next: () => {
         this.showFormModal.set(false);

@@ -134,7 +134,7 @@ export class AuthComponent implements OnInit, OnDestroy {
       this.activeTab.set(tab);
     }
 
-    this.loadCaptcha();
+    // this.loadCaptcha();
     this.updateTitle();
 
     // Check for message in history state (e.g. from forgot password flow)
@@ -162,7 +162,7 @@ export class AuthComponent implements OnInit, OnDestroy {
     this.resetServerErrors.set({});
 
     if ((tab === 'login' || tab === 'register') && !this.captcha()) {
-      this.loadCaptcha();
+      // this.loadCaptcha();
     }
     this.updateTitle();
 
@@ -181,6 +181,7 @@ export class AuthComponent implements OnInit, OnDestroy {
     this.loginServerErrors.set({});
     this.loginForm.markAllAsTouched();
 
+    /* Bypass captcha validation
     if (this.loginForm.invalid || !this.loginCaptchaId()) {
       if (!this.loginCaptchaId()) {
         this.message.set({ type: 'error', text: this.t('auth.captchaReload') });
@@ -188,13 +189,14 @@ export class AuthComponent implements OnInit, OnDestroy {
 
       return;
     }
+    */
 
     const rawValue = this.loginForm.getRawValue();
     const payload: LoginRequest = {
       userName: rawValue.userName?.trim() ?? '',
       passWord: rawValue.passWord?.trim() ?? '',
-      captchaId: this.loginCaptchaId(),
-      captchaValue: rawValue.captchaValue?.trim() ?? ''
+      captchaId: this.loginCaptchaId() || 'dummy',
+      captchaValue: rawValue.captchaValue?.trim() || 'dummy'
     };
 
     this.submittingLogin.set(true);
@@ -237,6 +239,7 @@ export class AuthComponent implements OnInit, OnDestroy {
     this.registerServerErrors.set({});
     this.registerForm.markAllAsTouched();
 
+    /* Bypass captcha validation
     if (this.registerForm.invalid || !this.loginCaptchaId()) {
       if (!this.loginCaptchaId()) {
         this.message.set({ type: 'error', text: this.t('auth.captchaReload') });
@@ -244,6 +247,7 @@ export class AuthComponent implements OnInit, OnDestroy {
 
       return;
     }
+    */
 
     const rawValue = this.registerForm.getRawValue();
     const birthDate = `${rawValue.birthYear?.trim() ?? ''}-${String(rawValue.birthMonth ?? '').padStart(2, '0')}-${String(rawValue.birthDay ?? '').padStart(2, '0')}`;

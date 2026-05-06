@@ -1,6 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LanguageService } from '../../../core/services/language.service';
+import { OverviewService } from '../../../core/services/overview.service';
+import { OverviewResponse } from '../../../core/models/overview.model';
 
 @Component({
   selector: 'app-management-dashboard',
@@ -12,7 +14,7 @@ import { LanguageService } from '../../../core/services/language.service';
       <div class="page-header">
         <h1 class="page-title">{{ t('management.dashboardOverview') }}</h1>
         <div class="date-filter">
-          <span class="current-date">{{ t('management.today') }}: 29 Apr 2026</span>
+          <span class="current-date">{{ t('management.today') }}: {{ overview()?.date || '--' }}</span>
         </div>
       </div>
 
@@ -25,7 +27,7 @@ import { LanguageService } from '../../../core/services/language.service';
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
             </div>
           </div>
-          <div class="stat-value">124,500,000 ₫</div>
+          <div class="stat-value">{{ formatCurrency(overview()?.todayRevenue || 0) }}</div>
           <div class="stat-trend positive">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
             <span>+12.5%</span>
@@ -39,7 +41,7 @@ import { LanguageService } from '../../../core/services/language.service';
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
             </div>
           </div>
-          <div class="stat-value">1,452</div>
+          <div class="stat-value">{{ (overview()?.todayTicketCount || 0) | number }}</div>
           <div class="stat-trend positive">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
             <span>+5.2%</span>
@@ -53,7 +55,7 @@ import { LanguageService } from '../../../core/services/language.service';
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M17 3v18"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>
             </div>
           </div>
-          <div class="stat-value">24</div>
+          <div class="stat-value">{{ overview()?.nowShowingMovieCount || 0 }}</div>
           <div class="stat-trend neutral">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" x2="19" y1="12" y2="12"/></svg>
             <span>--</span>
@@ -67,7 +69,7 @@ import { LanguageService } from '../../../core/services/language.service';
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 16v-3a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3"/><path d="M4 20h16"/><path d="M7 11V7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4"/><rect width="12" height="4" x="6" y="16" rx="1"/></svg>
             </div>
           </div>
-          <div class="stat-value">68.5%</div>
+          <div class="stat-value">{{ (overview()?.seatOccupancyRate || 0) * 100 }}%</div>
           <div class="stat-trend negative">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>
             <span>-2.4%</span>
@@ -91,13 +93,12 @@ import { LanguageService } from '../../../core/services/language.service';
                 <span>0</span>
               </div>
               <div class="chart-bars">
-                <div class="bar-group"><div class="bar" style="height: 60%"></div><span class="bar-label">Thu</span></div>
-                <div class="bar-group"><div class="bar" style="height: 75%"></div><span class="bar-label">Fri</span></div>
-                <div class="bar-group"><div class="bar" style="height: 95%"></div><span class="bar-label">Sat</span></div>
-                <div class="bar-group"><div class="bar" style="height: 100%"></div><span class="bar-label">Sun</span></div>
-                <div class="bar-group"><div class="bar" style="height: 45%"></div><span class="bar-label">Mon</span></div>
-                <div class="bar-group"><div class="bar" style="height: 50%"></div><span class="bar-label">Tue</span></div>
-                <div class="bar-group"><div class="bar" style="height: 65%; background-color: #d62f1f;"></div><span class="bar-label">Wed</span></div>
+                <div *ngFor="let day of overview()?.revenueLast7Days; let last = last" class="bar-group">
+                  <div class="bar" [style.height]="(day.totalRevenue / 150000000 * 100) + '%'" [style.backgroundColor]="last ? '#d62f1f' : ''">
+                    <div class="bar-tooltip">{{ formatCurrency(day.totalRevenue) }}</div>
+                  </div>
+                  <span class="bar-label">{{ day.period | date:'EEE' }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -111,58 +112,14 @@ import { LanguageService } from '../../../core/services/language.service';
           </div>
           <div class="card-body">
             <ul class="movie-list">
-              <li class="movie-item">
-                <div class="movie-rank">1</div>
+              <li *ngFor="let movie of overview()?.topMovies; let i = index" class="movie-item">
+                <div class="movie-rank">{{ i + 1 }}</div>
                 <div class="movie-info">
-                  <div class="movie-name">Mai</div>
-                  <div class="movie-meta">Romance, Drama</div>
+                  <div class="movie-name">{{ language.currentLanguage() === 'vi' ? movie.name : movie.nameEn }}</div>
+                  <div class="movie-meta">{{ language.currentLanguage() === 'vi' ? movie.movieTypeName : movie.movieTypeNameEn }}</div>
                 </div>
                 <div class="movie-sales">
-                  <div class="sales-value">520</div>
-                  <div class="sales-label">{{ t('management.tickets') }}</div>
-                </div>
-              </li>
-              <li class="movie-item">
-                <div class="movie-rank">2</div>
-                <div class="movie-info">
-                  <div class="movie-name">Dune: Part Two</div>
-                  <div class="movie-meta">Sci-Fi, Action</div>
-                </div>
-                <div class="movie-sales">
-                  <div class="sales-value">415</div>
-                  <div class="sales-label">{{ t('management.tickets') }}</div>
-                </div>
-              </li>
-              <li class="movie-item">
-                <div class="movie-rank">3</div>
-                <div class="movie-info">
-                  <div class="movie-name">Kung Fu Panda 4</div>
-                  <div class="movie-meta">Animation, Comedy</div>
-                </div>
-                <div class="movie-sales">
-                  <div class="sales-value">380</div>
-                  <div class="sales-label">{{ t('management.tickets') }}</div>
-                </div>
-              </li>
-              <li class="movie-item">
-                <div class="movie-rank">4</div>
-                <div class="movie-info">
-                  <div class="movie-name">Exhuma</div>
-                  <div class="movie-meta">Horror, Mystery</div>
-                </div>
-                <div class="movie-sales">
-                  <div class="sales-value">290</div>
-                  <div class="sales-label">{{ t('management.tickets') }}</div>
-                </div>
-              </li>
-              <li class="movie-item">
-                <div class="movie-rank">5</div>
-                <div class="movie-info">
-                  <div class="movie-name">Godzilla x Kong</div>
-                  <div class="movie-meta">Action, Sci-Fi</div>
-                </div>
-                <div class="movie-sales">
-                  <div class="sales-value">245</div>
+                  <div class="sales-value">{{ movie.ticketCount || 0 }}</div>
                   <div class="sales-label">{{ t('management.tickets') }}</div>
                 </div>
               </li>
@@ -179,66 +136,36 @@ import { LanguageService } from '../../../core/services/language.service';
             <h2 class="card-title">{{ t('management.recentBookings') }}</h2>
           </div>
           <div class="card-body no-padding">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>{{ t('management.customer') }}</th>
-                  <th>{{ t('management.movie') }}</th>
-                  <th>{{ t('management.dateAndTime') }}</th>
-                  <th>{{ t('management.seats') }}</th>
-                  <th>{{ t('management.total') }}</th>
-                  <th>{{ t('management.status') }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>#BK-7829</td>
-                  <td>Nguyen Van A</td>
-                  <td>Mai</td>
-                  <td>Today, 19:30</td>
-                  <td>G4, G5</td>
-                  <td>220,000 ₫</td>
-                  <td><span class="status badge-success">{{ t('management.paid') }}</span></td>
-                </tr>
-                <tr>
-                  <td>#BK-7828</td>
-                  <td>Tran Thi B</td>
-                  <td>Dune: Part Two</td>
-                  <td>Today, 20:15</td>
-                  <td>H8, H9, H10</td>
-                  <td>390,000 ₫</td>
-                  <td><span class="status badge-success">{{ t('management.paid') }}</span></td>
-                </tr>
-                <tr>
-                  <td>#BK-7827</td>
-                  <td>Le Van C</td>
-                  <td>Kung Fu Panda 4</td>
-                  <td>Today, 18:00</td>
-                  <td>E5</td>
-                  <td>90,000 ₫</td>
-                  <td><span class="status badge-warning">{{ t('management.pending') }}</span></td>
-                </tr>
-                <tr>
-                  <td>#BK-7826</td>
-                  <td>Hoang Thu D</td>
-                  <td>Exhuma</td>
-                  <td>Today, 22:00</td>
-                  <td>J12, J13</td>
-                  <td>260,000 ₫</td>
-                  <td><span class="status badge-success">{{ t('management.paid') }}</span></td>
-                </tr>
-                <tr>
-                  <td>#BK-7825</td>
-                  <td>Pham Quang E</td>
-                  <td>Mai</td>
-                  <td>Today, 19:30</td>
-                  <td>F6, F7</td>
-                  <td>220,000 ₫</td>
-                  <td><span class="status badge-danger">{{ t('management.cancelled') }}</span></td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="overflow-x-auto">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>{{ t('management.customer') }}</th>
+                    <th>{{ t('management.movie') }}</th>
+                    <th>{{ t('management.dateAndTime') }}</th>
+                    <th>{{ t('management.seats') }}</th>
+                    <th>{{ t('management.total') }}</th>
+                    <th>{{ t('management.status') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let booking of overview()?.recentBookings">
+                    <td class="font-mono text-xs">{{ booking.tradingCode }}</td>
+                    <td>{{ booking.customerName }}</td>
+                    <td>{{ booking.movieName || '--' }}</td>
+                    <td>{{ booking.createTime | date:'dd/MM HH:mm' }}</td>
+                    <td>{{ booking.seatCodes || '--' }}</td>
+                    <td>{{ formatCurrency(booking.totalMoney) }}</td>
+                    <td>
+                      <span class="status" [ngClass]="getBookingStatus(booking.billStatus).class">
+                        {{ getBookingStatus(booking.billStatus).label }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -250,21 +177,13 @@ import { LanguageService } from '../../../core/services/language.service';
             </div>
             <div class="card-body">
               <div class="fb-total">
-                <div class="fb-value">48,250,000 ₫</div>
+                <div class="fb-value">{{ formatCurrency(getTotalFoodRevenue()) }}</div>
                 <div class="fb-label">{{ t('management.totalRevenue') }}</div>
               </div>
               <ul class="fb-list">
-                <li class="fb-item">
-                  <div class="fb-name">Combo 2 Popcorn & 2 Coke</div>
-                  <div class="fb-count">420 {{ t('management.sold') }}</div>
-                </li>
-                <li class="fb-item">
-                  <div class="fb-name">Large Popcorn (Sweet)</div>
-                  <div class="fb-count">315 {{ t('management.sold') }}</div>
-                </li>
-                <li class="fb-item">
-                  <div class="fb-name">Large Coke</div>
-                  <div class="fb-count">280 {{ t('management.sold') }}</div>
+                <li *ngFor="let food of overview()?.foodRevenueLast7Days" class="fb-item">
+                  <div class="fb-name">{{ food.nameOfFood }}</div>
+                  <div class="fb-count">{{ food.totalQuantity }} {{ t('management.sold') }}</div>
                 </li>
               </ul>
             </div>
@@ -277,22 +196,13 @@ import { LanguageService } from '../../../core/services/language.service';
             </div>
             <div class="card-body">
               <ul class="promo-list">
-                <li class="promo-item">
+                <li *ngFor="let promo of overview()?.activePromotions" class="promo-item">
                   <div class="promo-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a2 2 0 0 1-2.83 0l-8.97-8.97a2 2 0 0 1 0-2.82l9.19-9.19a2 2 0 0 1 2.82 0l8.98 8.97a2 2 0 0 1 0 2.82z"/><path d="M7 7h.01"/></svg>
                   </div>
                   <div class="promo-info">
-                    <div class="promo-code">VNPAY50K</div>
-                    <div class="promo-desc">Discount 50K for VNPAY users</div>
-                  </div>
-                </li>
-                <li class="promo-item">
-                  <div class="promo-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a2 2 0 0 1-2.83 0l-8.97-8.97a2 2 0 0 1 0-2.82l9.19-9.19a2 2 0 0 1 2.82 0l8.98 8.97a2 2 0 0 1 0 2.82z"/><path d="M7 7h.01"/></svg>
-                  </div>
-                  <div class="promo-info">
-                    <div class="promo-code">STUDENT20</div>
-                    <div class="promo-desc">20% off for students (with ID)</div>
+                    <div class="promo-code">{{ promo.code }}</div>
+                    <div class="promo-desc">{{ promo.description }} ({{ promo.percent }}%)</div>
                   </div>
                 </li>
               </ul>
@@ -304,7 +214,55 @@ import { LanguageService } from '../../../core/services/language.service';
   `,
   styleUrls: ['./management-dashboard.component.css']
 })
-export class ManagementDashboardComponent {
+export class ManagementDashboardComponent implements OnInit {
   protected readonly language = inject(LanguageService);
+  protected readonly overviewService = inject(OverviewService);
   protected readonly t = this.language.t.bind(this.language);
+
+  overview = signal<OverviewResponse | null>(null);
+
+  ngOnInit(): void {
+    this.loadOverview();
+  }
+
+  loadOverview() {
+    this.overviewService.getOverview().subscribe({
+      next: (data) => this.overview.set(data),
+      error: (err) => console.error('Error loading overview', err)
+    });
+  }
+
+  formatCurrency(value: number): string {
+    return new Intl.NumberFormat('vi-VN', { 
+      style: 'currency', 
+      currency: 'VND',
+      maximumFractionDigits: 0 
+    }).format(value);
+  }
+
+  getTotalFoodRevenue(): number {
+    return this.overview()?.revenueLast7Days.reduce((acc, day) => acc + (day.foodRevenue || 0), 0) || 0;
+  }
+
+  getBookingStatus(status: string): { label: string, class: string } {
+    const s = (status || '').toLowerCase();
+    const isVi = this.language.currentLanguage() === 'vi';
+    
+    switch (s) {
+      case 'success':
+        return { label: isVi ? 'Thành công' : 'Success', class: 'badge-success' };
+      case 'pending':
+        return { label: isVi ? 'Chờ thanh toán' : 'Pending', class: 'badge-warning' };
+      case 'fail':
+      case 'failure':
+        return { label: isVi ? 'Thất bại' : 'Failure', class: 'badge-danger' };
+      case 'expired':
+        return { label: isVi ? 'Hết hạn' : 'Expired', class: 'badge-muted' };
+      case 'cancel':
+      case 'cancelled':
+        return { label: isVi ? 'Đã hủy' : 'Cancelled', class: 'badge-danger' };
+      default:
+        return { label: status, class: '' };
+    }
+  }
 }

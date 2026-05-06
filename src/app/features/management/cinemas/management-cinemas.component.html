@@ -14,7 +14,7 @@
           (click)="toggleAddressDropdown()">
           <span [class.text-slate-400]="!selectedAddress()" [class.text-slate-800]="selectedAddress()"
             [class.dark:text-white]="selectedAddress()" class="font-medium truncate">
-            {{ selectedAddress() || t('management.selectArea') }}
+            {{ selectedAddress() || 'Chọn khu vực' }}
           </span>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform shrink-0"
             [class.rotate-180]="isAddressDropdownOpen()" viewBox="0 0 20 20" fill="currentColor">
@@ -336,13 +336,25 @@
             </div>
             <div>
               <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{{ t('management.roomType') }} *</label>
-              <select formControlName="type" class="w-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 px-3 outline-none focus:ring-2 focus:ring-rose-500">
-                <option value="STANDARD">Standard</option>
-                <option value="VIP">VIP</option>
-                <option value="SWEETBOX">Sweet Box</option>
-                <option value="IMAX">IMAX</option>
-                <option value="4DX">4DX</option>
-              </select>
+            <div class="relative w-full">
+              <div class="w-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 px-3 text-sm flex justify-between items-center cursor-pointer hover:border-rose-300 transition-all"
+                [class.ring-2]="isRoomTypeDropdownOpen()" [class.ring-rose-500]="isRoomTypeDropdownOpen()"
+                [class.border-rose-500]="isRoomTypeDropdownOpen()"
+                (click)="isRoomTypeDropdownOpen.set(!isRoomTypeDropdownOpen())">
+                <span class="truncate font-medium" [class.text-slate-400]="!roomForm.get('type')?.value">{{ roomForm.get('type')?.value || 'Chọn loại phòng' }}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform" [class.rotate-180]="isRoomTypeDropdownOpen()" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div *ngIf="isRoomTypeDropdownOpen()" class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg py-1 z-50">
+                <div *ngFor="let t of ['STANDARD', 'VIP', 'SWEETBOX', 'IMAX', '4DX']" 
+                  class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors" 
+                  (click)="roomForm.get('type')?.setValue(t); isRoomTypeDropdownOpen.set(false)">
+                  {{ t }}
+                </div>
+              </div>
+              <div *ngIf="isRoomTypeDropdownOpen()" class="fixed inset-0 z-40" (click)="isRoomTypeDropdownOpen.set(false)"></div>
+            </div>
             </div>
           </div>
 

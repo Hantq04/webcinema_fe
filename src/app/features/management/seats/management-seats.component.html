@@ -41,7 +41,7 @@
           [class.border-rose-500]="isAddressDropdownOpen()" (click)="toggleAddressDropdown()">
           <span [class.text-slate-400]="!selectedAddress()" [class.text-slate-800]="selectedAddress()"
             [class.dark:text-white]="selectedAddress()" class="font-medium">
-            {{ selectedAddress() || t('management.selectArea') }}
+            {{ selectedAddress() || 'Chọn khu vực' }}
           </span>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform"
             [class.rotate-180]="isAddressDropdownOpen()" viewBox="0 0 20 20" fill="currentColor">
@@ -53,6 +53,10 @@
 
         <div *ngIf="isAddressDropdownOpen()"
           class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg max-h-60 overflow-y-auto py-1 z-50">
+          <div class="px-4 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors italic"
+            (click)="onAddressChange(''); isAddressDropdownOpen.set(false)">
+            -- Tất cả khu vực --
+          </div>
           <div *ngFor="let addr of addresses()"
             class="px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 dark:hover:text-rose-400 cursor-pointer transition-colors flex items-center justify-between"
             [class.bg-rose-50]="selectedAddress() === addr" [class.dark:bg-rose-900/40]="selectedAddress() === addr"
@@ -84,7 +88,7 @@
           }" (click)="toggleCinemaDropdown()">
           <span [class.text-slate-400]="!selectedCinema()" [class.text-slate-800]="selectedCinema()"
             [class.dark:text-white]="selectedCinema()" class="font-medium">
-            {{ selectedCinema() || t('management.selectCinema') }}
+            {{ selectedCinema() || 'Chọn rạp' }}
           </span>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform"
             [class.text-slate-400]="selectedAddress()" [class.text-slate-300]="!selectedAddress()"
@@ -97,6 +101,10 @@
 
         <div *ngIf="isCinemaDropdownOpen()"
           class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg max-h-60 overflow-y-auto py-1 z-50">
+          <div class="px-4 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors italic"
+            (click)="onCinemaChange(''); isCinemaDropdownOpen.set(false)">
+            -- Tất cả rạp --
+          </div>
           <div *ngFor="let cinema of cinemas()"
             class="px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 dark:hover:text-rose-400 cursor-pointer transition-colors flex items-center justify-between"
             [class.bg-rose-50]="selectedCinema() === cinema" [class.dark:bg-rose-900/40]="selectedCinema() === cinema"

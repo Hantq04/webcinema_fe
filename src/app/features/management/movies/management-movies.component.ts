@@ -54,6 +54,9 @@ export class ManagementMoviesComponent implements OnInit {
   isEditMode = signal(false);
   deleteMovieName = signal<string>('');
 
+  isRateDropdownOpen = signal(false);
+  isBannerDropdownOpen = signal(false);
+
   constructor() {
     // Regex for URL validation
     const urlRegex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
@@ -406,5 +409,10 @@ export class ManagementMoviesComponent implements OnInit {
   hasMovieType(typeId: number): boolean {
     const currentTypes: number[] = this.movieForm.get('movieTypeIds')?.value || [];
     return currentTypes.includes(typeId);
+  }
+
+  getBannerTitle(id: any): string {
+    const banner = this.banners().find(b => b.id === id);
+    return banner ? banner.title : '';
   }
 }

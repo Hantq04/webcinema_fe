@@ -12,19 +12,40 @@
           class="border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-rose-500 outline-none transition-all">
 
         <!-- Filter by Area (Address) -->
-        <select [ngModel]="filterAddress()" (ngModelChange)="onAddressFilterChange($event)"
-          class="border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-rose-500 outline-none transition-all">
-          <option value="">-- Tất cả Khu vực --</option>
-          <option *ngFor="let a of addresses()" [value]="a">{{ a }}</option>
-        </select>
+        <div class="relative min-w-[180px]">
+          <div class="border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 px-3 text-sm flex justify-between items-center cursor-pointer hover:border-rose-300 transition-all"
+            [class.ring-2]="isFilterAddressOpen()" [class.ring-rose-500]="isFilterAddressOpen()"
+            [class.border-rose-500]="isFilterAddressOpen()" (click)="isFilterAddressOpen.set(!isFilterAddressOpen())">
+            <span class="truncate font-medium" [class.text-slate-400]="!filterAddress()">{{ filterAddress() || 'Chọn khu vực' }}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform" [class.rotate-180]="isFilterAddressOpen()" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div *ngIf="isFilterAddressOpen()" class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg py-1 z-50 max-h-60 overflow-y-auto">
+            <div class="px-4 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors italic" (click)="onAddressFilterChange(''); isFilterAddressOpen.set(false)">-- Tất cả khu vực --</div>
+            <div *ngFor="let a of addresses()" class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors" (click)="onAddressFilterChange(a); isFilterAddressOpen.set(false)">{{ a }}</div>
+          </div>
+          <div *ngIf="isFilterAddressOpen()" class="fixed inset-0 z-40" (click)="isFilterAddressOpen.set(false)"></div>
+        </div>
 
         <!-- Filter by Cinema -->
-        <select [ngModel]="filterCinemaName()" (ngModelChange)="filterCinemaName.set($event)"
-          [disabled]="!filterAddress()"
-          class="border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-rose-500 outline-none transition-all disabled:opacity-50">
-          <option value="">-- Tất cả Rạp --</option>
-          <option *ngFor="let c of filterCinemas()" [value]="c">{{ c }}</option>
-        </select>
+        <div class="relative min-w-[180px]">
+          <div class="border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 px-3 text-sm flex justify-between items-center transition-all"
+            [class.cursor-pointer]="filterAddress()" [class.hover:border-rose-300]="filterAddress()"
+            [class.opacity-50]="!filterAddress()" [class.ring-2]="isFilterCinemaOpen()" [class.ring-rose-500]="isFilterCinemaOpen()"
+            [class.border-rose-500]="isFilterCinemaOpen()"
+            (click)="filterAddress() && isFilterCinemaOpen.set(!isFilterCinemaOpen())">
+            <span class="truncate font-medium" [class.text-slate-400]="!filterCinemaName()">{{ filterCinemaName() || 'Chọn rạp' }}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform" [class.rotate-180]="isFilterCinemaOpen()" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div *ngIf="isFilterCinemaOpen()" class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg py-1 z-50 max-h-60 overflow-y-auto">
+            <div class="px-4 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors italic" (click)="filterCinemaName.set(''); isFilterCinemaOpen.set(false)">-- Tất cả rạp --</div>
+            <div *ngFor="let c of filterCinemas()" class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors" (click)="filterCinemaName.set(c); isFilterCinemaOpen.set(false)">{{ c }}</div>
+          </div>
+          <div *ngIf="isFilterCinemaOpen()" class="fixed inset-0 z-40" (click)="isFilterCinemaOpen.set(false)"></div>
+        </div>
 
         <!-- Search Input moved here -->
         <div class="relative w-full md:w-64">
@@ -113,8 +134,8 @@
             <div class="flex justify-between items-start mb-2">
               <h3 class="font-bold text-slate-800 dark:text-white line-clamp-1 flex-1">{{ s.movie || s.name }}</h3>
               <span class="text-xs px-2 py-1 rounded-full whitespace-nowrap ml-2"
-                [ngClass]="s.isActive ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'">
-                {{ s.isActive ? 'Hoạt động' : 'Kết thúc' }}
+                [ngClass]="getScheduleStatus(s).class">
+                {{ getScheduleStatus(s).label }}
               </span>
             </div>
             <div class="text-xs text-slate-500 dark:text-slate-400 space-y-1">
@@ -152,8 +173,8 @@
                   class="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full font-mono">{{
                   detail.code }}</span>
                 <span class="px-3 py-1 rounded-full font-medium"
-                  [ngClass]="detail.isActive ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'">
-                  {{ detail.isActive ? 'Đang hoạt động' : 'Kết thúc' }}
+                  [ngClass]="getScheduleStatus(detail).class">
+                  {{ getScheduleStatus(detail).label }}
                 </span>
               </div>
             </div>
@@ -275,35 +296,70 @@
         <div>
           <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Phim <span
               class="text-rose-500">*</span></label>
-          <select formControlName="movieName"
-            class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
-            [class.border-red-500]="scheduleForm.get('movieName')?.invalid && scheduleForm.get('movieName')?.touched">
-            <option value="" disabled>-- Chọn phim --</option>
-            <option *ngFor="let m of movies()" [value]="isEn() ? m.nameEn : m.name">{{ isEn() ? m.nameEn : m.name }}
-            </option>
-          </select>
+          <div class="relative w-full">
+            <div class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 text-sm flex justify-between items-center transition-all"
+              [class.cursor-pointer]="!isEditMode()" [class.hover:border-rose-300]="!isEditMode()"
+              [class.opacity-50]="isEditMode()" [class.ring-2]="isFormMovieOpen()" [class.ring-rose-500]="isFormMovieOpen()"
+              [class.border-rose-500]="isFormMovieOpen() || (scheduleForm.get('movieName')?.invalid && scheduleForm.get('movieName')?.touched)"
+              (click)="!isEditMode() && isFormMovieOpen.set(!isFormMovieOpen())">
+              <span class="truncate" [class.text-slate-400]="!scheduleForm.get('movieName')?.value">{{ scheduleForm.get('movieName')?.value || 'Chọn phim' }}</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform" [class.rotate-180]="isFormMovieOpen()" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div *ngIf="isFormMovieOpen()" class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg py-1 z-50 max-h-60 overflow-y-auto">
+              <div *ngFor="let m of movies()" class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors"
+                (click)="scheduleForm.get('movieName')?.setValue(isEn() ? m.nameEn : m.name); isFormMovieOpen.set(false)">
+                {{ isEn() ? m.nameEn : m.name }}
+              </div>
+            </div>
+            <div *ngIf="isFormMovieOpen()" class="fixed inset-0 z-40" (click)="isFormMovieOpen.set(false)"></div>
+          </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Address (Helper) -->
           <div>
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Khu vực</label>
-            <select formControlName="address"
-              class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow">
-              <option value="">-- Chọn khu vực --</option>
-              <option *ngFor="let a of addresses()" [value]="a">{{ a }}</option>
-            </select>
+            <div class="relative w-full">
+              <div class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 text-sm flex justify-between items-center transition-all"
+                [class.cursor-pointer]="!isEditMode()" [class.hover:border-rose-300]="!isEditMode()"
+                [class.opacity-50]="isEditMode()" [class.ring-2]="isFormAddressOpen()" [class.ring-rose-500]="isFormAddressOpen()"
+                [class.border-rose-500]="isFormAddressOpen()"
+                (click)="!isEditMode() && isFormAddressOpen.set(!isFormAddressOpen())">
+                <span class="truncate" [class.text-slate-400]="!scheduleForm.get('address')?.value">{{ scheduleForm.get('address')?.value || 'Chọn khu vực' }}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform" [class.rotate-180]="isFormAddressOpen()" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div *ngIf="isFormAddressOpen()" class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg py-1 z-50 max-h-60 overflow-y-auto">
+                <div class="px-4 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors italic" (click)="scheduleForm.get('address')?.setValue(''); isFormAddressOpen.set(false)">-- Bỏ chọn khu vực --</div>
+                <div *ngFor="let a of addresses()" class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors" (click)="scheduleForm.get('address')?.setValue(a); isFormAddressOpen.set(false)">{{ a }}</div>
+              </div>
+              <div *ngIf="isFormAddressOpen()" class="fixed inset-0 z-40" (click)="isFormAddressOpen.set(false)"></div>
+            </div>
           </div>
 
           <!-- Cinema -->
           <div>
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Rạp chiếu <span
                 class="text-rose-500">*</span></label>
-            <select formControlName="cinemaName"
-              class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow">
-              <option value="">-- Chọn rạp --</option>
-              <option *ngFor="let c of cinemas()" [value]="c">{{ c }}</option>
-            </select>
+            <div class="relative w-full">
+              <div class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 text-sm flex justify-between items-center transition-all"
+                [class.cursor-pointer]="!isEditMode() && cinemas().length > 0" [class.hover:border-rose-300]="!isEditMode() && cinemas().length > 0"
+                [class.opacity-50]="isEditMode() || cinemas().length === 0" [class.ring-2]="isFormCinemaOpen()" [class.ring-rose-500]="isFormCinemaOpen()"
+                [class.border-rose-500]="isFormCinemaOpen() || (scheduleForm.get('cinemaName')?.invalid && scheduleForm.get('cinemaName')?.touched)"
+                (click)="!isEditMode() && cinemas().length > 0 && isFormCinemaOpen.set(!isFormCinemaOpen())">
+                <span class="truncate" [class.text-slate-400]="!scheduleForm.get('cinemaName')?.value">{{ scheduleForm.get('cinemaName')?.value || 'Chọn rạp' }}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform" [class.rotate-180]="isFormCinemaOpen()" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div *ngIf="isFormCinemaOpen()" class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg py-1 z-50 max-h-60 overflow-y-auto">
+                <div *ngFor="let c of cinemas()" class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors" (click)="scheduleForm.get('cinemaName')?.setValue(c); isFormCinemaOpen.set(false)">{{ c }}</div>
+              </div>
+              <div *ngIf="isFormCinemaOpen()" class="fixed inset-0 z-40" (click)="isFormCinemaOpen.set(false)"></div>
+            </div>
           </div>
         </div>
 
@@ -312,12 +368,22 @@
           <div>
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Phòng chiếu <span
                 class="text-rose-500">*</span></label>
-            <select formControlName="roomName"
-              class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
-              [class.border-red-500]="scheduleForm.get('roomName')?.invalid && scheduleForm.get('roomName')?.touched">
-              <option value="">-- Chọn phòng --</option>
-              <option *ngFor="let r of rooms()" [value]="r">{{ r }}</option>
-            </select>
+            <div class="relative w-full">
+              <div class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 text-sm flex justify-between items-center transition-all"
+                [class.cursor-pointer]="!isEditMode() && rooms().length > 0" [class.hover:border-rose-300]="!isEditMode() && rooms().length > 0"
+                [class.opacity-50]="isEditMode() || rooms().length === 0" [class.ring-2]="isFormRoomOpen()" [class.ring-rose-500]="isFormRoomOpen()"
+                [class.border-rose-500]="isFormRoomOpen() || (scheduleForm.get('roomName')?.invalid && scheduleForm.get('roomName')?.touched)"
+                (click)="!isEditMode() && rooms().length > 0 && isFormRoomOpen.set(!isFormRoomOpen())">
+                <span class="truncate" [class.text-slate-400]="!scheduleForm.get('roomName')?.value">{{ scheduleForm.get('roomName')?.value || 'Chọn phòng' }}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform" [class.rotate-180]="isFormRoomOpen()" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div *ngIf="isFormRoomOpen()" class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg py-1 z-50 max-h-60 overflow-y-auto">
+                <div *ngFor="let r of rooms()" class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors" (click)="scheduleForm.get('roomName')?.setValue(r); isFormRoomOpen.set(false)">{{ r }}</div>
+              </div>
+              <div *ngIf="isFormRoomOpen()" class="fixed inset-0 z-40" (click)="isFormRoomOpen.set(false)"></div>
+            </div>
           </div>
 
           <!-- Start At -->

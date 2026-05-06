@@ -13,7 +13,7 @@ export interface ScheduleResponse {
   endAt: string;
   code: string;
   name: string;
-  isActive: boolean;
+  active: boolean;
 }
 
 export interface ScheduleShowtimeResponse {
