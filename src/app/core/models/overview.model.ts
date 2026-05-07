@@ -14,6 +14,7 @@ export interface MovieStatistic {
   movieDuration: number;
   premiereDate: string;
   ticketCount?: number;
+  totalTicketsBooked?: number;
 }
 
 export interface OverviewRecentBooking {
@@ -36,9 +37,12 @@ export interface FoodRevenue {
 export interface OverviewResponse {
   date: string;
   todayRevenue: number;
+  todayRevenueChangePercent?: number;
   todayTicketCount: number;
+  todayTicketCountChangePercent?: number;
   nowShowingMovieCount: number;
   seatOccupancyRate: number;
+  seatOccupancyRateChangePercent?: number;
   revenueLast7Days: RevenueTimePoint[];
   topMovies: MovieStatistic[];
   recentBookings: OverviewRecentBooking[];

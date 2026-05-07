@@ -58,6 +58,17 @@
   text-decoration: none;
   display: flex;
   align-items: center;
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 950px) {
+  .header-logo-link {
+    background-color: var(--m-brand-light);
+    width: 42px;
+    height: 42px;
+    justify-content: center;
+    border-radius: 10px;
+  }
 }
 
 .header-logo-text {
@@ -66,6 +77,21 @@
   color: var(--m-brand-color);
   letter-spacing: 0.1em;
   text-shadow: 0 2px 4px rgba(214, 47, 31, 0.1);
+}
+
+@media (max-width: 950px) {
+  .header-logo-text {
+    font-size: 0;
+    line-height: 0;
+  }
+
+  .header-logo-text::after {
+    content: 'C';
+    font-size: 1.75rem;
+    font-weight: 900;
+    color: var(--m-brand-color);
+    display: block;
+  }
 }
 
 .menu-label {
@@ -258,7 +284,8 @@
 }
 
 .logout-nav-item .nav-icon {
-  margin-right: 0; /* Align with other nav items */
+  margin-right: 0;
+  /* Align with other nav items */
 }
 
 .management-container:not(.collapsed) .logout-nav-item .nav-icon {
@@ -284,6 +311,13 @@
   justify-content: space-between;
   padding: 0 1.5rem;
   z-index: 5;
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .top-header {
+    padding: 0 1rem;
+  }
 }
 
 .search-bar {
@@ -293,6 +327,25 @@
   border-radius: 8px;
   padding: 0.5rem 1rem;
   width: 300px;
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 1100px) {
+  .search-bar {
+    width: 200px;
+  }
+}
+
+@media (max-width: 850px) {
+  .search-bar {
+    width: 40px;
+    padding: 0.5rem;
+    background: transparent;
+  }
+
+  .search-input {
+    display: none;
+  }
 }
 
 .search-input {
@@ -388,6 +441,17 @@
   border-left: 1px solid var(--m-border-color);
 }
 
+@media (max-width: 768px) {
+  .user-profile {
+    padding-left: 0;
+    border-left: none;
+  }
+
+  .user-details {
+    display: none;
+  }
+}
+
 .avatar {
   width: 36px;
   height: 36px;
@@ -441,6 +505,20 @@
   border-radius: 6px;
   background-color: var(--m-bg-surface-hover);
   transition: all 0.2s;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .for-users-btn {
+    padding: 0.35rem;
+    font-size: 0;
+  }
+
+  .for-users-btn::before {
+    content: '🏠';
+    /* Icon fallback if needed or just use current content as icon */
+    font-size: 1rem;
+  }
 }
 
 .for-users-btn:hover {

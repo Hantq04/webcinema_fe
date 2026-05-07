@@ -163,6 +163,46 @@
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 2.5rem !important;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  opacity: 0.6;
+  transition: all 0.2s;
+  user-select: none;
+  width: 2rem;
+  height: 2rem;
+}
+
+.password-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+.password-toggle:hover {
+  color: #eb1c14;
+  opacity: 1;
+}
+
 .field input:not([type='radio']):not([type='checkbox']):focus {
   border-color: #eb1c14;
   box-shadow: 0 0 0 3px rgba(235, 28, 20, 0.12);

@@ -50,7 +50,7 @@ import { Router } from '@angular/router';
                               [class.seat-btn--standard]="seat.seatType === 'Standard'"
                               [class.seat-btn--vip]="seat.seatType === 'VIP'"
                               [class.seat-btn--sweetbox]="seat.seatType === 'Sweet Box'"
-                              [class.seat-btn--booked]="seat.status === 'BOOKED'"
+                              [class.seat-btn--booked]="seat.status === 'BOOKED' || seat.status === 'OCCUPIED'"
                               [class.seat-btn--unavailable]="seat.status === 'UNAVAILABLE'"
                               [class.seat-btn--selected]="isSeatSelected(seat)"
                               (click)="toggleSeat(seat)"

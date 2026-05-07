@@ -56,11 +56,15 @@ export class AuthComponent implements OnInit, OnDestroy {
   protected readonly registerServerErrors = signal<Record<string, string>>({});
   protected readonly forgotServerErrors = signal<Record<string, string>>({});
   protected readonly resetServerErrors = signal<Record<string, string>>({});
+  protected readonly showLoginPassword = signal(false);
+  protected readonly showRegisterPassword = signal(false);
+  protected readonly showResetNewPassword = signal(false);
+  protected readonly showResetConfirmPassword = signal(false);
 
   protected readonly loginForm = this.formBuilder.group({
     userName: [''],
     passWord: [''],
-    captchaValue: ['']
+    captchaValue: ['', [Validators.required]]
   });
 
   protected readonly registerForm = this.formBuilder.group({
@@ -134,7 +138,7 @@ export class AuthComponent implements OnInit, OnDestroy {
       this.activeTab.set(tab);
     }
 
-    // this.loadCaptcha();
+    this.loadCaptcha();
     this.updateTitle();
 
     // Check for message in history state (e.g. from forgot password flow)
@@ -160,9 +164,13 @@ export class AuthComponent implements OnInit, OnDestroy {
     this.registerServerErrors.set({});
     this.forgotServerErrors.set({});
     this.resetServerErrors.set({});
+    this.showLoginPassword.set(false);
+    this.showRegisterPassword.set(false);
+    this.showResetNewPassword.set(false);
+    this.showResetConfirmPassword.set(false);
 
     if ((tab === 'login' || tab === 'register') && !this.captcha()) {
-      // this.loadCaptcha();
+      this.loadCaptcha();
     }
     this.updateTitle();
 
@@ -170,6 +178,13 @@ export class AuthComponent implements OnInit, OnDestroy {
     void this.router.navigate([base, tab], {
       state: message ? { flashMessage: message.text, flashType: message.type } : undefined
     });
+  }
+
+  protected togglePasswordVisibility(field: 'login' | 'register' | 'resetNew' | 'resetConfirm'): void {
+    if (field === 'login') this.showLoginPassword.update(v => !v);
+    else if (field === 'register') this.showRegisterPassword.update(v => !v);
+    else if (field === 'resetNew') this.showResetNewPassword.update(v => !v);
+    else if (field === 'resetConfirm') this.showResetConfirmPassword.update(v => !v);
   }
 
   protected refreshCaptcha(): void {
@@ -181,7 +196,6 @@ export class AuthComponent implements OnInit, OnDestroy {
     this.loginServerErrors.set({});
     this.loginForm.markAllAsTouched();
 
-    /* Bypass captcha validation
     if (this.loginForm.invalid || !this.loginCaptchaId()) {
       if (!this.loginCaptchaId()) {
         this.message.set({ type: 'error', text: this.t('auth.captchaReload') });
@@ -189,14 +203,13 @@ export class AuthComponent implements OnInit, OnDestroy {
 
       return;
     }
-    */
 
     const rawValue = this.loginForm.getRawValue();
     const payload: LoginRequest = {
       userName: rawValue.userName?.trim() ?? '',
       passWord: rawValue.passWord?.trim() ?? '',
-      captchaId: this.loginCaptchaId() || 'dummy',
-      captchaValue: rawValue.captchaValue?.trim() || 'dummy'
+      captchaId: this.loginCaptchaId(),
+      captchaValue: rawValue.captchaValue?.trim() ?? ''
     };
 
     this.submittingLogin.set(true);
@@ -204,7 +217,14 @@ export class AuthComponent implements OnInit, OnDestroy {
       .login(payload)
       .pipe(
         catchError((error: unknown) => {
-          return this.handleFormError('login', error, this.t('auth.loginError'), () => this.refreshCaptcha());
+          return this.handleFormError('login', error, this.t('auth.loginError'), () => {
+            this.refreshCaptcha();
+            this.loginForm.reset({
+              userName: '',
+              passWord: '',
+              captchaValue: ''
+            });
+          });
         }),
         finalize(() => this.submittingLogin.set(false))
       )
@@ -239,7 +259,6 @@ export class AuthComponent implements OnInit, OnDestroy {
     this.registerServerErrors.set({});
     this.registerForm.markAllAsTouched();
 
-    /* Bypass captcha validation
     if (this.registerForm.invalid || !this.loginCaptchaId()) {
       if (!this.loginCaptchaId()) {
         this.message.set({ type: 'error', text: this.t('auth.captchaReload') });
@@ -247,7 +266,6 @@ export class AuthComponent implements OnInit, OnDestroy {
 
       return;
     }
-    */
 
     const rawValue = this.registerForm.getRawValue();
     const birthDate = `${rawValue.birthYear?.trim() ?? ''}-${String(rawValue.birthMonth ?? '').padStart(2, '0')}-${String(rawValue.birthDay ?? '').padStart(2, '0')}`;

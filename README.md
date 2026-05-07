@@ -57,3 +57,29 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## Running on Another Machine or Local Network
+
+To run this project on another machine or allow access from other devices in your network:
+
+### 1. Automatic API URL Detection
+The system is configured to **automatically detect** the Backend address:
+- When accessing via `localhost`, the API will call `localhost:8080`.
+- When accessing via a network IP (e.g., `192.168.x.x`), the API will automatically call the Backend on the same IP at port `8080`.
+*Note: If the Backend is running on a completely different machine from the Frontend, you will need to manually update `src/app/core/services/api.service.ts`.*
+
+### 2. Start the Server for Network Access
+Run the following command to allow other devices to connect to your frontend:
+
+```bash
+npm run start:network
+```
+
+Once running, you can access the application from other devices using your machine's IP address: `http://<YOUR_IP>:4200/`.
+
+### 3. Prerequisites
+Ensure that:
+- Both machines are on the same local network (Wi-Fi or LAN).
+- Firewall settings on both machines allow traffic on ports `4200` (Frontend) and `8080` (Backend).
+- The Backend is configured to listen on `0.0.0.0` (Binding to all interfaces).
+

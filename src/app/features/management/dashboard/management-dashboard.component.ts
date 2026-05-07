@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LanguageService } from '../../../core/services/language.service';
 import { OverviewService } from '../../../core/services/overview.service';
-import { OverviewResponse } from '../../../core/models/overview.model';
+import { OverviewResponse, RevenueTimePoint } from '../../../core/models/overview.model';
 
 @Component({
   selector: 'app-management-dashboard',
@@ -14,7 +14,7 @@ import { OverviewResponse } from '../../../core/models/overview.model';
       <div class="page-header">
         <h1 class="page-title">{{ t('management.dashboardOverview') }}</h1>
         <div class="date-filter">
-          <span class="current-date">{{ t('management.today') }}: {{ overview()?.date || '--' }}</span>
+          <span class="current-date">{{ t('management.today') }}: {{ (overview()?.date | date:'dd/MM/yyyy') || '--' }}</span>
         </div>
       </div>
 
@@ -28,9 +28,10 @@ import { OverviewResponse } from '../../../core/models/overview.model';
             </div>
           </div>
           <div class="stat-value">{{ formatCurrency(overview()?.todayRevenue || 0) }}</div>
-          <div class="stat-trend positive">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-            <span>+12.5%</span>
+          <div class="stat-trend" [ngClass]="getTrendClass(overview()?.todayRevenueChangePercent)">
+            <svg *ngIf="(overview()?.todayRevenueChangePercent || 0) > 0" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            <svg *ngIf="(overview()?.todayRevenueChangePercent || 0) < 0" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>
+            <span>{{ formatPercent(overview()?.todayRevenueChangePercent) }}</span>
           </div>
         </div>
 
@@ -42,9 +43,10 @@ import { OverviewResponse } from '../../../core/models/overview.model';
             </div>
           </div>
           <div class="stat-value">{{ (overview()?.todayTicketCount || 0) | number }}</div>
-          <div class="stat-trend positive">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-            <span>+5.2%</span>
+          <div class="stat-trend" [ngClass]="getTrendClass(overview()?.todayTicketCountChangePercent)">
+            <svg *ngIf="(overview()?.todayTicketCountChangePercent || 0) > 0" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            <svg *ngIf="(overview()?.todayTicketCountChangePercent || 0) < 0" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>
+            <span>{{ formatPercent(overview()?.todayTicketCountChangePercent) }}</span>
           </div>
         </div>
 
@@ -57,8 +59,7 @@ import { OverviewResponse } from '../../../core/models/overview.model';
           </div>
           <div class="stat-value">{{ overview()?.nowShowingMovieCount || 0 }}</div>
           <div class="stat-trend neutral">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" x2="19" y1="12" y2="12"/></svg>
-            <span>--</span>
+            <!-- Hidden by request: cho % nhỏ hiện 3 mục trừ phim đang chiếu ra -->
           </div>
         </div>
 
@@ -69,10 +70,11 @@ import { OverviewResponse } from '../../../core/models/overview.model';
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 16v-3a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3"/><path d="M4 20h16"/><path d="M7 11V7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4"/><rect width="12" height="4" x="6" y="16" rx="1"/></svg>
             </div>
           </div>
-          <div class="stat-value">{{ (overview()?.seatOccupancyRate || 0) * 100 }}%</div>
-          <div class="stat-trend negative">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>
-            <span>-2.4%</span>
+          <div class="stat-value">{{ (overview()?.seatOccupancyRate || 0) }}%</div>
+          <div class="stat-trend" [ngClass]="getTrendClass(overview()?.seatOccupancyRateChangePercent)">
+            <svg *ngIf="(overview()?.seatOccupancyRateChangePercent || 0) > 0" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            <svg *ngIf="(overview()?.seatOccupancyRateChangePercent || 0) < 0" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>
+            <span>{{ formatPercent(overview()?.seatOccupancyRateChangePercent) }}</span>
           </div>
         </div>
       </div>
@@ -87,17 +89,18 @@ import { OverviewResponse } from '../../../core/models/overview.model';
           <div class="card-body">
             <div class="mock-chart">
               <div class="chart-y-axis">
-                <span>150M</span>
-                <span>100M</span>
-                <span>50M</span>
+                <span>20M</span>
+                <span>10M</span>
                 <span>0</span>
               </div>
               <div class="chart-bars">
-                <div *ngFor="let day of overview()?.revenueLast7Days; let last = last" class="bar-group">
-                  <div class="bar" [style.height]="(day.totalRevenue / 150000000 * 100) + '%'" [style.backgroundColor]="last ? '#d62f1f' : ''">
+                <div *ngFor="let day of revenuePoints(); let last = last" class="bar-group">
+                  <div class="bar" [style.height]="(day.totalRevenue / 20000000 * 100) + '%'" [style.backgroundColor]="last ? '#d62f1f' : ''">
                     <div class="bar-tooltip">{{ formatCurrency(day.totalRevenue) }}</div>
                   </div>
-                  <span class="bar-label">{{ day.period | date:'EEE' }}</span>
+                  <span class="bar-label" [style.color]="last ? '#d62f1f' : ''" [style.fontWeight]="last ? '600' : ''">
+                    {{ day.period | date:'dd/MM' }}
+                  </span>
                 </div>
               </div>
             </div>
@@ -108,18 +111,43 @@ import { OverviewResponse } from '../../../core/models/overview.model';
         <div class="card top-movies-card">
           <div class="card-header">
             <h2 class="card-title">{{ t('management.topSellingMovies') }}</h2>
-            <button class="view-all-btn">{{ t('management.viewAll') }}</button>
+            <button class="view-all-btn" (click)="toggleShowAllMovies()">{{ t('management.viewAll') }}</button>
           </div>
           <div class="card-body">
             <ul class="movie-list">
-              <li *ngFor="let movie of overview()?.topMovies; let i = index" class="movie-item">
+              <li *ngFor="let movie of topMoviesDisplay(); let i = index" class="movie-item">
                 <div class="movie-rank">{{ i + 1 }}</div>
                 <div class="movie-info">
                   <div class="movie-name">{{ language.currentLanguage() === 'vi' ? movie.name : movie.nameEn }}</div>
                   <div class="movie-meta">{{ language.currentLanguage() === 'vi' ? movie.movieTypeName : movie.movieTypeNameEn }}</div>
                 </div>
                 <div class="movie-sales">
-                  <div class="sales-value">{{ movie.ticketCount || 0 }}</div>
+                  <div class="sales-value">{{ movie.totalTicketsBooked || 0 }}</div>
+                  <div class="sales-label">{{ t('management.tickets') }}</div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Full Movies Modal -->
+      <div class="modal-overlay" *ngIf="showAllMovies()" (click)="toggleShowAllMovies()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2 class="modal-title">{{ t('management.topSellingMovies') }}</h2>
+            <button class="modal-close" (click)="toggleShowAllMovies()">&times;</button>
+          </div>
+          <div class="modal-body">
+            <ul class="movie-list full-list">
+              <li *ngFor="let movie of overview()?.topMovies; let i = index" class="movie-item">
+                <div class="movie-rank" [class.top-1]="i === 0" [class.top-2]="i === 1" [class.top-3]="i === 2">{{ i + 1 }}</div>
+                <div class="movie-info">
+                  <div class="movie-name">{{ language.currentLanguage() === 'vi' ? movie.name : movie.nameEn }}</div>
+                  <div class="movie-meta">{{ language.currentLanguage() === 'vi' ? movie.movieTypeName : movie.movieTypeNameEn }}</div>
+                </div>
+                <div class="movie-sales">
+                  <div class="sales-value">{{ movie.totalTicketsBooked || 0 }}</div>
                   <div class="sales-label">{{ t('management.tickets') }}</div>
                 </div>
               </li>
@@ -220,9 +248,56 @@ export class ManagementDashboardComponent implements OnInit {
   protected readonly t = this.language.t.bind(this.language);
 
   overview = signal<OverviewResponse | null>(null);
+  showAllMovies = signal(false);
+  
+  topMoviesDisplay = computed(() => {
+    return this.overview()?.topMovies.slice(0, 5) || [];
+  });
+  
+  revenuePoints = computed<RevenueTimePoint[]>(() => {
+    const raw = this.overview()?.revenueLast7Days || [];
+    const points: RevenueTimePoint[] = [];
+    
+    // Generate last 7 days including today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      
+      // Try to find matching data point
+      // Note: period might be "2024-05-07" or similar
+      const found = raw.find(p => {
+        if (!p.period) return false;
+        const pDate = new Date(p.period);
+        return pDate.getFullYear() === d.getFullYear() && 
+               pDate.getMonth() === d.getMonth() && 
+               pDate.getDate() === d.getDate();
+      });
+      
+      if (found) {
+        points.push(found);
+      } else {
+        points.push({
+          period: d.toISOString(),
+          totalRevenue: 0,
+          ticketRevenue: 0,
+          foodRevenue: 0,
+          ticketCount: 0
+        });
+      }
+    }
+    
+    return points;
+  });
 
   ngOnInit(): void {
     this.loadOverview();
+  }
+
+  toggleShowAllMovies() {
+    this.showAllMovies.update(v => !v);
   }
 
   loadOverview() {
@@ -233,10 +308,10 @@ export class ManagementDashboardComponent implements OnInit {
   }
 
   formatCurrency(value: number): string {
-    return new Intl.NumberFormat('vi-VN', { 
-      style: 'currency', 
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
       currency: 'VND',
-      maximumFractionDigits: 0 
+      maximumFractionDigits: 0
     }).format(value);
   }
 
@@ -247,7 +322,7 @@ export class ManagementDashboardComponent implements OnInit {
   getBookingStatus(status: string): { label: string, class: string } {
     const s = (status || '').toLowerCase();
     const isVi = this.language.currentLanguage() === 'vi';
-    
+
     switch (s) {
       case 'success':
         return { label: isVi ? 'Thành công' : 'Success', class: 'badge-success' };
@@ -264,5 +339,16 @@ export class ManagementDashboardComponent implements OnInit {
       default:
         return { label: status, class: '' };
     }
+  }
+
+  formatPercent(value: number | undefined): string {
+    if (value === undefined || value === null) return '--';
+    const sign = value > 0 ? '+' : '';
+    return `${sign}${value}%`;
+  }
+
+  getTrendClass(value: number | undefined): string {
+    if (value === undefined || value === null || value === 0) return 'neutral';
+    return value > 0 ? 'positive' : 'negative';
   }
 }

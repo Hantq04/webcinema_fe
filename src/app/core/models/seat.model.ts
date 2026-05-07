@@ -2,7 +2,7 @@ export interface SeatItem {
   id: number;
   line: string;
   number: number;
-  status: 'AVAILABLE' | 'BOOKED' | 'UNAVAILABLE';
+  status: 'AVAILABLE' | 'BOOKED' | 'UNAVAILABLE' | 'OCCUPIED';
   seatType: 'Standard' | 'VIP' | 'Sweet Box';
   pairIndex?: number;
   priceTicket?: number;
