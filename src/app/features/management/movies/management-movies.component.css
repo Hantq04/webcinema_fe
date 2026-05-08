@@ -24,3 +24,23 @@
 .dark .overflow-y-auto::-webkit-scrollbar-thumb:hover {
   background-color: rgba(71, 85, 105, 0.6);
 }
+
+/* Movie Rate Badges */
+.rate-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  color: white !important;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  border: none !important;
+  font-size: 10px;
+}
+
+.rate-g { background-color: #2f9d44 !important; }
+.rate-pg { background-color: #f39c12 !important; }
+.rate-pg13 { background-color: #6d5bd0 !important; }
+.rate-r { background-color: #e03a2f !important; }
+.rate-nc17 { background-color: #1f8bd6 !important; }

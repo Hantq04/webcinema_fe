@@ -58,6 +58,8 @@ export class ManagementSeatsComponent implements OnInit {
   // Seats State
   roomSeats = signal<SeatResponse[]>([]);
   searchQuery = signal<string>('');
+  selectedSeatIds = signal<number[]>([]);
+  isSelectionMode = signal(false);
 
   // Pagination
   currentPage = signal<number>(1);
@@ -141,6 +143,7 @@ export class ManagementSeatsComponent implements OnInit {
 
   onRoomChange(roomCode: string) {
     this.selectedRoomCode.set(roomCode);
+    this.selectedSeatIds.set([]); // Clear selection when room changes
     if (roomCode) {
       this.loadSeats(roomCode);
     } else {
@@ -290,6 +293,47 @@ export class ManagementSeatsComponent implements OnInit {
       },
       error: () => {
         this.isRefreshing.set(false);
+      }
+    });
+  }
+
+  toggleSelectionMode() {
+    this.isSelectionMode.update(v => !v);
+    if (!this.isSelectionMode()) {
+      this.selectedSeatIds.set([]);
+    }
+  }
+
+  onSeatClick(seat: SeatResponse) {
+    if (this.isSelectionMode()) {
+      const ids = this.selectedSeatIds();
+      if (ids.includes(seat.id)) {
+        this.selectedSeatIds.set(ids.filter(id => id !== seat.id));
+      } else {
+        this.selectedSeatIds.set([...ids, seat.id]);
+      }
+    } else {
+      this.openEditModal(seat);
+    }
+  }
+
+  submitRefreshSelected() {
+    const roomCode = this.selectedRoomCode();
+    const seatIds = this.selectedSeatIds();
+    if (!roomCode || seatIds.length === 0) return;
+
+    this.isRefreshing.set(true);
+    this.seatService.refreshSelectedSeats({ roomCode, seatIds }).subscribe({
+      next: () => {
+        this.isRefreshing.set(false);
+        this.selectedSeatIds.set([]);
+        this.isSelectionMode.set(false);
+        this.refreshSeats();
+        alert('Làm mới các ghế đã chọn thành công!');
+      },
+      error: (err) => {
+        this.isRefreshing.set(false);
+        alert('Lỗi khi làm mới ghế: ' + (err.error?.message || 'Không rõ lỗi'));
       }
     });
   }

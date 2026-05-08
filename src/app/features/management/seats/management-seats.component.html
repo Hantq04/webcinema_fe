@@ -5,8 +5,35 @@
 
     <div class="flex items-center gap-3">
       <button
+        class="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed border"
+        [class.bg-rose-50]="isSelectionMode()" [class.border-rose-200]="isSelectionMode()" [class.text-rose-600]="isSelectionMode()"
+        [class.bg-slate-100]="!isSelectionMode()" [class.dark:bg-slate-800]="!isSelectionMode()" [class.text-slate-700]="!isSelectionMode()" [class.dark:text-slate-200]="!isSelectionMode()"
+        (click)="toggleSelectionMode()" [disabled]="!selectedRoomCode()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+        {{ isSelectionMode() ? t('management.seatCancelSelection') : t('management.seatSelectMultiple') }}
+      </button>
+
+      <button
+        *ngIf="selectedSeatIds().length > 0"
+        class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium flex items-center gap-2 transition-colors shadow-sm disabled:opacity-70"
+        (click)="submitRefreshSelected()" [disabled]="isRefreshing()">
+        <svg *ngIf="isRefreshing()" class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <svg *ngIf="!isRefreshing()" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+          <path d="M3 3v5h5" />
+        </svg>
+        {{ t('management.seatRefresh') }} ({{ selectedSeatIds().length }})
+      </button>
+
+      <button
+        *ngIf="selectedSeatIds().length === 0"
         class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        (click)="openRefreshModal()" [disabled]="!selectedRoomCode()">
+        (click)="openRefreshModal()" [disabled]="!selectedRoomCode() || isSelectionMode()">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
           stroke-width="2">
           <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
@@ -55,7 +82,7 @@
           class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg max-h-60 overflow-y-auto py-1 z-50">
           <div class="px-4 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors italic"
             (click)="onAddressChange(''); isAddressDropdownOpen.set(false)">
-            -- Tất cả khu vực --
+            {{ t('management.allAreasFilter') }}
           </div>
           <div *ngFor="let addr of addresses()"
             class="px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 dark:hover:text-rose-400 cursor-pointer transition-colors flex items-center justify-between"
@@ -103,7 +130,7 @@
           class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg max-h-60 overflow-y-auto py-1 z-50">
           <div class="px-4 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors italic"
             (click)="onCinemaChange(''); isCinemaDropdownOpen.set(false)">
-            -- Tất cả rạp --
+            {{ t('management.allCinemasFilter') }}
           </div>
           <div *ngFor="let cinema of cinemas()"
             class="px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 dark:hover:text-rose-400 cursor-pointer transition-colors flex items-center justify-between"
@@ -189,15 +216,16 @@
           <!-- Seat Grid -->
           <div class="flex flex-col gap-2">
             <div *ngFor="let row of groupedMapSeats()" class="flex items-center justify-center gap-1.5">
-              <div *ngFor="let seat of row.seats" (click)="openEditModal(seat)"
+              <div *ngFor="let seat of row.seats" (click)="onSeatClick(seat)"
                 class="group relative h-8 flex items-center justify-center text-[10px] font-bold cursor-pointer transition-all hover:scale-110 rounded-sm"
                 [ngClass]="{
                   'w-8 border': true,
+                  'ring-4 ring-rose-500/50 scale-110 z-10': selectedSeatIds().includes(seat.id),
                   'bg-white dark:bg-transparent border-emerald-500 text-emerald-700 dark:text-emerald-400': isStatus(seat.status, ['AVAILABLE', 'Available', 'Ghế trống']) && isType(seat.seatType, ['Standard', 'Thường', '']),
                   'bg-white dark:bg-transparent border-red-500 text-red-700 dark:text-red-400': isStatus(seat.status, ['AVAILABLE', 'Available', 'Ghế trống']) && isType(seat.seatType, ['VIP']),
                   'bg-pink-500 border-pink-500 text-white': isStatus(seat.status, ['AVAILABLE', 'Available', 'Ghế trống']) && isType(seat.seatType, ['Sweet Box', 'Couple']),
                   'bg-[#94a3b8] border-[#94a3b8] text-white': isStatus(seat.status, ['OCCUPIED', 'Occupied', 'Đã đặt']),
-                  'bg-gray-200 dark:bg-slate-700 border-gray-200 dark:border-slate-700 text-gray-400 dark:text-slate-500 cursor-not-allowed': isStatus(seat.status, ['UNAVAILABLE', 'Unavailable', 'Bảo trì', 'Maintenance', 'Disabled', 'Khóa'])
+                  'bg-gray-200 dark:bg-slate-700 border-gray-200 dark:border-slate-700 text-gray-400 dark:text-slate-500': isStatus(seat.status, ['UNAVAILABLE', 'Unavailable', 'Bảo trì', 'Maintenance', 'Disabled', 'Khóa'])
                 }">
                 <span *ngIf="isStatus(seat.status, ['AVAILABLE', 'Available', 'Ghế trống'])">{{ seat.line }}{{
                   seat.number }}</span>

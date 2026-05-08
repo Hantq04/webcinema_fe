@@ -34,6 +34,7 @@ export interface MovieDTO {
   rate: string;
   poster?: string;
   status?: string;
+  endDate?: string;
   durationMinutes?: number;
   duration?: number;
 }

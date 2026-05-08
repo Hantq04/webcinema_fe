@@ -385,9 +385,9 @@ export class ManagementSchedulesComponent implements OnInit {
     }
 
     if (now >= start && now <= end) {
-      return { label: this.t('management.statusNowShowing'), class: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' };
+      return { label: this.t('management.statusNowShowing'), class: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' };
     } else if (now < start) {
-      return { label: this.t('management.statusComingSoon'), class: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' };
+      return { label: this.t('management.statusComingSoon'), class: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' };
     } else {
       return { label: this.t('management.statusEnded'), class: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400' };
     }

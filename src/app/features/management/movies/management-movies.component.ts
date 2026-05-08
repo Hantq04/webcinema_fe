@@ -74,6 +74,7 @@ export class ManagementMoviesComponent implements OnInit {
       trailer: ['', [Validators.required, Validators.pattern(urlRegex)]],
       movieDuration: ['', [Validators.required, Validators.min(1)]],
       premiereDate: ['', Validators.required],
+      endDate: ['', Validators.required],
       bannerId: ['', Validators.required],
       rate: ['', Validators.required],
       movieTypeIds: [[], [Validators.required, Validators.minLength(1)]]
@@ -142,6 +143,33 @@ export class ManagementMoviesComponent implements OnInit {
           dataList = res.content;
           total = res.totalElements ?? dataList.length;
           totalP = res.totalPages ?? 1;
+        }
+
+        // Apply custom sorting for 'ALL' tab: Now Showing (1) -> Coming Soon (2) -> Ended (3)
+        // Within each category, sort by premiereDate descending
+        if (this.activeTab() === 'ALL') {
+          dataList.sort((a: any, b: any) => {
+            const getPriority = (m: any) => {
+              const nowTime = new Date().getTime();
+              const p = m.premiereDate || m.releaseDate;
+              const e = m.endDate;
+              const pTime = p ? new Date(p.replace(' ', 'T')).getTime() : 0;
+              const eTime = e ? new Date(e.replace(' ', 'T')).getTime() : 0;
+              
+              if (eTime && nowTime > eTime) return 3; // Ended
+              if (pTime && nowTime < pTime) return 2; // Coming Soon
+              return 1; // Now Showing
+            };
+
+            const pA = getPriority(a);
+            const pB = getPriority(b);
+
+            if (pA !== pB) return pA - pB;
+
+            const dateA = new Date((a.premiereDate || a.releaseDate || '').replace(' ', 'T')).getTime();
+            const dateB = new Date((b.premiereDate || b.releaseDate || '').replace(' ', 'T')).getTime();
+            return dateB - dateA;
+          });
         }
 
         this.totalElements.set(total);
@@ -260,6 +288,10 @@ export class ManagementMoviesComponent implements OnInit {
         .filter(t => typeStrVi.includes(t.movieTypeNameVi) || typeStrEn.includes(t.movieTypeNameEn))
         .map(t => t.id);
     }
+    let formattedEndDate = detail.endDate;
+    if (formattedEndDate) {
+      formattedEndDate = formattedEndDate.split('T')[0].split(' ')[0];
+    }
 
     this.movieForm.patchValue({
       code: detail.code,
@@ -272,8 +304,9 @@ export class ManagementMoviesComponent implements OnInit {
       language: detail.language,
       subtitle: detail.subtitle,
       trailer: detail.trailer || (detail as any).trailerUrl,
-      movieDuration: detail.movieDuration || detail.durationMinutes || detail.duration,
+      movieDuration: detail.movieDuration || (detail as any).durationMinutes || (detail as any).duration,
       premiereDate: formattedDate,
+      endDate: formattedEndDate,
       bannerId: detail.bannerId,
       rate: detail.rate,
       movieTypeIds: mappedTypeIds
@@ -292,8 +325,10 @@ export class ManagementMoviesComponent implements OnInit {
     
     // Format payload if needed (e.g. date conversion)
     if (payload.premiereDate && payload.premiereDate.length === 10) {
-      // Appending time if backend expects datetime
       payload.premiereDate = `${payload.premiereDate}T00:00:00`;
+    }
+    if (payload.endDate && payload.endDate.length === 10) {
+      payload.endDate = `${payload.endDate}T00:00:00`;
     }
 
     const obs$ = this.isEditMode() 
@@ -414,5 +449,58 @@ export class ManagementMoviesComponent implements OnInit {
   getBannerTitle(id: any): string {
     const banner = this.banners().find(b => b.id === id);
     return banner ? banner.title : '';
+  }
+
+  protected movieRateCode(movie: any): string {
+    if (!movie) return 'P';
+    const rate = (movie.rate || movie.ageRating || '').toUpperCase();
+    if (rate.includes('PG-13')) return 'PG-13';
+    if (rate.includes('NC-17')) return 'NC-17';
+    if (rate.startsWith('PG')) return 'PG';
+    if (rate.startsWith('G')) return 'G';
+    if (rate.startsWith('R')) return 'R';
+    // For P, T13, T16, T18, K
+    if (rate.startsWith('P')) return 'P';
+    if (rate.startsWith('K')) return 'K';
+    if (rate.startsWith('C13') || rate.startsWith('T13')) return 'T13';
+    if (rate.startsWith('C16') || rate.startsWith('T16')) return 'T16';
+    if (rate.startsWith('C18') || rate.startsWith('T18')) return 'T18';
+    return (rate.split(/[\s-]/)[0] || '').trim();
+  }
+
+  protected getRateClass(movie: any): string {
+    const r = this.movieRateCode(movie);
+    if (r === 'G' || r === 'P') return 'rate-g';
+    if (r === 'PG' || r === 'K') return 'rate-pg';
+    if (r === 'PG-13' || r === 'T13') return 'rate-pg13';
+    if (r === 'R' || r === 'T16') return 'rate-r';
+    if (r === 'NC-17' || r === 'T18') return 'rate-nc17';
+    return '';
+  }
+
+  protected getMovieStatus(movie: any): { label: string, class: string } {
+    if (!movie) return { label: '', class: '' };
+    
+    const nowTime = new Date().getTime();
+    
+    const premiere = movie.premiereDate || movie.releaseDate;
+    const end = movie.endDate;
+
+    // Convert strings like "2026-04-01 00:00:00" to Date objects
+    const pTime = premiere ? new Date(premiere.replace(' ', 'T')).getTime() : 0;
+    const eTime = end ? new Date(end.replace(' ', 'T')).getTime() : 0;
+
+    // 1. If today is after endDate -> Ended
+    if (eTime && nowTime > eTime) {
+      return { label: this.t('management.statusEnded'), class: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400' };
+    }
+
+    // 2. If today is before premiereDate -> Coming Soon
+    if (pTime && nowTime < pTime) {
+      return { label: this.t('management.statusComingSoon'), class: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' };
+    }
+
+    // 3. Otherwise (in between or no end date) -> Now Showing
+    return { label: this.t('management.statusNowShowing'), class: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' };
   }
 }

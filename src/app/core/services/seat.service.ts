@@ -125,4 +125,8 @@ export class SeatService {
     const params = new HttpParams().set('roomCode', roomCode);
     return this.http.put<any>(this.apiService.apiUrl('/api/v1/seat/refresh'), null, { params });
   }
+
+  refreshSelectedSeats(payload: { roomCode: string; seatIds: number[] }): Observable<any> {
+    return this.http.put<any>(this.apiService.apiUrl('/api/v1/seat/refresh-selected'), payload);
+  }
 }
