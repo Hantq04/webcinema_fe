@@ -51,7 +51,7 @@ export class ManagementPromotionComponent implements OnInit {
       promotionType: ['', [Validators.required]],
       startTime: ['', [Validators.required]],
       endTime: ['', [Validators.required]],
-      description: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(500)]],
+      description: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(500)]],
       nameRankCustomer: ['', [Validators.required]]
     });
   }

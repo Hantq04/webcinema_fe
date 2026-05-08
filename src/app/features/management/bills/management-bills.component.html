@@ -20,11 +20,14 @@
               <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
             </svg>
           </div>
-          <div *ngIf="isStatusDropdownOpen()" class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg py-1 z-50 max-h-60 overflow-y-auto">
+          <div *ngIf="isStatusDropdownOpen()" class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg py-1 z-50">
             <div class="px-4 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors italic" (click)="filterStatus.set(''); isStatusDropdownOpen.set(false)">-- Tất cả trạng thái --</div>
-            <div *ngFor="let s of statuses()" class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors" (click)="filterStatus.set(s.code); isStatusDropdownOpen.set(false)">
-              {{ isEn() ? s.descriptionEn : s.descriptionVi }}
-            </div>
+            <ng-container *ngFor="let s of statuses()">
+              <div *ngIf="s.code && (isEn() ? s.descriptionEn : s.descriptionVi)"
+                class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors" (click)="filterStatus.set(s.code); isStatusDropdownOpen.set(false)">
+                {{ isEn() ? s.descriptionEn : s.descriptionVi }}
+              </div>
+            </ng-container>
             <!-- Hardcoded fallbacks if API list is empty but we have data with these codes -->
             <ng-container *ngIf="statuses().length === 0">
               <div *ngFor="let code of ['SUCCESS', 'PENDING', 'FAILURE', 'EXPIRED']" 

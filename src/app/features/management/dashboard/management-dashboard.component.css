@@ -37,7 +37,7 @@
   background-color: var(--m-bg-surface);
   border-radius: 12px;
   border: 1px solid var(--m-border-color);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
   display: flex;
   flex-direction: column;
 }
@@ -91,7 +91,7 @@
   border-radius: 12px;
   padding: 1.25rem;
   border: 1px solid var(--m-border-color);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
 .stat-header {
@@ -116,10 +116,25 @@
   justify-content: center;
 }
 
-.revenue-icon { background-color: var(--m-success-bg); color: var(--m-success-text); }
-.tickets-icon { background-color: var(--m-info-bg); color: var(--m-info-text); }
-.movies-icon { background-color: var(--m-purple-bg); color: var(--m-purple-text); }
-.occupancy-icon { background-color: var(--m-orange-bg); color: var(--m-orange-text); }
+.revenue-icon {
+  background-color: var(--m-success-bg);
+  color: var(--m-success-text);
+}
+
+.tickets-icon {
+  background-color: var(--m-info-bg);
+  color: var(--m-info-text);
+}
+
+.movies-icon {
+  background-color: var(--m-purple-bg);
+  color: var(--m-purple-text);
+}
+
+.occupancy-icon {
+  background-color: var(--m-orange-bg);
+  color: var(--m-orange-text);
+}
 
 .stat-value {
   font-size: 1.5rem;
@@ -136,9 +151,17 @@
   font-weight: 500;
 }
 
-.stat-trend.positive { color: var(--m-success-text); }
-.stat-trend.negative { color: var(--m-danger-text); }
-.stat-trend.neutral { color: var(--m-text-secondary); }
+.stat-trend.positive {
+  color: var(--m-success-text);
+}
+
+.stat-trend.negative {
+  color: var(--m-danger-text);
+}
+
+.stat-trend.neutral {
+  color: var(--m-text-secondary);
+}
 
 /* Charts Row */
 .charts-row {
@@ -170,7 +193,8 @@
   color: var(--m-text-muted);
   font-size: 0.75rem;
   padding-right: 1rem;
-  height: 220px; /* Fixed chart height */
+  height: 220px;
+  /* Fixed chart height */
   border-right: 1px solid var(--m-border-color);
 }
 
@@ -180,7 +204,8 @@
   justify-content: space-around;
   align-items: flex-end;
   padding-left: 1rem;
-  height: 220px; /* Match Y-axis height */
+  height: 220px;
+  /* Match Y-axis height */
   border-bottom: 1px solid var(--m-border-color);
 }
 
@@ -278,14 +303,22 @@
 .movie-rank {
   font-size: 1.25rem;
   font-weight: 800;
-  color: var(--m-text-muted);
+  color: var(--m-text-primary);
   width: 24px;
   text-align: center;
 }
 
-.movie-item:nth-child(1) .movie-rank { color: var(--m-gold-text); }
-.movie-item:nth-child(2) .movie-rank { color: var(--m-text-muted); }
-.movie-item:nth-child(3) .movie-rank { color: var(--m-bronze-text); }
+.movie-item:nth-child(1) .movie-rank {
+  color: var(--m-gold-text);
+}
+
+.movie-item:nth-child(2) .movie-rank {
+  color: var(--m-text-muted);
+}
+
+.movie-item:nth-child(3) .movie-rank {
+  color: var(--m-bronze-text);
+}
 
 .movie-info {
   flex: 1;
@@ -337,6 +370,17 @@
   border-collapse: collapse;
 }
 
+.table-scroll-container {
+  max-height: 520px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.table-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
 .data-table th {
   text-align: left;
   padding: 1rem 1.5rem;
@@ -346,6 +390,9 @@
   font-weight: 600;
   border-bottom: 1px solid var(--m-border-color);
   background-color: var(--m-bg-primary);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .data-table td {
@@ -413,6 +460,14 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  max-height: 200px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.fb-list::-webkit-scrollbar {
+  display: none;
 }
 
 .fb-item {
@@ -444,6 +499,14 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  max-height: 110px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.promo-list::-webkit-scrollbar {
+  display: none;
 }
 
 .promo-item {
@@ -496,7 +559,8 @@
   border-radius: 20px;
   width: 95%;
   max-width: 850px;
-  min-height: 500px; /* Đảm bảo hiện đủ không gian cho top 5 */
+  min-height: 500px;
+  /* Đảm bảo hiện đủ không gian cho top 5 */
   max-height: 90vh;
   display: flex;
   flex-direction: column;
@@ -563,16 +627,29 @@
   gap: 1.25rem !important;
 }
 
-.movie-rank.top-1 { color: #f59e0b; font-size: 1.5rem; }
-.movie-rank.top-2 { color: #94a3b8; font-size: 1.4rem; }
-.movie-rank.top-3 { color: #b45309; font-size: 1.3rem; }
+.movie-rank.top-1 {
+  color: #f59e0b;
+  font-size: 1.5rem;
+}
+
+.movie-rank.top-2 {
+  color: #94a3b8;
+  font-size: 1.4rem;
+}
+
+.movie-rank.top-3 {
+  color: #b45309;
+  font-size: 1.3rem;
+}
 
 /* Responsive Grid Adjustments */
 @media (max-width: 1200px) {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  .charts-row, .details-row {
+
+  .charts-row,
+  .details-row {
     grid-template-columns: 1fr;
   }
 }

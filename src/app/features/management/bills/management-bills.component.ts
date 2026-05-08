@@ -82,7 +82,26 @@ export class ManagementBillsComponent implements OnInit {
 
   private loadStatuses() {
     this.billService.getAllStatus().subscribe({
-      next: (data) => this.statuses.set(data),
+      next: (data) => {
+        const mapped = data.map(s => {
+          const name = s.name.toLowerCase();
+          let code = s.name.toUpperCase();
+          
+          // Map to codes used in template
+          if (name === 'success') code = 'PAID';
+          if (name === 'pending') code = 'HOLD';
+          if (name === 'fail') code = 'FAILURE';
+          if (name === 'cancel') code = 'CANCELLED';
+          
+          return {
+            ...s,
+            code: code,
+            descriptionVi: this.getStatusName(code),
+            descriptionEn: code.charAt(0) + code.slice(1).toLowerCase()
+          };
+        });
+        this.statuses.set(mapped);
+      },
       error: (err) => console.error('Error loading statuses', err)
     });
   }
@@ -302,18 +321,30 @@ export class ManagementBillsComponent implements OnInit {
   }
 
   getStatusName(code: string): string {
+    if (!code) return '';
+    
     const s = this.statuses().find(x => x.code === code);
-    if (s) return this.isEn() ? s.descriptionEn : s.descriptionVi;
+    if (s && (this.isEn() ? s.descriptionEn : s.descriptionVi)) {
+      return this.isEn() ? s.descriptionEn : s.descriptionVi;
+    }
     
     const mapping: any = {
-      'SUCCESS': this.t('management.statusSuccess'),
-      'PENDING': this.t('management.statusPending'),
-      'FAILURE': this.t('management.statusFailure'),
-      'EXPIRED': this.t('management.statusExpired'),
-      'PAID': this.t('management.statusPaid'),
-      'HOLD': this.t('management.statusHold'),
-      'CANCELLED': this.t('management.statusCancelled')
+      'SUCCESS': 'Thành công',
+      'PAID': 'Đã thanh toán',
+      'PENDING': 'Đang chờ',
+      'HOLD': 'Đang giữ chỗ',
+      'FAILURE': 'Thất bại',
+      'FAIL': 'Thất bại',
+      'EXPIRED': 'Hết hạn',
+      'CANCEL': 'Đã hủy',
+      'CANCELLED': 'Đã hủy'
     };
-    return mapping[code] || code;
+    
+    // Check translation service too
+    const tKey = `management.status${code.charAt(0).toUpperCase() + code.slice(1).toLowerCase()}`;
+    const translated = this.t(tKey);
+    if (translated !== tKey) return translated;
+
+    return mapping[code.toUpperCase()] || code;
   }
 }

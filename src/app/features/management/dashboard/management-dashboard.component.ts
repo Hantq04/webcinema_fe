@@ -164,7 +164,7 @@ import { OverviewResponse, RevenueTimePoint } from '../../../core/models/overvie
             <h2 class="card-title">{{ t('management.recentBookings') }}</h2>
           </div>
           <div class="card-body no-padding">
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto table-scroll-container">
               <table class="data-table">
                 <thead>
                   <tr>
