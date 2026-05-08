@@ -43,7 +43,7 @@ export class ManagementBillsComponent implements OnInit {
 
   // Form
   billForm!: FormGroup;
-  backendErrorMsg = signal<string | null>(null);
+  fieldErrors = signal<Record<string, string>>({});
   holdInfo = signal<BillHoldResponse | null>(null);
   
   // Computed
@@ -73,8 +73,8 @@ export class ManagementBillsComponent implements OnInit {
 
   private initForm() {
     this.billForm = this.fb.group({
-      customerName: ['', [Validators.required, Validators.minLength(2)]],
-      tickets: ['', Validators.required], // Will be comma separated string in form, array in payload
+      customerName: [''],
+      tickets: [''], 
       foods: [''],
       promotionCode: ['']
     });
@@ -153,7 +153,7 @@ export class ManagementBillsComponent implements OnInit {
   
   openAddModal() {
     this.isEditMode.set(false);
-    this.backendErrorMsg.set(null);
+    this.fieldErrors.set({});
     this.holdInfo.set(null);
     this.billForm.reset();
     this.showFormModal.set(true);
@@ -164,7 +164,7 @@ export class ManagementBillsComponent implements OnInit {
     if (!detail) return;
     
     this.isEditMode.set(true);
-    this.backendErrorMsg.set(null);
+    this.fieldErrors.set({});
     this.holdInfo.set(null);
     
     this.billForm.patchValue({
@@ -182,11 +182,6 @@ export class ManagementBillsComponent implements OnInit {
   }
 
   submitForm() {
-    if (this.billForm.invalid) {
-      this.billForm.markAllAsTouched();
-      return;
-    }
-
     const val = this.billForm.value;
     const payload = {
       customerName: val.customerName,
@@ -202,15 +197,28 @@ export class ManagementBillsComponent implements OnInit {
         this.billService.updateBill({ ...payload, tradingCode: code }).subscribe({
           next: () => {
             alert('Cập nhật thành công! (Dữ liệu local chưa được refresh do dùng mock)');
+            this.fieldErrors.set({});
             this.closeFormModal();
           },
-          error: (err) => this.backendErrorMsg.set(err.error?.message || 'Có lỗi xảy ra')
+          error: (err) => {
+            const apiError = err.error;
+            if (apiError && apiError.errors && Array.isArray(apiError.errors)) {
+              const newErrors: Record<string, string> = {};
+              apiError.errors.forEach((e: any) => {
+                if (e.field) newErrors[e.field] = e.message;
+              });
+              this.fieldErrors.set(newErrors);
+            } else {
+              this.fieldErrors.set({ _general: apiError?.message || 'Có lỗi xảy ra' });
+            }
+          }
         });
       }
     } else {
       // API Create
       this.billService.createBill(payload).subscribe({
         next: (res: BillHoldResponse) => {
+          this.fieldErrors.set({});
           this.holdInfo.set(res);
           // Auto add to mock list for UX
           const newBill: BillResponse = {
@@ -227,7 +235,18 @@ export class ManagementBillsComponent implements OnInit {
           alert('Tạo hóa đơn thành công! Mã: ' + res.tradingCode);
           this.closeFormModal();
         },
-        error: (err) => this.backendErrorMsg.set(err.error?.message || 'Có lỗi xảy ra')
+        error: (err) => {
+          const apiError = err.error;
+          if (apiError && apiError.errors && Array.isArray(apiError.errors)) {
+            const newErrors: Record<string, string> = {};
+            apiError.errors.forEach((e: any) => {
+              if (e.field) newErrors[e.field] = e.message;
+            });
+            this.fieldErrors.set(newErrors);
+          } else {
+            this.fieldErrors.set({ _general: apiError?.message || 'Có lỗi xảy ra' });
+          }
+        }
       });
     }
   }

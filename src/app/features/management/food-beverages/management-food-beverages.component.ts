@@ -34,6 +34,7 @@ export class ManagementFoodBeveragesComponent implements OnInit {
   selectedFile: File | null = null;
   imagePreview: string | null = null;
   foodToDelete = signal<FoodDTO | null>(null);
+  fieldErrors = signal<Record<string, string>>({});
 
   filteredFoods = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
@@ -47,9 +48,9 @@ export class ManagementFoodBeveragesComponent implements OnInit {
   constructor() {
     this.foodForm = this.fb.group({
       id: [null],
-      nameOfFood: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
-      price: [null, [Validators.required, Validators.min(1000)]],
-      description: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(50)]],
+      nameOfFood: [''],
+      price: [null],
+      description: [''],
       image: [null]
     });
   }
@@ -84,6 +85,7 @@ export class ManagementFoodBeveragesComponent implements OnInit {
     this.foodForm.reset();
     this.selectedFile = null;
     this.imagePreview = null;
+    this.fieldErrors.set({});
     this.showFormModal.set(true);
   }
 
@@ -97,42 +99,45 @@ export class ManagementFoodBeveragesComponent implements OnInit {
     });
     this.selectedFile = null;
     this.imagePreview = this.resolveImageUrl(food.image);
+    this.fieldErrors.set({});
     this.showFormModal.set(true);
   }
 
   submitForm() {
-    if (this.foodForm.invalid || (!this.isEditMode() && !this.selectedFile)) {
-      this.foodForm.markAllAsTouched();
-      return;
-    }
-
     const formData = new FormData();
     const rawValue = this.foodForm.getRawValue();
     
     formData.append('nameOfFood', rawValue.nameOfFood);
-    formData.append('price', rawValue.price.toString());
-    formData.append('description', rawValue.description);
+    formData.append('price', (rawValue.price || 0).toString());
+    formData.append('description', rawValue.description || '');
     
     if (this.selectedFile) {
       formData.append('image', this.selectedFile);
     }
     
-    if (this.isEditMode()) {
-      formData.append('id', rawValue.id.toString());
-      this.foodService.updateFood(formData).subscribe({
-        next: () => {
-          this.showFormModal.set(false);
-          this.loadFoods();
+    const obs = this.isEditMode() 
+      ? this.foodService.updateFood(formData) 
+      : this.foodService.saveFood(formData);
+
+    obs.subscribe({
+      next: () => {
+        this.showFormModal.set(false);
+        this.fieldErrors.set({});
+        this.loadFoods();
+      },
+      error: (err) => {
+        const apiError = err.error;
+        if (apiError && apiError.errors && Array.isArray(apiError.errors)) {
+          const newErrors: Record<string, string> = {};
+          apiError.errors.forEach((e: any) => {
+            if (e.field) newErrors[e.field] = e.message;
+          });
+          this.fieldErrors.set(newErrors);
+        } else {
+          this.fieldErrors.set({ _general: apiError?.message || 'Có lỗi xảy ra' });
         }
-      });
-    } else {
-      this.foodService.saveFood(formData).subscribe({
-        next: () => {
-          this.showFormModal.set(false);
-          this.loadFoods();
-        }
-      });
-    }
+      }
+    });
   }
 
   openDeleteModal(food: FoodDTO) {

@@ -5,6 +5,7 @@ import { LanguageService } from '../../../core/services/language.service';
 import { SeatResponse, SeatService } from '../../../core/services/seat.service';
 import { CinemaService } from '../../../core/services/cinema.service';
 import { RoomService } from '../../../core/services/room.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-management-seats',
@@ -20,6 +21,7 @@ export class ManagementSeatsComponent implements OnInit {
   protected readonly cinemaService = inject(CinemaService);
   protected readonly roomService = inject(RoomService);
   protected readonly platformId = inject(PLATFORM_ID);
+  protected readonly route = inject(ActivatedRoute);
   protected readonly t = this.language.t.bind(this.language);
 
   // Filter State
@@ -91,6 +93,18 @@ export class ManagementSeatsComponent implements OnInit {
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       this.loadAddresses();
+
+      // Handle query params for pre-filling filters
+      this.route.queryParams.subscribe(params => {
+        const address = params['address'];
+        const cinema = params['cinema'];
+        const room = params['room'];
+
+        if (address) {
+          this.selectedAddress.set(address);
+          this.loadCinemas(address, cinema, room);
+        }
+      });
     }
   }
 
@@ -115,9 +129,21 @@ export class ManagementSeatsComponent implements OnInit {
     }
   }
 
-  loadCinemas(address: string) {
+  loadCinemas(address: string, targetCinema?: string, targetRoom?: string) {
     this.cinemaService.getCinemasByAddress(address).subscribe(cinemas => {
       this.cinemas.set(cinemas);
+      
+      if (targetCinema) {
+        // Use a more flexible match (case-insensitive and trimmed)
+        const matchedCinema = cinemas.find(c => 
+          c.trim().toLowerCase() === targetCinema.trim().toLowerCase()
+        );
+        
+        if (matchedCinema) {
+          this.selectedCinema.set(matchedCinema);
+          this.loadRooms(matchedCinema, targetRoom);
+        }
+      }
     });
   }
 
@@ -132,11 +158,19 @@ export class ManagementSeatsComponent implements OnInit {
     }
   }
 
-  loadRooms(cinema: string) {
+  loadRooms(cinema: string, targetRoomCode?: string) {
     this.roomService.getRoomsByCinema(cinema).subscribe(rooms => {
       this.rooms.set(rooms);
       if (rooms && rooms.length > 0) {
-        this.onRoomChange(rooms[0]);
+        // If a target room is provided, select it (case-insensitive); otherwise select the first one
+        let toSelect = rooms[0];
+        if (targetRoomCode) {
+          const matchedRoom = rooms.find(r => 
+            r.trim().toLowerCase() === targetRoomCode.trim().toLowerCase()
+          );
+          if (matchedRoom) toSelect = matchedRoom;
+        }
+        this.onRoomChange(toSelect);
       }
     });
   }
@@ -152,7 +186,10 @@ export class ManagementSeatsComponent implements OnInit {
   }
 
   loadSeats(roomCode: string) {
-    this.seatService.getSeatsByRoom(roomCode).subscribe(seats => {
+    const cinemaName = this.selectedCinema();
+    if (!cinemaName) return;
+
+    this.seatService.getSeatsByRoom(roomCode, cinemaName).subscribe(seats => {
       this.roomSeats.set(seats);
       this.currentPage.set(1);
     });
@@ -228,7 +265,7 @@ export class ManagementSeatsComponent implements OnInit {
 
   openGenerateModal() {
     this.generateData.set({
-      roomName: this.selectedRoomCode(),
+      roomName: this.selectedCinema(),
       roomCode: this.selectedRoomCode()
     });
     this.showGenerateModal.set(true);

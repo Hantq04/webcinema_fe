@@ -56,7 +56,7 @@ export class ManagementSchedulesComponent implements OnInit {
   isEditMode = signal(false);
   deleteScheduleCode = signal<string>('');
   deleteMovieId = signal<number>(0);
-  backendErrorMsg = signal<string | null>(null);
+  fieldErrors = signal<Record<string, string>>({});
 
   // Dropdown UI state
   isFilterAddressOpen = signal(false);
@@ -69,12 +69,12 @@ export class ManagementSchedulesComponent implements OnInit {
   constructor() {
     this.scheduleForm = this.fb.group({
       code: [{ value: '', disabled: true }],
-      movieName: ['', Validators.required],
-      address: [''], // Used for selecting cinema
-      cinemaName: [''], // Selected cinema, used to fetch rooms
-      roomName: ['', Validators.required], // Actually we just need roomName and roomCode
-      roomCode: ['', Validators.required],
-      startAt: ['', Validators.required]
+      movieName: [''],
+      address: [''], 
+      cinemaName: [''], 
+      roomName: [''], 
+      roomCode: [''],
+      startAt: ['']
     });
 
     // Subscribe to form changes for dropdown cascade
@@ -248,7 +248,7 @@ export class ManagementSchedulesComponent implements OnInit {
   openAddModal() {
     this.isEditMode.set(false);
     this.scheduleForm.reset();
-    this.backendErrorMsg.set(null);
+    this.fieldErrors.set({});
 
     this.scheduleForm.get('movieName')?.enable();
     this.scheduleForm.get('roomName')?.enable();
@@ -263,7 +263,7 @@ export class ManagementSchedulesComponent implements OnInit {
     if (!detail) return;
 
     this.isEditMode.set(true);
-    this.backendErrorMsg.set(null);
+    this.fieldErrors.set({});
 
     // Format date for input[type="datetime-local"]
     let formattedDate = detail.startAt;
@@ -290,11 +290,6 @@ export class ManagementSchedulesComponent implements OnInit {
   }
 
   submitForm() {
-    if (this.scheduleForm.invalid) {
-      this.scheduleForm.markAllAsTouched();
-      return;
-    }
-
     const rawValue = this.scheduleForm.getRawValue();
 
     // Format date: YYYY-MM-DDTHH:mm -> YYYY-MM-DD HH:mm:ss
@@ -326,10 +321,19 @@ export class ManagementSchedulesComponent implements OnInit {
       next: () => {
         this.closeFormModal();
         this.loadSchedules();
+        this.fieldErrors.set({});
       },
       error: (err) => {
-        const msg = err.error?.message || err.message || 'Lỗi hệ thống';
-        this.backendErrorMsg.set(msg);
+        const apiError = err.error;
+        if (apiError && apiError.errors && Array.isArray(apiError.errors)) {
+          const newErrors: Record<string, string> = {};
+          apiError.errors.forEach((e: any) => {
+            if (e.field) newErrors[e.field] = e.message;
+          });
+          this.fieldErrors.set(newErrors);
+        } else {
+          this.fieldErrors.set({ _general: apiError?.message || 'Có lỗi xảy ra' });
+        }
       }
     });
   }

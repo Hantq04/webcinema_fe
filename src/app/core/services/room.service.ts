@@ -11,13 +11,13 @@ export interface RoomDTO {
   type: string;
   description?: string;
   status?: string;
+  isActive?: boolean;
   lastUpdated?: string;
 }
 
 export interface RoomPayload {
   code?: string;
   name: string;
-  cinemaName: string;
   capacity: number;
   type: string;
   description?: string;
@@ -48,20 +48,16 @@ export class RoomService {
     );
   }
 
-  // Temporary mock for UI building until backend returns RoomDTO[]
+  getRoomsByCinemaDetail(cinemaName: string): Observable<RoomDTO[]> {
+    return this.http.get<any>(this.apiService.apiUrl(`/api/v1/room/get-by-cinema-detail?cinemaName=${cinemaName}`)).pipe(
+      map(response => response.data || []),
+      catchError(() => of([]))
+    );
+  }
+
+  // Temporary mock for UI building until backend provides RoomDTO[]
   mockGetRoomsByCinema(cinemaName: string): Observable<RoomDTO[]> {
-    if (!cinemaName) return of([]);
-    const mocks: RoomDTO[] = [
-      { code: 'R1', name: 'Phòng 1', cinemaName: 'CineGo Hoàn Kiếm', capacity: 150, type: 'STANDARD', status: 'Active', description: 'Phòng 2D tiêu chuẩn', lastUpdated: '2026-05-01' },
-      { code: 'R2', name: 'Phòng 2 VIP', cinemaName: 'CineGo Hoàn Kiếm', capacity: 80, type: 'VIP', status: 'Active', description: 'Phòng VIP ghế da', lastUpdated: '2026-05-02' },
-      { code: 'IMAX1', name: 'IMAX Laser', cinemaName: 'CineGo Cầu Giấy', capacity: 350, type: 'IMAX', status: 'Active', description: 'Phòng chiếu IMAX lớn nhất', lastUpdated: '2026-04-20' },
-      { code: 'R3', name: 'Phòng 3', cinemaName: 'CineGo Cầu Giấy', capacity: 120, type: 'STANDARD', status: 'Maintenance', description: 'Đang bảo trì màn chiếu', lastUpdated: '2026-05-02' }
-    ];
-    const filtered = mocks.filter(m => m.cinemaName.includes(cinemaName) || cinemaName.includes(m.cinemaName));
-    return of(filtered.length > 0 ? filtered : [
-      { code: 'A1', name: 'Phòng chiếu 1', cinemaName: cinemaName, capacity: 100, type: 'STANDARD', status: 'Active' },
-      { code: 'A2', name: 'Phòng chiếu 2', cinemaName: cinemaName, capacity: 120, type: 'STANDARD', status: 'Active' }
-    ]);
+    return this.getRoomsByCinemaDetail(cinemaName);
   }
 
   saveRoom(payload: RoomPayload): Observable<any> {

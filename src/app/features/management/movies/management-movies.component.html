@@ -341,6 +341,9 @@
 
       <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50 dark:bg-slate-900/50">
         <form [formGroup]="movieForm" class="space-y-6">
+          <div *ngIf="fieldErrors()['_general']" class="p-3 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 rounded-xl text-xs text-red-600 dark:text-red-400">
+            {{ fieldErrors()['_general'] }}
+          </div>
 
           <div *ngIf="isEditMode()"
             class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
@@ -363,9 +366,8 @@
                     t('management.movieName') }} <span class="text-rose-500">*</span></label>
                   <input type="text" formControlName="name"
                     class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
-                    [class.border-red-500]="movieForm.get('name')?.invalid && movieForm.get('name')?.touched">
-                  <p *ngIf="movieForm.get('name')?.invalid && movieForm.get('name')?.touched"
-                    class="text-xs text-red-500 mt-1">Yêu cầu từ 3-50 ký tự.</p>
+                    [class.border-red-500]="(movieForm.get('name')?.invalid && movieForm.get('name')?.touched) || fieldErrors()['name']">
+                  <p *ngIf="fieldErrors()['name']" class="text-xs text-red-500 mt-1">{{ fieldErrors()['name'] }}</p>
                 </div>
 
                 <div class="sm:col-span-2">
@@ -373,9 +375,8 @@
                     t('management.movieNameEn') }} <span class="text-rose-500">*</span></label>
                   <input type="text" formControlName="nameEn"
                     class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
-                    [class.border-red-500]="movieForm.get('nameEn')?.invalid && movieForm.get('nameEn')?.touched">
-                  <p *ngIf="movieForm.get('nameEn')?.invalid && movieForm.get('nameEn')?.touched"
-                    class="text-xs text-red-500 mt-1">Yêu cầu từ 3-50 ký tự.</p>
+                    [class.border-red-500]="(movieForm.get('nameEn')?.invalid && movieForm.get('nameEn')?.touched) || fieldErrors()['nameEn']">
+                  <p *ngIf="fieldErrors()['nameEn']" class="text-xs text-red-500 mt-1">{{ fieldErrors()['nameEn'] }}</p>
                 </div>
 
                 <div>
@@ -384,7 +385,8 @@
                   </label>
                   <input type="number" formControlName="movieDuration"
                     class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow text-sm"
-                    [class.border-red-500]="movieForm.get('movieDuration')?.invalid && movieForm.get('movieDuration')?.touched">
+                    [class.border-red-500]="(movieForm.get('movieDuration')?.invalid && movieForm.get('movieDuration')?.touched) || fieldErrors()['movieDuration']">
+                  <p *ngIf="fieldErrors()['movieDuration']" class="text-xs text-red-500 mt-1">{{ fieldErrors()['movieDuration'] }}</p>
                 </div>
                 
                 <div class="hidden sm:block"></div> <!-- Spacer -->
@@ -395,7 +397,8 @@
                   </label>
                   <input type="date" formControlName="premiereDate"
                     class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow text-sm"
-                    [class.border-red-500]="movieForm.get('premiereDate')?.invalid && movieForm.get('premiereDate')?.touched">
+                    [class.border-red-500]="(movieForm.get('premiereDate')?.invalid && movieForm.get('premiereDate')?.touched) || fieldErrors()['premiereDate']">
+                  <p *ngIf="fieldErrors()['premiereDate']" class="text-xs text-red-500 mt-1">{{ fieldErrors()['premiereDate'] }}</p>
                 </div>
 
                 <div>
@@ -404,7 +407,8 @@
                   </label>
                   <input type="date" formControlName="endDate"
                     class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow text-sm"
-                    [class.border-red-500]="movieForm.get('endDate')?.invalid && movieForm.get('endDate')?.touched">
+                    [class.border-red-500]="(movieForm.get('endDate')?.invalid && movieForm.get('endDate')?.touched) || fieldErrors()['endDate']">
+                  <p *ngIf="fieldErrors()['endDate']" class="text-xs text-red-500 mt-1">{{ fieldErrors()['endDate'] }}</p>
                 </div>
               </div>
             </div>
@@ -420,7 +424,8 @@
                   t('management.director') }} <span class="text-rose-500">*</span></label>
                 <input type="text" formControlName="director"
                   class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
-                  [class.border-red-500]="movieForm.get('director')?.invalid && movieForm.get('director')?.touched">
+                  [class.border-red-500]="(movieForm.get('director')?.invalid && movieForm.get('director')?.touched) || fieldErrors()['director']">
+                <p *ngIf="fieldErrors()['director']" class="text-xs text-red-500 mt-1">{{ fieldErrors()['director'] }}</p>
               </div>
 
               <div>
@@ -428,7 +433,8 @@
                   t('management.actor') }} <span class="text-rose-500">*</span></label>
                 <input type="text" formControlName="actor"
                   class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
-                  [class.border-red-500]="movieForm.get('actor')?.invalid && movieForm.get('actor')?.touched">
+                  [class.border-red-500]="(movieForm.get('actor')?.invalid && movieForm.get('actor')?.touched) || fieldErrors()['actor']">
+                <p *ngIf="fieldErrors()['actor']" class="text-xs text-red-500 mt-1">{{ fieldErrors()['actor'] }}</p>
               </div>
 
               <div class="grid grid-cols-2 gap-4">
@@ -437,14 +443,16 @@
                     t('management.language') }} <span class="text-rose-500">*</span></label>
                   <input type="text" formControlName="language" placeholder="Tiếng Việt"
                     class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
-                    [class.border-red-500]="movieForm.get('language')?.invalid && movieForm.get('language')?.touched">
+                    [class.border-red-500]="(movieForm.get('language')?.invalid && movieForm.get('language')?.touched) || fieldErrors()['language']">
+                  <p *ngIf="fieldErrors()['language']" class="text-xs text-red-500 mt-1">{{ fieldErrors()['language'] }}</p>
                 </div>
                 <div>
                   <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{
                     t('management.subtitle') }} <span class="text-rose-500">*</span></label>
                   <input type="text" formControlName="subtitle" placeholder="Phụ đề tiếng Anh"
                     class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
-                    [class.border-red-500]="movieForm.get('subtitle')?.invalid && movieForm.get('subtitle')?.touched">
+                    [class.border-red-500]="(movieForm.get('subtitle')?.invalid && movieForm.get('subtitle')?.touched) || fieldErrors()['subtitle']">
+                  <p *ngIf="fieldErrors()['subtitle']" class="text-xs text-red-500 mt-1">{{ fieldErrors()['subtitle'] }}</p>
                 </div>
               </div>
             </div>
@@ -464,7 +472,7 @@
                   <div class="relative w-full">
                     <div class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 text-sm flex justify-between items-center cursor-pointer hover:border-rose-300 transition-all"
                       [class.ring-2]="isRateDropdownOpen()" [class.ring-rose-500]="isRateDropdownOpen()"
-                      [class.border-rose-500]="isRateDropdownOpen() || (movieForm.get('rate')?.invalid && movieForm.get('rate')?.touched)"
+                      [class.border-rose-500]="isRateDropdownOpen() || (movieForm.get('rate')?.invalid && movieForm.get('rate')?.touched) || fieldErrors()['rate']"
                       (click)="isRateDropdownOpen.set(!isRateDropdownOpen())">
                       <span class="truncate" [class.text-slate-400]="!movieForm.get('rate')?.value">
                         <span *ngIf="movieForm.get('rate')?.value" class="rate-badge" [ngClass]="getRateClass({rate: movieForm.get('rate')?.value})">
@@ -485,6 +493,7 @@
                     </div>
                     <div *ngIf="isRateDropdownOpen()" class="fixed inset-0 z-40" (click)="isRateDropdownOpen.set(false)"></div>
                   </div>
+                  <p *ngIf="fieldErrors()['rate']" class="text-xs text-red-500 mt-1">{{ fieldErrors()['rate'] }}</p>
                 </div>
                 <div>
                   <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{
@@ -492,7 +501,7 @@
                   <div class="relative w-full">
                     <div class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 text-sm flex justify-between items-center cursor-pointer hover:border-rose-300 transition-all"
                       [class.ring-2]="isBannerDropdownOpen()" [class.ring-rose-500]="isBannerDropdownOpen()"
-                      [class.border-rose-500]="isBannerDropdownOpen() || (movieForm.get('bannerId')?.invalid && movieForm.get('bannerId')?.touched)"
+                      [class.border-rose-500]="isBannerDropdownOpen() || (movieForm.get('bannerId')?.invalid && movieForm.get('bannerId')?.touched) || fieldErrors()['bannerId']"
                       (click)="isBannerDropdownOpen.set(!isBannerDropdownOpen())">
                       <span class="truncate" [class.text-slate-400]="!movieForm.get('bannerId')?.value">
                         {{ getBannerTitle(movieForm.get('bannerId')?.value) || 'Chọn banner' }}
@@ -509,6 +518,7 @@
                     </div>
                     <div *ngIf="isBannerDropdownOpen()" class="fixed inset-0 z-40" (click)="isBannerDropdownOpen.set(false)"></div>
                   </div>
+                  <p *ngIf="fieldErrors()['bannerId']" class="text-xs text-red-500 mt-1">{{ fieldErrors()['bannerId'] }}</p>
                 </div>
               </div>
 
@@ -523,8 +533,7 @@
                     {{ isEn() ? type.movieTypeNameEn : type.movieTypeNameVi }}
                   </div>
                 </div>
-                <p *ngIf="movieForm.get('movieTypeIds')?.invalid && movieForm.get('movieTypeIds')?.touched"
-                  class="text-xs text-red-500 mt-2">Vui lòng chọn ít nhất 1 thể loại.</p>
+                <p *ngIf="fieldErrors()['movieTypeIds']" class="text-xs text-red-500 mt-2">{{ fieldErrors()['movieTypeIds'] }}</p>
               </div>
 
               <div>
@@ -532,26 +541,24 @@
                   t('management.trailer') }} <span class="text-rose-500">*</span></label>
                 <input type="text" formControlName="trailer" placeholder="https://youtube.com/..."
                   class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
-                  [class.border-red-500]="movieForm.get('trailer')?.invalid && movieForm.get('trailer')?.touched">
-                <p *ngIf="movieForm.get('trailer')?.invalid && movieForm.get('trailer')?.touched"
-                  class="text-xs text-red-500 mt-1">Phải là URL hợp lệ.</p>
+                  [class.border-red-500]="(movieForm.get('trailer')?.invalid && movieForm.get('trailer')?.touched) || fieldErrors()['trailer']">
+                <p *ngIf="fieldErrors()['trailer']" class="text-xs text-red-500 mt-1">{{ fieldErrors()['trailer'] }}</p>
+              </div>
               </div>
             </div>
 
-            <div
-              class="space-y-4 bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
-              <h3
-                class="font-bold text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-700 pb-2">
-                Nội dung</h3>
+            <div class="space-y-4 bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+              <h3 class="font-bold text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-700 pb-2">
+                Nội dung
+              </h3>
 
               <div>
                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{
                   t('management.movieDescription') }} <span class="text-rose-500">*</span></label>
                 <textarea formControlName="description" rows="6"
                   class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow resize-none"
-                  [class.border-red-500]="movieForm.get('description')?.invalid && movieForm.get('description')?.touched"></textarea>
-                <p *ngIf="movieForm.get('description')?.invalid && movieForm.get('description')?.touched"
-                  class="text-xs text-red-500 mt-1">Yêu cầu từ 6-5000 ký tự.</p>
+                  [class.border-red-500]="(movieForm.get('description')?.invalid && movieForm.get('description')?.touched) || fieldErrors()['description']"></textarea>
+                <p *ngIf="fieldErrors()['description']" class="text-xs text-red-500 mt-1">{{ fieldErrors()['description'] }}</p>
               </div>
 
               <div>
@@ -559,9 +566,9 @@
                   t('management.movieDescriptionEn') }} <span class="text-rose-500">*</span></label>
                 <textarea formControlName="descriptionEn" rows="6"
                   class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow resize-none"
-                  [class.border-red-500]="movieForm.get('descriptionEn')?.invalid && movieForm.get('descriptionEn')?.touched"></textarea>
+                  [class.border-red-500]="(movieForm.get('descriptionEn')?.invalid && movieForm.get('descriptionEn')?.touched) || fieldErrors()['descriptionEn']"></textarea>
+                <p *ngIf="fieldErrors()['descriptionEn']" class="text-xs text-red-500 mt-1">{{ fieldErrors()['descriptionEn'] }}</p>
               </div>
-            </div>
           </div>
         </form>
       </div>

@@ -53,6 +53,7 @@ export class ManagementMoviesComponent implements OnInit {
   movieForm: FormGroup;
   isEditMode = signal(false);
   deleteMovieName = signal<string>('');
+  fieldErrors = signal<Record<string, string>>({});
 
   isRateDropdownOpen = signal(false);
   isBannerDropdownOpen = signal(false);
@@ -63,21 +64,21 @@ export class ManagementMoviesComponent implements OnInit {
 
     this.movieForm = this.fb.group({
       code: [{ value: '', disabled: true }],
-      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
-      nameEn: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
-      director: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
-      actor: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
-      description: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(5000)]],
-      descriptionEn: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(5000)]],
-      language: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
-      subtitle: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
-      trailer: ['', [Validators.required, Validators.pattern(urlRegex)]],
-      movieDuration: ['', [Validators.required, Validators.min(1)]],
-      premiereDate: ['', Validators.required],
-      endDate: ['', Validators.required],
-      bannerId: ['', Validators.required],
-      rate: ['', Validators.required],
-      movieTypeIds: [[], [Validators.required, Validators.minLength(1)]]
+      name: [''],
+      nameEn: [''],
+      director: [''],
+      actor: [''],
+      description: [''],
+      descriptionEn: [''],
+      language: [''],
+      subtitle: [''],
+      trailer: [''],
+      movieDuration: [''],
+      premiereDate: [''],
+      endDate: [''],
+      bannerId: [''],
+      rate: [''],
+      movieTypeIds: [[]]
     });
   }
 
@@ -254,10 +255,11 @@ export class ManagementMoviesComponent implements OnInit {
       movieTypeIds: []
     });
 
-    // Make premiereDate required for create
-    this.movieForm.get('premiereDate')?.setValidators([Validators.required]);
+    // No validators needed, backend-driven
+    this.movieForm.get('premiereDate')?.clearValidators();
     this.movieForm.get('premiereDate')?.updateValueAndValidity();
 
+    this.fieldErrors.set({});
     this.showFormModal.set(true);
   }
 
@@ -267,8 +269,8 @@ export class ManagementMoviesComponent implements OnInit {
 
     this.isEditMode.set(true);
     
-    // For edit, premiereDate might be read-only or optional depending on logic, keeping it required for now
-    this.movieForm.get('premiereDate')?.setValidators([Validators.required]);
+    // No validators needed, backend-driven
+    this.movieForm.get('premiereDate')?.clearValidators();
     this.movieForm.get('premiereDate')?.updateValueAndValidity();
 
     // Format date for input[type="date"] if needed. Assuming yyyy-MM-dd HH:mm:ss or yyyy-MM-dd'T'HH:mm:ss
@@ -312,15 +314,11 @@ export class ManagementMoviesComponent implements OnInit {
       movieTypeIds: mappedTypeIds
     });
 
+    this.fieldErrors.set({});
     this.showFormModal.set(true);
   }
 
   submitForm() {
-    if (this.movieForm.invalid) {
-      this.movieForm.markAllAsTouched();
-      return;
-    }
-
     const payload = this.movieForm.getRawValue();
     
     // Format payload if needed (e.g. date conversion)
@@ -338,14 +336,23 @@ export class ManagementMoviesComponent implements OnInit {
     obs$.subscribe({
       next: () => {
         this.showFormModal.set(false);
+        this.fieldErrors.set({});
         this.loadMovies(); // Refresh list
         if (this.isEditMode() && this.selectedMovieCode()) {
           this.loadMovieDetail(this.selectedMovieCode()!); // Refresh detail
         }
       },
       error: (err) => {
-        console.error('Save failed', err);
-        // Handle error (show toast)
+        const apiError = err.error;
+        if (apiError && apiError.errors && Array.isArray(apiError.errors)) {
+          const newErrors: Record<string, string> = {};
+          apiError.errors.forEach((e: any) => {
+            if (e.field) newErrors[e.field] = e.message;
+          });
+          this.fieldErrors.set(newErrors);
+        } else {
+          this.fieldErrors.set({ _general: apiError?.message || 'Có lỗi xảy ra' });
+        }
       }
     });
   }

@@ -49,6 +49,8 @@ export class ManagementCinemasComponent implements OnInit {
   isEditRoomMode = signal(false);
   deleteCinemaCode = signal<string>('');
   deleteRoomCode = signal<string>('');
+  cinemaFieldErrors = signal<Record<string, string>>({});
+  roomFieldErrors = signal<Record<string, string>>({});
 
   constructor() {
     this.cinemaForm = this.fb.group({
@@ -59,12 +61,12 @@ export class ManagementCinemasComponent implements OnInit {
     });
 
     this.roomForm = this.fb.group({
-      code: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(5)]],
-      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
+      code: ['', [Validators.required]],
+      name: [''],
       cinemaName: [{ value: '', disabled: true }],
-      capacity: [100, [Validators.required, Validators.min(50), Validators.max(400)]],
+      capacity: [100, [Validators.required]],
       type: ['STANDARD', Validators.required],
-      description: ['', [Validators.minLength(6), Validators.maxLength(50)]]
+      description: ['']
     });
   }
 
@@ -96,13 +98,24 @@ export class ManagementCinemasComponent implements OnInit {
   // --- Cinemas ---
   loadCinemas(address: string) {
     this.isLoadingCinemas.set(true);
-    // Use mock method until backend provides CinemaDTO[]
-    this.cinemaService.mockGetCinemas(address).subscribe({
+    this.cinemaService.getAllCinemas().subscribe({
       next: (data) => {
-        this.cinemas.set(data);
+        // Filter by address if selected
+        const filtered = address ? data.filter(c => c.address.includes(address)) : data;
+        this.cinemas.set(filtered);
         this.isLoadingCinemas.set(false);
-        if (data.length > 0 && !this.selectedCinema()) {
-          this.selectCinema(data[0]);
+        
+        // Fetch room counts for each cinema to display in the list
+        filtered.forEach(cinema => {
+          this.roomService.getRoomsByCinemaDetail(cinema.nameOfCinema).subscribe(rooms => {
+            this.cinemas.update(current => 
+              current.map(c => c.code === cinema.code ? { ...c, totalRooms: rooms.length } : c)
+            );
+          });
+        });
+
+        if (filtered.length > 0 && !this.selectedCinema()) {
+          this.selectCinema(filtered[0]);
         }
       },
       error: () => this.isLoadingCinemas.set(false)
@@ -127,8 +140,7 @@ export class ManagementCinemasComponent implements OnInit {
   // --- Rooms ---
   loadRooms(cinemaName: string) {
     this.isLoadingRooms.set(true);
-    // Use mock method until backend provides RoomDTO[]
-    this.roomService.mockGetRoomsByCinema(cinemaName).subscribe({
+    this.roomService.getRoomsByCinemaDetail(cinemaName).subscribe({
       next: (data) => {
         this.rooms.set(data);
         this.isLoadingRooms.set(false);
@@ -153,6 +165,7 @@ export class ManagementCinemasComponent implements OnInit {
     if (this.selectedAddress()) {
       this.cinemaForm.patchValue({ address: this.selectedAddress() });
     }
+    this.cinemaFieldErrors.set({});
     this.showCinemaModal.set(true);
   }
 
@@ -164,24 +177,35 @@ export class ManagementCinemasComponent implements OnInit {
       address: cinema.address,
       description: cinema.description
     });
+    this.cinemaFieldErrors.set({});
     this.showCinemaModal.set(true);
   }
 
   submitCinema() {
-    if (this.cinemaForm.invalid) {
-      this.cinemaForm.markAllAsTouched();
-      return;
-    }
-    
     const payload = this.cinemaForm.getRawValue(); // gets disabled fields too
     const obs$ = this.isEditCinemaMode() 
       ? this.cinemaService.updateCinema(payload)
       : this.cinemaService.saveCinema(payload);
 
-    obs$.subscribe(() => {
-      this.showCinemaModal.set(false);
-      this.loadCinemas(this.selectedAddress());
-      this.loadAddresses(); // Refresh addresses in case a new one was added
+    obs$.subscribe({
+      next: () => {
+        this.showCinemaModal.set(false);
+        this.cinemaFieldErrors.set({});
+        this.loadCinemas(this.selectedAddress());
+        this.loadAddresses(); // Refresh addresses in case a new one was added
+      },
+      error: (err) => {
+        const apiError = err.error;
+        if (apiError && apiError.errors && Array.isArray(apiError.errors)) {
+          const newErrors: Record<string, string> = {};
+          apiError.errors.forEach((e: any) => {
+            if (e.field) newErrors[e.field] = e.message;
+          });
+          this.cinemaFieldErrors.set(newErrors);
+        } else {
+          this.cinemaFieldErrors.set({ _general: apiError?.message || 'Có lỗi xảy ra' });
+        }
+      }
     });
   }
 
@@ -212,6 +236,7 @@ export class ManagementCinemasComponent implements OnInit {
       type: 'STANDARD'
     });
     this.roomForm.get('code')?.enable();
+    this.roomFieldErrors.set({});
     this.showRoomModal.set(true);
   }
 
@@ -226,24 +251,43 @@ export class ManagementCinemasComponent implements OnInit {
       description: room.description
     });
     this.roomForm.get('code')?.disable(); // Code shouldn't be edited
+    this.roomFieldErrors.set({});
     this.showRoomModal.set(true);
   }
 
   submitRoom() {
-    if (this.roomForm.invalid) {
-      this.roomForm.markAllAsTouched();
-      return;
-    }
-
-    const payload = this.roomForm.getRawValue();
+    const raw = this.roomForm.getRawValue();
+    const payload = {
+      code: raw.code,
+      name: raw.cinemaName,
+      capacity: raw.capacity,
+      type: raw.type,
+      description: raw.description
+    };
     const obs$ = this.isEditRoomMode()
       ? this.roomService.updateRoom(payload)
       : this.roomService.saveRoom(payload);
 
-    obs$.subscribe(() => {
-      this.showRoomModal.set(false);
-      if (this.selectedCinema()) {
-        this.loadRooms(this.selectedCinema()!.nameOfCinema);
+    obs$.subscribe({
+      next: () => {
+        this.showRoomModal.set(false);
+        this.roomFieldErrors.set({});
+        if (this.selectedCinema()) {
+          this.loadRooms(this.selectedCinema()!.nameOfCinema);
+        }
+      },
+      error: (err) => {
+        const apiError = err.error;
+        if (apiError && apiError.errors && Array.isArray(apiError.errors)) {
+          const newErrors: Record<string, string> = {};
+          apiError.errors.forEach((e: any) => {
+            if (e.field) newErrors[e.field] = e.message;
+          });
+          this.roomFieldErrors.set(newErrors);
+        } else {
+          // Fallback if no field errors
+          this.roomFieldErrors.set({ _general: apiError?.message || 'Có lỗi xảy ra' });
+        }
       }
     });
   }
@@ -263,10 +307,12 @@ export class ManagementCinemasComponent implements OnInit {
   }
 
   // Helpers
-  getBadgeClass(status: string | undefined): string {
-    if (!status) return 'bg-gray-100 text-gray-800';
-    if (status.toUpperCase() === 'ACTIVE') return 'bg-emerald-100 text-emerald-800';
-    if (status.toUpperCase() === 'MAINTENANCE') return 'bg-amber-100 text-amber-800';
+  getBadgeClass(item: any): string {
+    const isActive = item?.isActive;
+    const status = item?.status?.toUpperCase();
+
+    if (isActive === true || status === 'ACTIVE') return 'bg-emerald-100 text-emerald-800';
+    if (isActive === false || status === 'MAINTENANCE') return 'bg-amber-100 text-amber-800';
     return 'bg-gray-100 text-gray-800';
   }
 }

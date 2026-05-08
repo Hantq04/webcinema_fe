@@ -33,6 +33,7 @@ export class ManagementBannerComponent implements OnInit {
   selectedFile: File | null = null;
   imagePreview: string | null = null;
   bannerToDelete = signal<BannerResponse | null>(null);
+  fieldErrors = signal<Record<string, string>>({});
 
   filteredBanners = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
@@ -45,8 +46,8 @@ export class ManagementBannerComponent implements OnInit {
 
   constructor() {
     this.bannerForm = this.fb.group({
-      title: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
-      titleEn: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      title: [''],
+      titleEn: [''],
       image: [null]
     });
   }
@@ -80,26 +81,37 @@ export class ManagementBannerComponent implements OnInit {
     this.bannerForm.reset();
     this.selectedFile = null;
     this.imagePreview = null;
+    this.fieldErrors.set({});
     this.showFormModal.set(true);
   }
 
   submitForm() {
-    if (this.bannerForm.invalid || !this.selectedFile) {
-      this.bannerForm.markAllAsTouched();
-      return;
-    }
-
     const formData = new FormData();
     const rawValue = this.bannerForm.getRawValue();
     
     formData.append('title', rawValue.title);
     formData.append('titleEn', rawValue.titleEn);
-    formData.append('image', this.selectedFile);
+    if (this.selectedFile) {
+      formData.append('image', this.selectedFile);
+    }
     
     this.bannerService.saveBanner(formData).subscribe({
       next: () => {
         this.showFormModal.set(false);
+        this.fieldErrors.set({});
         this.loadBanners();
+      },
+      error: (err) => {
+        const apiError = err.error;
+        if (apiError && apiError.errors && Array.isArray(apiError.errors)) {
+          const newErrors: Record<string, string> = {};
+          apiError.errors.forEach((e: any) => {
+            if (e.field) newErrors[e.field] = e.message;
+          });
+          this.fieldErrors.set(newErrors);
+        } else {
+          this.fieldErrors.set({ _general: apiError?.message || 'Có lỗi xảy ra' });
+        }
       }
     });
   }

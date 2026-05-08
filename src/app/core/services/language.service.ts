@@ -117,7 +117,6 @@ const translations = {
       allCinemasFilter: '-- Tất cả rạp --',
       allRoomsFilter: '-- Tất cả phòng --',
       allStatusFilter: '-- Tất cả trạng thái --',
-      deselectArea: '-- Bỏ chọn khu vực --',
       devMessage: 'Tính năng đang được phát triển',
       forUsers: 'Dành cho người dùng',
       others: 'Khác',
@@ -174,7 +173,7 @@ const translations = {
       noMapDataDesc: 'Vui lòng chọn phòng chiếu hoặc tạo mới ghế cho phòng này.',
       seatModalGenerateTitle: 'Tạo danh sách ghế',
       seatModalGenerateDesc: 'Thao tác này sẽ tự động tạo sơ đồ ghế chuẩn cho phòng chiếu. Những ghế cũ sẽ bị xóa hoặc ghi đè.',
-      seatModalRoomName: 'Tên phòng chiếu',
+      seatModalRoomName: 'Tên rạp chiếu',
       seatModalRoomCode: 'Mã phòng chiếu',
       seatModalEditTitle: 'Cập nhật ghế',
       seatModalEditDesc: 'Sửa thông tin dòng và số của ghế.',
@@ -209,6 +208,8 @@ const translations = {
       searchCinemaOrRoom: 'Tìm kiếm rạp, phòng chiếu...',
       confirmDeleteCinema: 'Bạn có chắc chắn muốn xóa rạp này? Sẽ xóa tất cả phòng và ghế thuộc rạp.',
       confirmDeleteRoom: 'Bạn có chắc chắn muốn xóa phòng này? Các ghế thuộc phòng cũng sẽ bị xóa.',
+      statusActive: 'Đang hoạt động',
+      statusInactive: 'Dừng hoạt động',
       movieManagement: 'Quản lý phim',
       addMovie: 'Thêm phim',
       editMovie: 'Sửa phim',
@@ -234,7 +235,7 @@ const translations = {
       comingSoon: 'Sắp chiếu',
       topSales: 'Top doanh thu',
       confirmDeleteMovie: 'Bạn có chắc chắn muốn xóa phim này? Thao tác này không thể hoàn tác.',
-      
+
       // Invoice Management
       invoiceTitle: 'Quản lý Hóa đơn',
       invoiceList: 'Danh sách hóa đơn',
@@ -263,7 +264,7 @@ const translations = {
       invoiceConfirmCancelDesc: 'Bạn có chắc chắn muốn hủy hóa đơn này? Thao tác này không thể hoàn tác.',
       invoiceConfirmDeleteTitle: 'Xóa hóa đơn?',
       invoiceConfirmDeleteDesc: 'Bạn có chắc chắn muốn xóa hóa đơn này? Thao tác này không thể hoàn tác.',
-      
+
       validation: {
         required: 'Trường này là bắt buộc',
         minLength: 'Cần ít nhất {{min}} ký tự',
@@ -587,7 +588,6 @@ const translations = {
       allCinemasFilter: '-- All Cinemas --',
       allRoomsFilter: '-- All Rooms --',
       allStatusFilter: '-- All Statuses --',
-      deselectArea: '-- Deselect Area --',
       devMessage: 'Feature is under development',
       forUsers: 'For Users',
       others: 'Others',
@@ -644,7 +644,7 @@ const translations = {
       noMapDataDesc: 'Please select a room or generate new seats for this room.',
       seatModalGenerateTitle: 'Generate Seat List',
       seatModalGenerateDesc: 'This will automatically generate a standard seat map. Old seats will be deleted or overwritten.',
-      seatModalRoomName: 'Room Name',
+      seatModalRoomName: 'Cinema Name',
       seatModalRoomCode: 'Room Code',
       seatModalEditTitle: 'Edit Seat',
       seatModalEditDesc: 'Edit the row and number of the seat.',
@@ -679,6 +679,8 @@ const translations = {
       searchCinemaOrRoom: 'Search cinema, room...',
       confirmDeleteCinema: 'Are you sure you want to delete this cinema? All rooms and seats will be deleted.',
       confirmDeleteRoom: 'Are you sure you want to delete this room? All seats will be deleted.',
+      statusActive: 'Active',
+      statusInactive: 'Inactive',
       movieManagement: 'Movie Management',
       addMovie: 'Add Movie',
       editMovie: 'Edit Movie',

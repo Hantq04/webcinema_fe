@@ -99,10 +99,14 @@
       </div>
 
       <form [formGroup]="foodForm" (ngSubmit)="submitForm()" class="p-6 space-y-5">
+        <div *ngIf="fieldErrors()['_general']" class="p-3 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 rounded-xl text-xs text-red-600 dark:text-red-400">
+          {{ fieldErrors()['_general'] }}
+        </div>
         <!-- Image Upload -->
         <div class="space-y-2">
           <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Hình ảnh sản phẩm</label>
           <div class="relative aspect-video rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 overflow-hidden group cursor-pointer hover:border-rose-400 transition-colors bg-slate-50 dark:bg-slate-800"
+               [class.border-rose-500]="fieldErrors()['image']"
                (click)="fileInput.click()">
             <img *ngIf="imagePreview" [src]="imagePreview" class="w-full h-full object-cover">
             <div *ngIf="!imagePreview" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400">
@@ -113,6 +117,7 @@
             </div>
             <input #fileInput type="file" class="hidden" (change)="onFileSelected($event)" accept="image/*">
           </div>
+          <p *ngIf="fieldErrors()['image']" class="text-xs text-rose-500 mt-1">{{ fieldErrors()['image'] }}</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -120,15 +125,17 @@
             <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Tên món ăn</label>
             <input type="text" formControlName="nameOfFood" 
                    class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:ring-2 focus:ring-rose-500 transition-all"
+                   [class.border-rose-500]="(foodForm.get('nameOfFood')?.invalid && foodForm.get('nameOfFood')?.touched) || fieldErrors()['nameOfFood']"
                    placeholder="Nhập tên món...">
-            <p *ngIf="foodForm.get('nameOfFood')?.invalid && foodForm.get('nameOfFood')?.touched" class="text-[10px] text-red-500">Từ 3-20 ký tự</p>
+            <p *ngIf="fieldErrors()['nameOfFood']" class="text-xs text-rose-500 mt-1">{{ fieldErrors()['nameOfFood'] }}</p>
           </div>
           <div class="space-y-1">
             <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Giá (VNĐ)</label>
             <input type="number" formControlName="price" 
                    class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:ring-2 focus:ring-rose-500 transition-all"
+                   [class.border-rose-500]="(foodForm.get('price')?.invalid && foodForm.get('price')?.touched) || fieldErrors()['price']"
                    placeholder="Nhập giá...">
-            <p *ngIf="foodForm.get('price')?.invalid && foodForm.get('price')?.touched" class="text-[10px] text-red-500">Tối thiểu 1,000đ</p>
+            <p *ngIf="fieldErrors()['price']" class="text-xs text-rose-500 mt-1">{{ fieldErrors()['price'] }}</p>
           </div>
         </div>
 
@@ -136,8 +143,9 @@
           <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Mô tả ngắn</label>
           <textarea formControlName="description" rows="3"
                     class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:ring-2 focus:ring-rose-500 transition-all resize-none"
+                    [class.border-rose-500]="(foodForm.get('description')?.invalid && foodForm.get('description')?.touched) || fieldErrors()['description']"
                     placeholder="Mô tả món ăn..."></textarea>
-          <p *ngIf="foodForm.get('description')?.invalid && foodForm.get('description')?.touched" class="text-[10px] text-red-500">Từ 6-50 ký tự</p>
+          <p *ngIf="fieldErrors()['description']" class="text-xs text-rose-500 mt-1">{{ fieldErrors()['description'] }}</p>
         </div>
 
         <div class="pt-4 flex gap-3">

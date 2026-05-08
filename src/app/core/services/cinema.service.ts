@@ -9,6 +9,8 @@ export interface CinemaDTO {
   address: string;
   description?: string;
   status?: string;
+  isActive?: boolean;
+  lastUpdated?: string;
   totalRooms?: number;
 }
 
@@ -40,15 +42,21 @@ export class CinemaService {
     );
   }
 
-  // Temporary mock for UI building until backend returns CinemaDTO[]
+  getAllCinemas(): Observable<CinemaDTO[]> {
+    return this.http.get<any>(this.apiService.apiUrl('/api/v1/cinema/get-all-cinema')).pipe(
+      map(response => response.data || []),
+      catchError(() => of([]))
+    );
+  }
+
+  // Temporary mock for UI building until backend provides CinemaDTO[]
   mockGetCinemas(address: string): Observable<CinemaDTO[]> {
-    const mocks: CinemaDTO[] = [
-      { code: 'HN01', nameOfCinema: 'CineGo Hoàn Kiếm', address: 'Hoàn Kiếm, Hà Nội', status: 'Active', totalRooms: 5, description: 'Rạp trung tâm' },
-      { code: 'HN02', nameOfCinema: 'CineGo Cầu Giấy', address: 'Cầu Giấy, Hà Nội', status: 'Active', totalRooms: 8, description: 'Rạp sinh viên' },
-      { code: 'HCM01', nameOfCinema: 'CineGo Q1', address: 'Quận 1, TP.HCM', status: 'Maintenance', totalRooms: 4, description: 'Rạp flagship' }
-    ];
-    const filtered = address ? mocks.filter(m => m.address.includes(address)) : mocks;
-    return of(filtered);
+    return this.getAllCinemas().pipe(
+      map(cinemas => {
+        if (!address) return cinemas;
+        return cinemas.filter(c => c.address.includes(address));
+      })
+    );
   }
 
   saveCinema(payload: CinemaPayload): Observable<any> {

@@ -306,9 +306,9 @@
 
     <form [formGroup]="scheduleForm" (ngSubmit)="submitForm()"
       class="flex-1 overflow-y-auto p-6 space-y-6 min-h-[300px] pb-30">
-      <div *ngIf="backendErrorMsg()"
+      <div *ngIf="fieldErrors()['_general']"
         class="p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg text-sm border border-red-100 dark:border-red-800/30">
-        {{ backendErrorMsg() }}
+        {{ fieldErrors()['_general'] }}
       </div>
 
       <div class="space-y-4">
@@ -322,7 +322,7 @@
               [class.cursor-pointer]="!isEditMode()" [class.hover:border-rose-300]="!isEditMode()"
               [class.opacity-50]="isEditMode()" [class.ring-2]="isFormMovieOpen()"
               [class.ring-rose-500]="isFormMovieOpen()"
-              [class.border-rose-500]="isFormMovieOpen() || (scheduleForm.get('movieName')?.invalid && scheduleForm.get('movieName')?.touched)"
+              [class.border-rose-500]="isFormMovieOpen() || (scheduleForm.get('movieName')?.invalid && scheduleForm.get('movieName')?.touched) || fieldErrors()['movieName']"
               (click)="!isEditMode() && isFormMovieOpen.set(!isFormMovieOpen())">
               <span class="truncate" [class.text-slate-400]="!scheduleForm.get('movieName')?.value">{{
                 scheduleForm.get('movieName')?.value || 'Chọn phim' }}</span>
@@ -343,6 +343,7 @@
             </div>
             <div *ngIf="isFormMovieOpen()" class="fixed inset-0 z-40" (click)="isFormMovieOpen.set(false)"></div>
           </div>
+          <p *ngIf="fieldErrors()['movieName']" class="text-xs text-red-500 mt-1">{{ fieldErrors()['movieName'] }}</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -367,8 +368,6 @@
               </div>
               <div *ngIf="isFormAddressOpen()"
                 class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg py-1 z-50 max-h-60 overflow-y-auto">
-                <div
-                  (click)="scheduleForm.get('address')?.setValue(''); isFormAddressOpen.set(false)">{{ t('management.deselectArea') }}</div>
                 <div *ngFor="let a of addresses()"
                   class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors"
                   (click)="scheduleForm.get('address')?.setValue(a); isFormAddressOpen.set(false)">{{ a }}</div>
@@ -388,7 +387,7 @@
                 [class.hover:border-rose-300]="!isEditMode() && cinemas().length > 0"
                 [class.opacity-50]="isEditMode() || cinemas().length === 0" [class.ring-2]="isFormCinemaOpen()"
                 [class.ring-rose-500]="isFormCinemaOpen()"
-                [class.border-rose-500]="isFormCinemaOpen() || (scheduleForm.get('cinemaName')?.invalid && scheduleForm.get('cinemaName')?.touched)"
+                [class.border-rose-500]="isFormCinemaOpen() || (scheduleForm.get('cinemaName')?.invalid && scheduleForm.get('cinemaName')?.touched) || fieldErrors()['roomName']"
                 (click)="!isEditMode() && cinemas().length > 0 && isFormCinemaOpen.set(!isFormCinemaOpen())">
                 <span class="truncate" [class.text-slate-400]="!scheduleForm.get('cinemaName')?.value">{{
                   scheduleForm.get('cinemaName')?.value || 'Chọn rạp' }}</span>
@@ -407,6 +406,7 @@
               </div>
               <div *ngIf="isFormCinemaOpen()" class="fixed inset-0 z-40" (click)="isFormCinemaOpen.set(false)"></div>
             </div>
+            <p *ngIf="fieldErrors()['roomName']" class="text-xs text-red-500 mt-1">{{ fieldErrors()['roomName'] }}</p>
           </div>
         </div>
 
@@ -422,7 +422,7 @@
                 [class.hover:border-rose-300]="!isEditMode() && rooms().length > 0"
                 [class.opacity-50]="isEditMode() || rooms().length === 0" [class.ring-2]="isFormRoomOpen()"
                 [class.ring-rose-500]="isFormRoomOpen()"
-                [class.border-rose-500]="isFormRoomOpen() || (scheduleForm.get('roomName')?.invalid && scheduleForm.get('roomName')?.touched)"
+                [class.border-rose-500]="isFormRoomOpen() || (scheduleForm.get('roomName')?.invalid && scheduleForm.get('roomName')?.touched) || fieldErrors()['roomCode']"
                 (click)="!isEditMode() && rooms().length > 0 && isFormRoomOpen.set(!isFormRoomOpen())">
                 <span class="truncate" [class.text-slate-400]="!scheduleForm.get('roomName')?.value">{{
                   scheduleForm.get('roomName')?.value || 'Chọn phòng' }}</span>
@@ -441,6 +441,7 @@
               </div>
               <div *ngIf="isFormRoomOpen()" class="fixed inset-0 z-40" (click)="isFormRoomOpen.set(false)"></div>
             </div>
+            <p *ngIf="fieldErrors()['roomCode']" class="text-xs text-red-500 mt-1">{{ fieldErrors()['roomCode'] }}</p>
           </div>
 
           <!-- Start At -->
@@ -449,7 +450,8 @@
                 class="text-rose-500">*</span></label>
             <input type="datetime-local" formControlName="startAt"
               class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
-              [class.border-red-500]="scheduleForm.get('startAt')?.invalid && scheduleForm.get('startAt')?.touched">
+              [class.border-red-500]="(scheduleForm.get('startAt')?.invalid && scheduleForm.get('startAt')?.touched) || fieldErrors()['startAt']">
+            <p *ngIf="fieldErrors()['startAt']" class="text-xs text-red-500 mt-1">{{ fieldErrors()['startAt'] }}</p>
           </div>
         </div>
 

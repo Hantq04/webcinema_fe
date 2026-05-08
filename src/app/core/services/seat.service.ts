@@ -84,8 +84,10 @@ export class SeatService {
     );
   }
 
-  getSeatsByRoom(roomCode: string): Observable<SeatResponse[]> {
-    const params = new HttpParams().set('roomCode', roomCode);
+  getSeatsByRoom(roomCode: string, cinemaName: string): Observable<SeatResponse[]> {
+    const params = new HttpParams()
+      .set('roomCode', roomCode)
+      .set('cinemaName', cinemaName);
     return this.http.get<any>(this.apiService.apiUrl('/api/v1/seat/get-by-room'), { params }).pipe(
       map(response => {
         if (response && response.data) {

@@ -33,6 +33,7 @@ export class ManagementEventComponent implements OnInit {
   selectedFile: File | null = null;
   imagePreview: string | null = null;
   eventToDelete = signal<Event | null>(null);
+  fieldErrors = signal<Record<string, string>>({});
 
   filteredEvents = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
@@ -44,7 +45,7 @@ export class ManagementEventComponent implements OnInit {
 
   constructor() {
     this.eventForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
+      name: [''],
       image: [null]
     });
   }
@@ -78,23 +79,34 @@ export class ManagementEventComponent implements OnInit {
     this.eventForm.reset();
     this.selectedFile = null;
     this.imagePreview = null;
+    this.fieldErrors.set({});
     this.showFormModal.set(true);
   }
 
   submitForm() {
-    if (this.eventForm.invalid || !this.selectedFile) {
-      this.eventForm.markAllAsTouched();
-      return;
-    }
-
     const formData = new FormData();
-    formData.append('name', this.eventForm.get('name')?.value);
-    formData.append('image', this.selectedFile);
+    formData.append('name', this.eventForm.get('name')?.value || '');
+    if (this.selectedFile) {
+      formData.append('image', this.selectedFile);
+    }
     
     this.eventService.saveEvent(formData).subscribe({
       next: () => {
         this.showFormModal.set(false);
+        this.fieldErrors.set({});
         this.loadEvents();
+      },
+      error: (err) => {
+        const apiError = err.error;
+        if (apiError && apiError.errors && Array.isArray(apiError.errors)) {
+          const newErrors: Record<string, string> = {};
+          apiError.errors.forEach((e: any) => {
+            if (e.field) newErrors[e.field] = e.message;
+          });
+          this.fieldErrors.set(newErrors);
+        } else {
+          this.fieldErrors.set({ _general: apiError?.message || 'Có lỗi xảy ra' });
+        }
       }
     });
   }
