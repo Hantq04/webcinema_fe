@@ -55,74 +55,86 @@ interface MovieCard extends Movie {
         </header>
 
         @if (activeSection() === 'now-showing') {
-          <section class="movies-list" aria-label="{{ t('home.nowShowingTitle') }}">
-            @for (movie of nowShowingMovies(); track movie.id) {
-              <article class="movie-card">
-                <a [routerLink]="['/movies', movie.code || movie.id]" class="movie-card__poster" style="display: block; text-decoration: none;">
-                  <img class="movie-card__poster-image" [src]="moviePoster(movie)" [alt]="movie.title" loading="lazy" />
-                  <span 
-                    class="movie-card__age"
-                    [class.movie-card__age--g]="movieRateCode(movie) === 'G'"
-                    [class.movie-card__age--pg]="movieRateCode(movie) === 'PG'"
-                    [class.movie-card__age--pg13]="movieRateCode(movie) === 'PG-13'"
-                    [class.movie-card__age--r]="movieRateCode(movie) === 'R'"
-                    [class.movie-card__age--nc17]="movieRateCode(movie) === 'NC-17'"
-                  >{{ movie.ageRating || movie.posterLabel }}</span>
-                  @if (movie.rank) {
-                    <span class="movie-card__rank movie-card__rank--{{ movie.rank }}">{{ movie.rank }}</span>
-                  }
-                </a>
-
-                <div class="movie-card__body">
-                  <a [routerLink]="['/movies', movie.code || movie.id]" style="text-decoration: none; color: inherit;">
-                    <h2 class="movie-card__title">{{ getTitle(movie) }}</h2>
-                  </a>
-                  <p class="movie-card__meta"><strong>{{ t('movies.genre') }}:</strong> {{ movie.subtitle }}</p>
-                  <p class="movie-card__meta"><strong>{{ t('movies.duration') }}:</strong> {{ movie.durationMinutes }} {{ t('movies.minutes') }}</p>
-                  <p class="movie-card__meta"><strong>{{ t('movies.releaseDate') }}:</strong> {{ movie.releaseHint }}</p>
-                  <button type="button" (click)="openSchedule(movie)" class="movie-card__button">
-                    <span style="font-weight: 900; font-size: 1.1rem; margin-right: 6px; line-height: 1; transform: translateY(-1px);">»</span>
-                    {{ movie.ctaLabel }}
-                  </button>
-                </div>
-              </article>
-            }
-          </section>
-        } @else {
-          <section class="movies-list movies-list--coming-soon" aria-label="{{ t('home.comingSoonTitle') }}">
-            @for (movie of comingSoonMovies(); track movie.id) {
-              <article class="movie-card movie-card--coming-soon">
-                <a [routerLink]="['/movies', movie.code || movie.id]" class="movie-card__poster movie-card__poster--{{ movie.posterTone }}" style="display: block; text-decoration: none; cursor: pointer;">
-                  @if (movie.posterUrl || movie.backdropUrl) {
+          @if (nowShowingMovies().length > 0) {
+            <section class="movies-list" aria-label="{{ t('home.nowShowingTitle') }}">
+              @for (movie of nowShowingMovies(); track movie.id) {
+                <article class="movie-card">
+                  <a [routerLink]="['/movies', movie.code || movie.id]" class="movie-card__poster" style="display: block; text-decoration: none;">
                     <img class="movie-card__poster-image" [src]="moviePoster(movie)" [alt]="movie.title" loading="lazy" />
-                  } @else {
-                    <div class="movie-card__poster-copy movie-card__poster-copy--centered">
-                      <span class="movie-card__poster-kicker">{{ movie.posterLabel }}</span>
-                      <strong class="movie-card__poster-title movie-card__poster-title--coming">{{ getTitle(movie) }}</strong>
-                      <span class="movie-card__poster-subtitle">{{ movie.releaseHint }}</span>
-                    </div>
-                  }
-                  <span 
-                    class="movie-card__age"
-                    [class.movie-card__age--g]="movieRateCode(movie) === 'G'"
-                    [class.movie-card__age--pg]="movieRateCode(movie) === 'PG'"
-                    [class.movie-card__age--pg13]="movieRateCode(movie) === 'PG-13'"
-                    [class.movie-card__age--r]="movieRateCode(movie) === 'R'"
-                    [class.movie-card__age--nc17]="movieRateCode(movie) === 'NC-17'"
-                  >{{ movie.ageRating || movie.posterLabel }}</span>
-                </a>
-
-                <div class="movie-card__body">
-                  <a [routerLink]="['/movies', movie.code || movie.id]" style="text-decoration: none; color: inherit;">
-                    <h2 class="movie-card__title">{{ getTitle(movie) }}</h2>
+                    <span 
+                      class="movie-card__age"
+                      [class.movie-card__age--g]="movieRateCode(movie) === 'G'"
+                      [class.movie-card__age--pg]="movieRateCode(movie) === 'PG'"
+                      [class.movie-card__age--pg13]="movieRateCode(movie) === 'PG-13'"
+                      [class.movie-card__age--r]="movieRateCode(movie) === 'R'"
+                      [class.movie-card__age--nc17]="movieRateCode(movie) === 'NC-17'"
+                    >{{ movie.ageRating || movie.posterLabel }}</span>
+                    @if (movie.rank) {
+                      <span class="movie-card__rank movie-card__rank--{{ movie.rank }}">{{ movie.rank }}</span>
+                    }
                   </a>
-                  <p class="movie-card__meta"><strong>{{ t('movies.genre') }}:</strong> {{ movie.subtitle }}</p>
-                  <p class="movie-card__meta"><strong>{{ t('movies.duration') }}:</strong> {{ movie.durationMinutes }} {{ t('movies.minutes') }}</p>
-                  <p class="movie-card__meta"><strong>{{ t('movies.releaseDate') }}:</strong> {{ movie.releaseHint }}</p>
-                </div>
-              </article>
-            }
-          </section>
+
+                  <div class="movie-card__body">
+                    <a [routerLink]="['/movies', movie.code || movie.id]" style="text-decoration: none; color: inherit;">
+                      <h2 class="movie-card__title">{{ getTitle(movie) }}</h2>
+                    </a>
+                    <p class="movie-card__meta"><strong>{{ t('movies.genre') }}:</strong> {{ movie.subtitle }}</p>
+                    <p class="movie-card__meta"><strong>{{ t('movies.duration') }}:</strong> {{ movie.durationMinutes }} {{ t('movies.minutes') }}</p>
+                    <p class="movie-card__meta"><strong>{{ t('movies.releaseDate') }}:</strong> {{ movie.releaseHint }}</p>
+                    <button type="button" (click)="openSchedule(movie)" class="movie-card__button">
+                      <span style="font-weight: 900; font-size: 1.1rem; margin-right: 6px; line-height: 1; transform: translateY(-1px);">»</span>
+                      {{ movie.ctaLabel }}
+                    </button>
+                  </div>
+                </article>
+              }
+            </section>
+          } @else {
+            <div class="movies-empty">
+              <p>{{ t('movies.noShowing') }}</p>
+            </div>
+          }
+        } @else {
+          @if (comingSoonMovies().length > 0) {
+            <section class="movies-list movies-list--coming-soon" aria-label="{{ t('home.comingSoonTitle') }}">
+              @for (movie of comingSoonMovies(); track movie.id) {
+                <article class="movie-card movie-card--coming-soon">
+                  <a [routerLink]="['/movies', movie.code || movie.id]" class="movie-card__poster movie-card__poster--{{ movie.posterTone }}" style="display: block; text-decoration: none; cursor: pointer;">
+                    @if (movie.posterUrl || movie.backdropUrl) {
+                      <img class="movie-card__poster-image" [src]="moviePoster(movie)" [alt]="movie.title" loading="lazy" />
+                    } @else {
+                      <div class="movie-card__poster-copy movie-card__poster-copy--centered">
+                        <span class="movie-card__poster-kicker">{{ movie.posterLabel }}</span>
+                        <strong class="movie-card__poster-title movie-card__poster-title--coming">{{ getTitle(movie) }}</strong>
+                        <span class="movie-card__poster-subtitle">{{ movie.releaseHint }}</span>
+                      </div>
+                    }
+                    <span 
+                      class="movie-card__age"
+                      [class.movie-card__age--g]="movieRateCode(movie) === 'G'"
+                      [class.movie-card__age--pg]="movieRateCode(movie) === 'PG'"
+                      [class.movie-card__age--pg13]="movieRateCode(movie) === 'PG-13'"
+                      [class.movie-card__age--r]="movieRateCode(movie) === 'R'"
+                      [class.movie-card__age--nc17]="movieRateCode(movie) === 'NC-17'"
+                    >{{ movie.ageRating || movie.posterLabel }}</span>
+                  </a>
+
+                  <div class="movie-card__body">
+                    <a [routerLink]="['/movies', movie.code || movie.id]" style="text-decoration: none; color: inherit;">
+                      <h2 class="movie-card__title">{{ getTitle(movie) }}</h2>
+                    </a>
+                    <p class="movie-card__meta"><strong>{{ t('movies.genre') }}:</strong> {{ movie.subtitle }}</p>
+                    <p class="movie-card__meta"><strong>{{ t('movies.duration') }}:</strong> {{ movie.durationMinutes }} {{ t('movies.minutes') }}</p>
+                    <p class="movie-card__meta"><strong>{{ t('movies.releaseDate') }}:</strong> {{ movie.releaseHint }}</p>
+                  </div>
+                </article>
+              }
+            </section>
+          } @else {
+            <div class="movies-empty">
+              <p>{{ t('movies.noComing') }}</p>
+            </div>
+          }
         }
       </div>
 
@@ -254,6 +266,21 @@ interface MovieCard extends Movie {
       display: grid;
       gap: 2rem;
       grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .movies-empty {
+      padding: 4rem 1rem;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 1rem;
+      border: 2px dashed rgba(48, 34, 25, 0.2);
+    }
+
+    .movies-empty p {
+      color: #6f5b46;
+      font-size: 1.25rem;
+      font-weight: 500;
+      margin: 0;
     }
 
     .movie-card {

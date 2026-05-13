@@ -302,7 +302,9 @@ const translations = {
       minutes: 'phút',
       preBook: 'ĐẶT TRƯỚC',
       notFound: 'Không tìm thấy thông tin phim.',
-      goBack: 'Quay lại'
+      goBack: 'Quay lại',
+      noShowing: 'Hiện chưa có thông tin về các phim đang chiếu',
+      noComing: 'Hiện chưa có thông tin về các phim sắp chiếu'
     },
     booking: {
       title: 'Đặt vé CineGo',
@@ -773,7 +775,9 @@ const translations = {
       minutes: 'minutes',
       preBook: 'PRE-BOOK',
       notFound: 'Movie information not found.',
-      goBack: 'Go Back'
+      goBack: 'Go Back',
+      noShowing: 'No information about movies currently showing',
+      noComing: 'No information about upcoming movies'
     },
     booking: {
       title: 'CineGo Booking',
