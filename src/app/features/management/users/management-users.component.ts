@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 
 import { UserTableComponent } from './components/user-table.component';
 import { UserDetailDrawerComponent } from './components/user-detail-drawer.component';
-import { StaffCreateModalComponent } from './components/staff-create-modal.component';
 import { MyProfileFormComponent } from './components/my-profile-form.component';
 import { LanguageService } from '../../../core/services/language.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -19,7 +18,6 @@ import { UserResponse, UserDetailResponse, StaffRegisterDTO, UserProfileResponse
     FormsModule,
     UserTableComponent,
     UserDetailDrawerComponent, 
-    StaffCreateModalComponent, 
     MyProfileFormComponent
   ],
   templateUrl: './management-users.component.html',
@@ -41,6 +39,7 @@ export class ManagementUsersComponent implements OnInit {
   // Filters
   searchQuery = signal('');
   selectedRole = signal('');
+  isRoleFilterOpen = signal(false);
 
   // Selection
   selectedUsernames = signal<string[]>([]);
@@ -50,8 +49,7 @@ export class ManagementUsersComponent implements OnInit {
   isLoadingDrawer = signal(false);
   selectedUserDetail = signal<UserDetailResponse | null>(null);
 
-  isCreateModalOpen = signal(false);
-  isSubmittingCreate = signal(false);
+
 
   // Profile Form
   myProfileData = signal<UserProfileResponse | null>(null);
@@ -185,30 +183,7 @@ export class ManagementUsersComponent implements OnInit {
 
   // --- Actions ---
 
-  openCreateModal() {
-    this.isCreateModalOpen.set(true);
-  }
 
-  closeCreateModal() {
-    this.isCreateModalOpen.set(false);
-  }
-
-  submitStaffCreate(dto: StaffRegisterDTO) {
-    this.isSubmittingCreate.set(true);
-    this.userService.staffRegister(dto).subscribe({
-      next: () => {
-        this.isSubmittingCreate.set(false);
-        this.closeCreateModal();
-        this.showToast(this.t('management.staffCreatedSuccess'), 'success');
-        this.loadUsers();
-      },
-      error: (err) => {
-        console.error('Staff register error', err);
-        this.isSubmittingCreate.set(false);
-        this.showToast(err.error?.message || 'Có lỗi xảy ra', 'error');
-      }
-    });
-  }
 
   openUserDetail(user: UserResponse) {
     this.selectedUserDetail.set(null);

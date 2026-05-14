@@ -1,293 +1,185 @@
-import { Component, EventEmitter, Input, Output, inject, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, OnInit, OnChanges, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserProfileResponse } from '../../../../core/models/user.model';
 import { LanguageService } from '../../../../core/services/language.service';
+import { LocationService, Province, District } from '../../../../core/services/location.service';
 
 @Component({
   selector: 'app-my-profile-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   template: `
-    <div class="profile-container">
-      <div class="profile-header">
-        <h3>{{ t('management.myProfileTitle') }}</h3>
-        <p>{{ t('management.myProfileDesc') }}</p>
+    <div class="max-w-4xl mx-auto pb-8">
+      <div class="mb-8">
+        <h3 class="text-2xl font-bold text-slate-800 dark:text-white mb-2">{{ t('management.myProfileTitle') }}</h3>
+        <p class="text-slate-500 dark:text-slate-400">{{ t('management.myProfileDesc') }}</p>
       </div>
 
-      <div class="loading-state" *ngIf="isLoading">
-        <div class="spinner"></div>
+      <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-20 text-slate-500">
+        <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-rose-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
         <p>{{ t('shared.loading') }}...</p>
       </div>
 
       <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="!isLoading">
-        <div class="profile-content">
-          <!-- Left side: Avatar -->
-          <div class="avatar-section">
-            <div class="avatar-preview">
-              <img *ngIf="avatarPreview" [src]="avatarPreview" alt="Avatar">
-              <span *ngIf="!avatarPreview" class="avatar-placeholder">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              </span>
-            </div>
-            <div class="upload-btn-wrapper">
-              <button type="button" class="btn btn-outline">{{ t('management.myProfileAvatar') }}</button>
-              <input type="file" accept="image/*" (change)="onFileSelected($event)">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5 lg:gap-x-12">
+          <!-- Row 1 -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Họ tên <span class="text-rose-500">*</span></label>
+            <input type="text" formControlName="name" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('name')">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Tỉnh/Thành phố <span class="text-rose-500">*</span></label>
+            <div class="relative w-full">
+              <div class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 flex justify-between items-center cursor-pointer hover:border-rose-400 transition-all"
+                [class.ring-2]="isCityOpen" [class.ring-rose-500/10]="isCityOpen" [class.border-rose-500]="isCityOpen"
+                (click)="isCityOpen = !isCityOpen; isDistrictOpen = false; isGenderOpen = false">
+                <span class="truncate" [class.text-slate-400]="!form.get('city')?.value">
+                  {{ getProvinceName(form.get('city')?.value) || 'Vui lòng chọn...' }}
+                </span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform" [class.rotate-180]="isCityOpen" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div *ngIf="isCityOpen" class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg py-1.5 z-[110] max-h-60 overflow-y-auto custom-scrollbar">
+                <div *ngFor="let p of provinces()" 
+                  class="px-3 py-2 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/20 cursor-pointer transition-colors"
+                  [class.text-rose-600]="form.get('city')?.value === p.code.toString()"
+                  (click)="form.get('city')?.setValue(p.code.toString()); isCityOpen = false">
+                  {{ p.name }}
+                </div>
+              </div>
+              <div *ngIf="isCityOpen" class="fixed inset-0 z-[105]" (click)="isCityOpen = false"></div>
             </div>
           </div>
 
-          <!-- Right side: Form fields -->
-          <div class="form-section">
-            <div class="form-row">
-              <div class="form-group">
-                <label>{{ t('management.userFormName') }} <span class="required">*</span></label>
-                <input type="text" formControlName="name" class="form-control" [class.is-invalid]="isInvalid('name')">
+          <!-- Row 2 -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Số điện thoại <span class="text-rose-500">*</span></label>
+            <input type="text" formControlName="phoneNumber" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('phoneNumber')">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Quận/Huyện <span class="text-rose-500">*</span></label>
+            <div class="relative w-full">
+              <div class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 flex justify-between items-center cursor-pointer hover:border-rose-400 transition-all"
+                [class.ring-2]="isDistrictOpen" [class.ring-rose-500/10]="isDistrictOpen" [class.border-rose-500]="isDistrictOpen"
+                [class.opacity-50]="!form.get('city')?.value" [class.cursor-not-allowed]="!form.get('city')?.value"
+                (click)="form.get('city')?.value && (isDistrictOpen = !isDistrictOpen); isCityOpen = false; isGenderOpen = false">
+                <span class="truncate" [class.text-slate-400]="!form.get('district')?.value">
+                  {{ getDistrictName(form.get('district')?.value) || 'Vui lòng chọn...' }}
+                </span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform" [class.rotate-180]="isDistrictOpen" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
               </div>
-              <div class="form-group">
-                <label>{{ t('management.userFormEmail') }} <span class="required">*</span></label>
-                <input type="email" formControlName="email" class="form-control" [class.is-invalid]="isInvalid('email')">
+              <div *ngIf="isDistrictOpen" class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg py-1.5 z-[110] max-h-60 overflow-y-auto custom-scrollbar">
+                <div *ngFor="let d of districts()" 
+                  class="px-3 py-2 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/20 cursor-pointer transition-colors"
+                  [class.text-rose-600]="form.get('district')?.value === d.code.toString()"
+                  (click)="form.get('district')?.setValue(d.code.toString()); isDistrictOpen = false">
+                  {{ d.name }}
+                </div>
+                <div *ngIf="districts().length === 0" class="px-3 py-2 text-sm text-slate-400 italic">Không có dữ liệu</div>
               </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label>{{ t('management.userFormPhone') }} <span class="required">*</span></label>
-                <input type="text" formControlName="phoneNumber" class="form-control" [class.is-invalid]="isInvalid('phoneNumber')">
-              </div>
-              <div class="form-group">
-                <label>{{ t('management.userFormGender') }}</label>
-                <select formControlName="gender" class="form-control">
-                  <option value="">Chọn giới tính</option>
-                  <option value="Nam">Nam</option>
-                  <option value="Nữ">Nữ</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label>{{ t('management.userFormBirthDate') }}</label>
-                <input type="date" formControlName="birthDate" class="form-control">
-              </div>
-              <div class="form-group">
-                <label>Tỉnh/Thành phố</label>
-                <input type="text" formControlName="city" class="form-control">
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label>Quận/Huyện</label>
-                <input type="text" formControlName="district" class="form-control">
-              </div>
-              <div class="form-group">
-                <label>Địa chỉ</label>
-                <input type="text" formControlName="address" class="form-control">
-              </div>
-            </div>
-
-            <div class="form-actions">
-              <button type="submit" class="btn btn-primary" [disabled]="form.invalid || isSubmitting">
-                <span class="spinner-inline" *ngIf="isSubmitting"></span>
-                {{ t('management.myProfileUpdate') }}
-              </button>
+              <div *ngIf="isDistrictOpen" class="fixed inset-0 z-[105]" (click)="isDistrictOpen = false"></div>
             </div>
           </div>
+
+          <!-- Row 3 -->
+          <div class="relative">
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Giới tính</label>
+            <div class="relative w-full">
+              <div class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 flex justify-between items-center cursor-pointer hover:border-rose-400 transition-all"
+                [class.ring-2]="isGenderOpen" [class.ring-rose-500/10]="isGenderOpen" [class.border-rose-500]="isGenderOpen"
+                (click)="isGenderOpen = !isGenderOpen; isCityOpen = false; isDistrictOpen = false">
+                <span class="truncate" [class.text-slate-400]="!form.get('gender')?.value || form.get('gender')?.value === 'None'">
+                  {{ form.get('gender')?.value && form.get('gender')?.value !== 'None' ? form.get('gender')?.value : 'Chọn giới tính' }}
+                </span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform duration-200" [class.rotate-180]="isGenderOpen" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              
+              <!-- Dropdown Menu -->
+              <div *ngIf="isGenderOpen" 
+                class="absolute top-full left-0 mt-1.5 w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg py-1.5 z-[100] animate-in fade-in slide-in-from-top-1 duration-200">
+                <div class="px-3 py-2 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/20 cursor-pointer transition-colors flex items-center justify-between" 
+                  [class.text-rose-600]="form.get('gender')?.value === 'Nam'"
+                  (click)="form.get('gender')?.setValue('Nam'); isGenderOpen = false">
+                  <span>Nam</span>
+                  <svg *ngIf="form.get('gender')?.value === 'Nam'" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                </div>
+                <div class="px-3 py-2 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/20 cursor-pointer transition-colors flex items-center justify-between" 
+                  [class.text-rose-600]="form.get('gender')?.value === 'Nữ'"
+                  (click)="form.get('gender')?.setValue('Nữ'); isGenderOpen = false">
+                  <span>Nữ</span>
+                  <svg *ngIf="form.get('gender')?.value === 'Nữ'" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                </div>
+              </div>
+              <div *ngIf="isGenderOpen" class="fixed inset-0 z-[90]" (click)="isGenderOpen = false"></div>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Địa chỉ <span class="text-rose-500">*</span></label>
+            <input type="text" formControlName="address" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('address')">
+          </div>
+
+          <!-- Row 4 -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Ngày sinh</label>
+            <div class="w-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 rounded-lg py-2.5 px-3">
+              {{ profile?.birthDate || 'N/A' }}
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Mật khẩu cũ <span class="text-rose-500">*</span></label>
+            <input type="password" formControlName="oldPassword" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('oldPassword')">
+          </div>
+
+          <!-- Row 5 -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email <span class="text-rose-500">*</span></label>
+            <input type="email" formControlName="email" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('email')">
+          </div>
+          <div class="hidden md:block"></div> <!-- Empty right column space -->
+          
+          <!-- Checkbox Row -->
+          <div class="col-span-1 md:col-span-2 pt-2">
+            <label class="flex items-center gap-2 cursor-pointer text-sm font-medium text-slate-700 dark:text-slate-300 w-fit">
+              <input type="checkbox" formControlName="wantsChangePassword" class="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500"> Tôi muốn thay đổi mật khẩu
+            </label>
+          </div>
+
+          <!-- Password Row -->
+          <ng-container *ngIf="form.get('wantsChangePassword')?.value">
+            <div class="mt-2">
+              <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Mật khẩu mới <span class="text-rose-500">*</span></label>
+              <input type="password" formControlName="newPassword" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('newPassword')">
+            </div>
+            <div class="mt-2">
+              <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nhập lại mật khẩu mới <span class="text-rose-500">*</span></label>
+              <input type="password" formControlName="confirmPassword" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('confirmPassword')">
+            </div>
+          </ng-container>
+        </div>
+        
+        <div class="mt-10 flex justify-center w-full">
+          <button type="submit" 
+            class="px-10 py-3 text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg transition-all shadow-md flex items-center gap-2 transform active:scale-95" 
+            [disabled]="isSubmitting">
+            <svg *ngIf="isSubmitting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            Cập nhật hồ sơ
+          </button>
         </div>
       </form>
     </div>
   `,
-  styles: [`
-    .profile-container {
-      background: var(--bg-card);
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      padding: 2rem;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-    }
-    .profile-header {
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--border-color);
-    }
-    .profile-header h3 {
-      margin: 0 0 0.5rem 0;
-      font-size: 1.25rem;
-      color: var(--text-primary);
-    }
-    .profile-header p {
-      margin: 0;
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-    }
-
-    .profile-content {
-      display: flex;
-      gap: 3rem;
-      flex-wrap: wrap;
-    }
-    .avatar-section {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-      width: 200px;
-    }
-    .avatar-preview {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      background: rgba(0,0,0,0.05);
-      border: 2px dashed var(--border-color);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-    :host-context(body.dark-theme) .avatar-preview {
-      background: rgba(255,255,255,0.05);
-    }
-    .avatar-preview img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .avatar-placeholder {
-      color: var(--text-secondary);
-      opacity: 0.5;
-    }
-    
-    .upload-btn-wrapper {
-      position: relative;
-      overflow: hidden;
-      display: inline-block;
-    }
-    .upload-btn-wrapper input[type=file] {
-      font-size: 100px;
-      position: absolute;
-      left: 0;
-      top: 0;
-      opacity: 0;
-      cursor: pointer;
-    }
-
-    .form-section {
-      flex: 1;
-      min-width: 300px;
-    }
-
-    .form-row {
-      display: flex;
-      gap: 1.5rem;
-      margin-bottom: 1.25rem;
-    }
-    .form-group {
-      flex: 1;
-    }
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-      color: var(--text-primary);
-      font-size: 0.9rem;
-    }
-    .required {
-      color: #ef4444;
-    }
-    .form-control {
-      width: 100%;
-      padding: 0.6rem 0.75rem;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      background: var(--bg-card);
-      color: var(--text-primary);
-      font-size: 0.95rem;
-      transition: border-color 0.2s;
-    }
-    .form-control:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.1);
-    }
-    .form-control.is-invalid {
-      border-color: #ef4444;
-    }
-    select.form-control {
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 0.75rem center;
-    }
-
-    .form-actions {
-      margin-top: 2rem;
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    .btn {
-      padding: 0.6rem 1.5rem;
-      border-radius: 6px;
-      font-weight: 500;
-      font-size: 0.95rem;
-      cursor: pointer;
-      border: none;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .btn-outline {
-      background: transparent;
-      border: 1px solid var(--border-color);
-      color: var(--text-primary);
-    }
-    .btn-outline:hover {
-      background: var(--hover-color);
-    }
-    .btn-primary {
-      background: var(--primary-color);
-      color: white;
-    }
-    .btn-primary:hover:not(:disabled) {
-      filter: brightness(1.1);
-    }
-    .btn:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
-
-    .loading-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 3rem;
-      color: var(--text-secondary);
-    }
-    .spinner {
-      border: 3px solid rgba(229, 9, 20, 0.2);
-      border-radius: 50%;
-      border-top: 3px solid var(--primary-color);
-      width: 30px;
-      height: 30px;
-      animation: spin 1s linear infinite;
-      margin-bottom: 1rem;
-    }
-    .spinner-inline {
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 1s ease-in-out infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-  `]
+  styles: []
 })
-export class MyProfileFormComponent implements OnInit {
+export class MyProfileFormComponent implements OnInit, OnChanges {
   private readonly fb = inject(FormBuilder);
   private readonly language = inject(LanguageService);
+  private readonly locationService = inject(LocationService);
 
   @Input() profile: UserProfileResponse | null = null;
   @Input() isLoading = false;
@@ -296,11 +188,36 @@ export class MyProfileFormComponent implements OnInit {
   @Output() updateProfile = new EventEmitter<FormData>();
 
   form!: FormGroup;
-  avatarFile: File | null = null;
-  avatarPreview: string | null = null;
+  provinces = signal<Province[]>([]);
+  districts = signal<District[]>([]);
+  isGenderOpen = false;
+  isCityOpen = false;
+  isDistrictOpen = false;
 
   ngOnInit() {
     this.initForm();
+    this.locationService.getProvinces().subscribe(data => this.provinces.set(data));
+    
+    this.form.get('city')?.valueChanges.subscribe(cityCode => {
+      if (cityCode) {
+        this.locationService.getDistricts(parseInt(cityCode)).subscribe(data => this.districts.set(data));
+      } else {
+        this.districts.set([]);
+      }
+      this.form.patchValue({ district: '' }, { emitEvent: false });
+    });
+
+    this.form.get('wantsChangePassword')?.valueChanges.subscribe(checked => {
+      if (checked) {
+        this.form.get('newPassword')?.setValidators([Validators.required]);
+        this.form.get('confirmPassword')?.setValidators([Validators.required]);
+      } else {
+        this.form.get('newPassword')?.clearValidators();
+        this.form.get('confirmPassword')?.clearValidators();
+      }
+      this.form.get('newPassword')?.updateValueAndValidity();
+      this.form.get('confirmPassword')?.updateValueAndValidity();
+    });
   }
 
   ngOnChanges(changes: any) {
@@ -318,27 +235,56 @@ export class MyProfileFormComponent implements OnInit {
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       phoneNumber: ['', Validators.required],
-      gender: [''],
+      gender: ['None'],
       birthDate: [''],
-      address: [''],
-      city: [''],
-      district: ['']
+      address: ['', Validators.required],
+      city: ['', Validators.required],
+      district: ['', Validators.required],
+      oldPassword: ['', Validators.required],
+      wantsChangePassword: [false],
+      newPassword: [''],
+      confirmPassword: ['']
     });
   }
 
   private patchForm(p: UserProfileResponse) {
+    if (!p) return;
+    
+    // Patch basic info
     this.form.patchValue({
       name: p.name || '',
       email: p.email || '',
       phoneNumber: p.phoneNumber || '',
-      gender: p.gender || '',
+      gender: p.gender || 'None',
       birthDate: p.birthDate || '',
-      address: p.address || '',
-      city: p.city || '',
-      district: p.district || ''
-    });
-    this.avatarPreview = p.avatarUrl;
-    this.avatarFile = null;
+      address: p.address || ''
+    }, { emitEvent: false });
+
+    // Handle City and District mapping
+    if (p.city) {
+      // Find province by code (p.city might be a code or name)
+      this.locationService.getProvinces().subscribe(provinces => {
+        const province = provinces.find(pr => pr.code.toString() === p.city || pr.name === p.city);
+        if (province) {
+          this.form.get('city')?.setValue(province.code.toString(), { emitEvent: true });
+          
+          // Now wait for districts to load from the valueChanges subscription
+          // But we need to ensure the district is set AFTER they load
+          this.locationService.getDistricts(province.code).subscribe(districts => {
+            this.districts.set(districts);
+            const district = districts.find(d => d.code.toString() === p.district || d.name === p.district);
+            if (district) {
+              this.form.get('district')?.setValue(district.code.toString(), { emitEvent: false });
+            } else if (p.district) {
+              this.form.get('district')?.setValue(p.district, { emitEvent: false });
+            }
+          });
+        } else {
+          this.form.get('city')?.setValue(p.city, { emitEvent: false });
+          if (p.district) this.form.get('district')?.setValue(p.district, { emitEvent: false });
+        }
+      });
+    }
   }
 
   isInvalid(field: string): boolean {
@@ -346,16 +292,14 @@ export class MyProfileFormComponent implements OnInit {
     return !!(control && control.invalid && (control.dirty || control.touched));
   }
 
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.avatarFile = file;
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.avatarPreview = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
+  getProvinceName(code: any): string {
+    if (!code) return '';
+    return this.provinces().find(p => p.code.toString() === code.toString())?.name || '';
+  }
+
+  getDistrictName(code: any): string {
+    if (!code) return '';
+    return this.districts().find(d => d.code.toString() === code.toString())?.name || '';
   }
 
   submit() {
@@ -365,6 +309,12 @@ export class MyProfileFormComponent implements OnInit {
     }
 
     const val = this.form.value;
+    
+    if (val.wantsChangePassword && val.newPassword !== val.confirmPassword) {
+      alert('Mật khẩu mới và Nhập lại mật khẩu không khớp');
+      return;
+    }
+
     const formData = new FormData();
     
     // Add strings
@@ -372,14 +322,15 @@ export class MyProfileFormComponent implements OnInit {
     formData.append('email', val.email);
     formData.append('phoneNumber', val.phoneNumber);
     if (val.gender) formData.append('gender', val.gender);
-    if (val.birthDate) formData.append('birthDate', val.birthDate);
     if (val.address) formData.append('address', val.address);
     if (val.city) formData.append('city', val.city);
     if (val.district) formData.append('district', val.district);
-
-    // Add file if changed
-    if (this.avatarFile) {
-      formData.append('avatar', this.avatarFile);
+    
+    // Passwords
+    if (val.oldPassword) formData.append('oldPassword', val.oldPassword);
+    if (val.wantsChangePassword && val.newPassword) {
+      formData.append('newPassword', val.newPassword);
+      formData.append('confirmPassword', val.confirmPassword);
     }
 
     this.updateProfile.emit(formData);

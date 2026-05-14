@@ -76,7 +76,6 @@ import { FormsModule } from '@angular/forms';
       border-radius: 12px;
       border: 1px solid var(--border-color);
       overflow-x: auto;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
     }
     .data-table {
       width: 100%;
@@ -157,12 +156,12 @@ import { FormsModule } from '@angular/forms';
     /* Badges */
     .role-badge {
       display: inline-block;
-      padding: 0.25rem 0.75rem;
+      padding: 0.2rem 0.6rem;
       border-radius: 9999px;
-      font-size: 0.8rem;
-      font-weight: 600;
+      font-size: 0.7rem;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.4px;
     }
     .role-admin {
       background: rgba(239, 68, 68, 0.15);

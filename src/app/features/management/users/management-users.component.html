@@ -3,9 +3,10 @@
 
   <!-- Top Action Bar -->
   <header
-    class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+    class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
     <div class="flex flex-col md:flex-row items-start md:items-center gap-4 w-full xl:w-auto">
-      <h1 class="text-xl font-bold text-slate-800 dark:text-white whitespace-nowrap">{{ t('management.userManagement') }}</h1>
+      <h1 class="text-xl font-bold text-slate-800 dark:text-white whitespace-nowrap">{{ t('management.userManagement')
+        }}</h1>
       <div class="h-8 w-px bg-slate-200 dark:bg-slate-700 hidden md:block"></div>
 
       <!-- Filters (only show in list view) -->
@@ -21,24 +22,41 @@
           </div>
           <input type="text"
             class="pl-10 w-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-rose-500 outline-none transition-all"
-            [placeholder]="t('management.userSearchPlaceholder')" [ngModel]="searchQuery()" (ngModelChange)="onSearchChange($event)">
+            [placeholder]="t('management.userSearchPlaceholder')" [ngModel]="searchQuery()"
+            (ngModelChange)="onSearchChange($event)">
         </div>
 
         <!-- Role Filter -->
-        <div class="relative min-w-[160px]">
-          <select
-              class="w-full appearance-none border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 pl-3 pr-8 text-sm focus:ring-2 focus:ring-rose-500 outline-none transition-all cursor-pointer"
-              [ngModel]="selectedRole()" (ngModelChange)="onRoleChange($event)">
-              <option value="">{{ t('management.filterAllRoles') }}</option>
-              <option value="ADMIN">{{ t('management.roleAdmin') }}</option>
-              <option value="STAFF">{{ t('management.roleStaff') }}</option>
-              <option value="USER">{{ t('management.roleUser') }}</option>
-          </select>
-          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
-            <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+        <div class="relative min-w-[180px]">
+          <div
+            class="border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 px-3 text-sm flex justify-between items-center cursor-pointer hover:border-rose-300 transition-all"
+            [class.ring-2]="isRoleFilterOpen()" [class.ring-rose-500]="isRoleFilterOpen()"
+            [class.border-rose-500]="isRoleFilterOpen()" (click)="isRoleFilterOpen.set(!isRoleFilterOpen())">
+            <span class="truncate font-medium" [class.text-slate-400]="!selectedRole()">
+              {{ selectedRole() === 'ADMIN' ? t('management.roleAdmin') : (selectedRole() === 'STAFF' ?
+              t('management.roleStaff') : (selectedRole() === 'USER' ? t('management.roleUser') :
+              t('management.filterAllRoles'))) }}
+            </span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform"
+              [class.rotate-180]="isRoleFilterOpen()" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd"
+                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                clip-rule="evenodd" />
             </svg>
           </div>
+          <div *ngIf="isRoleFilterOpen()"
+            class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg py-1 z-50 max-h-60 overflow-y-auto">
+            <div
+              class="px-4 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors italic"
+              (click)="onRoleChange(''); isRoleFilterOpen.set(false)">{{ t('management.filterAllRoles') }}</div>
+            <div class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors"
+              (click)="onRoleChange('ADMIN'); isRoleFilterOpen.set(false)">{{ t('management.roleAdmin') }}</div>
+            <div class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors"
+              (click)="onRoleChange('STAFF'); isRoleFilterOpen.set(false)">{{ t('management.roleStaff') }}</div>
+            <div class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors"
+              (click)="onRoleChange('USER'); isRoleFilterOpen.set(false)">{{ t('management.roleUser') }}</div>
+          </div>
+          <div *ngIf="isRoleFilterOpen()" class="fixed inset-0 z-40" (click)="isRoleFilterOpen.set(false)"></div>
         </div>
       </div>
     </div>
@@ -49,13 +67,25 @@
       <button *ngIf="currentView() === 'LIST'"
         class="px-4 py-2 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors whitespace-nowrap"
         (click)="switchToProfile()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
         {{ t('management.myProfile') }}
       </button>
       <button *ngIf="currentView() === 'MY_PROFILE'"
         class="px-4 py-2 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors whitespace-nowrap"
         (click)="switchToList()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="8" y1="6" x2="21" y2="6" />
+          <line x1="8" y1="12" x2="21" y2="12" />
+          <line x1="8" y1="18" x2="21" y2="18" />
+          <line x1="3" y1="6" x2="3.01" y2="6" />
+          <line x1="3" y1="12" x2="3.01" y2="12" />
+          <line x1="3" y1="18" x2="3.01" y2="18" />
+        </svg>
         {{ t('management.userList') }}
       </button>
 
@@ -64,22 +94,24 @@
         <button *ngIf="selectedUsernames().length > 0"
           class="px-4 py-2 border border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/50 dark:hover:bg-red-900/20 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors whitespace-nowrap"
           (click)="bulkDelete()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18" />
+            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+            <line x1="10" x2="10" y1="11" y2="17" />
+            <line x1="14" x2="14" y1="11" y2="17" />
+          </svg>
           {{ t('management.bulkDelete') }} ({{ selectedUsernames().length }})
         </button>
 
-        <!-- Add Staff -->
-        <button
-          class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors shadow-sm whitespace-nowrap"
-          (click)="openCreateModal()">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          {{ t('management.addStaff') }}
-        </button>
+
       </ng-container>
     </div>
   </header>
 
-  <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden min-h-[600px]">
+  <div
+    class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden min-h-[600px]">
     <!-- LIST VIEW -->
     <ng-container *ngIf="currentView() === 'LIST'">
       <!-- Loading State -->
@@ -92,25 +124,35 @@
       <ng-container *ngIf="!isLoadingList()">
         <div class="overflow-x-auto">
           <!-- We still use UserTableComponent, but it's now wrapped in the new container -->
-          <app-user-table 
-            [users]="paginatedUsers()"
-            [selectedUsernames]="selectedUsernames()"
-            (selectionChange)="onSelectionChange($event)"
-            (viewDetail)="openUserDetail($event)"
+          <app-user-table [users]="paginatedUsers()" [selectedUsernames]="selectedUsernames()"
+            (selectionChange)="onSelectionChange($event)" (viewDetail)="openUserDetail($event)"
             (deleteUser)="deleteUser($event)">
           </app-user-table>
         </div>
 
         <!-- Pagination -->
-        <div class="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-between items-center" *ngIf="totalPages() > 1">
-          <button class="p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors" [disabled]="currentPage() === 1" (click)="onPageChange(currentPage() - 1)">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        <div
+          class="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-between items-center"
+          *ngIf="totalPages() > 1">
+          <button
+            class="p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors"
+            [disabled]="currentPage() === 1" (click)="onPageChange(currentPage() - 1)">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
           </button>
-          
-          <span class="text-sm font-medium text-slate-600 dark:text-slate-400">Trang {{ currentPage() }} / {{ totalPages() }}</span>
-          
-          <button class="p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors" [disabled]="currentPage() === totalPages()" (click)="onPageChange(currentPage() + 1)">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+
+          <span class="text-sm font-medium text-slate-600 dark:text-slate-400">Trang {{ currentPage() }} / {{
+            totalPages() }}</span>
+
+          <button
+            class="p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors"
+            [disabled]="currentPage() === totalPages()" (click)="onPageChange(currentPage() + 1)">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
           </button>
         </div>
       </ng-container>
@@ -119,28 +161,16 @@
     <!-- MY PROFILE VIEW -->
     <ng-container *ngIf="currentView() === 'MY_PROFILE'">
       <div class="p-6">
-        <app-my-profile-form
-          [profile]="myProfileData()"
-          [isLoading]="isLoadingProfile()"
-          [isSubmitting]="isSubmittingProfile()"
-          (updateProfile)="updateMyProfile($event)">
+        <app-my-profile-form [profile]="myProfileData()" [isLoading]="isLoadingProfile()"
+          [isSubmitting]="isSubmittingProfile()" (updateProfile)="updateMyProfile($event)">
         </app-my-profile-form>
       </div>
     </ng-container>
   </div>
 
-  <!-- Modals & Drawers -->
-  <app-staff-create-modal
-    [isOpen]="isCreateModalOpen()"
-    [isSubmitting]="isSubmittingCreate()"
-    (closeDialog)="closeCreateModal()"
-    (submitForm)="submitStaffCreate($event)">
-  </app-staff-create-modal>
 
-  <app-user-detail-drawer
-    [isOpen]="isDrawerOpen()"
-    [isLoading]="isLoadingDrawer()"
-    [user]="selectedUserDetail()"
+
+  <app-user-detail-drawer [isOpen]="isDrawerOpen()" [isLoading]="isLoadingDrawer()" [user]="selectedUserDetail()"
     (closeDrawer)="closeUserDetail()">
   </app-user-detail-drawer>
 </div>

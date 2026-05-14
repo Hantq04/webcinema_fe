@@ -10,305 +10,114 @@ import { AuthService } from '../../../../core/services/auth.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   template: `
-    <div class="modal-overlay" [class.show]="isOpen">
-      <div class="modal-container">
-        <div class="modal-header">
-          <h3>{{ t('management.staffCreateTitle') }}</h3>
-          <button class="close-btn" (click)="close()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    <div *ngIf="isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+      <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in duration-200">
+        <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+          <h3 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-rose-500"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>
+            {{ t('management.staffCreateTitle') }}
+          </h3>
+          <button class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors" (click)="close()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </div>
         
-        <div class="modal-body">
-          <p class="modal-desc">{{ t('management.staffCreateDesc') }}</p>
+        <div class="flex-1 overflow-y-auto p-6">
+          <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">{{ t('management.staffCreateDesc') }}</p>
           
-          <form [formGroup]="form" (ngSubmit)="submit()">
-            <div class="form-row">
-              <div class="form-group">
-                <label>{{ t('management.userFormUsername') }} <span class="required">*</span></label>
-                <input type="text" formControlName="userName" class="form-control" [class.is-invalid]="isInvalid('userName')">
-                <div class="error-msg" *ngIf="isInvalid('userName')">Username từ 3-20 ký tự.</div>
+          <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.userFormUsername') }} <span class="text-rose-500">*</span></label>
+                <input type="text" formControlName="userName" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('userName')">
+                <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('userName')">Username từ 3-20 ký tự.</p>
               </div>
-              <div class="form-group">
-                <label>{{ t('management.userFormEmail') }} <span class="required">*</span></label>
-                <input type="email" formControlName="email" class="form-control" [class.is-invalid]="isInvalid('email')">
-                <div class="error-msg" *ngIf="isInvalid('email')">Email không hợp lệ.</div>
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label>{{ t('management.userFormName') }} <span class="required">*</span></label>
-                <input type="text" formControlName="name" class="form-control" [class.is-invalid]="isInvalid('name')">
-                <div class="error-msg" *ngIf="isInvalid('name')">Họ tên từ 3-20 ký tự.</div>
-              </div>
-              <div class="form-group">
-                <label>{{ t('management.userFormPhone') }} <span class="required">*</span></label>
-                <input type="text" formControlName="phoneNumber" class="form-control" [class.is-invalid]="isInvalid('phoneNumber')">
-                <div class="error-msg" *ngIf="isInvalid('phoneNumber')">SĐT phải bắt đầu bằng 0 và có 10 chữ số.</div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.userFormEmail') }} <span class="text-rose-500">*</span></label>
+                <input type="email" formControlName="email" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('email')">
+                <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('email')">Email không hợp lệ.</p>
               </div>
             </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label>{{ t('management.userFormBirthDate') }} <span class="required">*</span></label>
-                <input type="date" formControlName="birthDate" class="form-control" [class.is-invalid]="isInvalid('birthDate')">
-                <div class="error-msg" *ngIf="isInvalid('birthDate')">Ngày sinh là bắt buộc.</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.userFormName') }} <span class="text-rose-500">*</span></label>
+                <input type="text" formControlName="name" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('name')">
+                <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('name')">Họ tên từ 3-20 ký tự.</p>
               </div>
-              <div class="form-group">
-                <label>{{ t('management.userFormGender') }} <span class="required">*</span></label>
-                <select formControlName="gender" class="form-control" [class.is-invalid]="isInvalid('gender')">
-                  <option value="">Chọn giới tính</option>
-                  <option value="Nam">Nam</option>
-                  <option value="Nữ">Nữ</option>
-                </select>
-                <div class="error-msg" *ngIf="isInvalid('gender')">Vui lòng chọn giới tính.</div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.userFormPhone') }} <span class="text-rose-500">*</span></label>
+                <input type="text" formControlName="phoneNumber" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('phoneNumber')">
+                <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('phoneNumber')">SĐT phải bắt đầu bằng 0 và có 10 chữ số.</p>
               </div>
             </div>
 
-            <div class="form-group">
-              <label>{{ t('management.userFormPassword') }} <span class="required">*</span></label>
-              <input type="password" formControlName="password" class="form-control" [class.is-invalid]="isInvalid('password')">
-              <div class="error-msg" *ngIf="isInvalid('password')">Mật khẩu cần 8-20 ký tự, có chữ hoa, chữ thường, số và ký tự đặc biệt.</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.userFormBirthDate') }} <span class="text-rose-500">*</span></label>
+                <input type="date" formControlName="birthDate" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('birthDate')">
+                <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('birthDate')">Ngày sinh là bắt buộc.</p>
+              </div>
+              <div class="relative">
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.userFormGender') }} <span class="text-rose-500">*</span></label>
+                <div class="relative w-full">
+                  <div
+                    class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 text-sm flex justify-between items-center cursor-pointer hover:border-rose-300 transition-all"
+                    [class.ring-2]="isGenderOpen" [class.ring-rose-500]="isGenderOpen"
+                    [class.border-rose-500]="isGenderOpen || isInvalid('gender')" (click)="isGenderOpen = !isGenderOpen">
+                    <span class="truncate" [class.text-slate-400]="!form.get('gender')?.value">{{ form.get('gender')?.value || 'Chọn giới tính' }}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform" [class.rotate-180]="isGenderOpen" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <div *ngIf="isGenderOpen" class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg py-1 z-50">
+                    <div class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors" (click)="form.get('gender')?.setValue('Nam'); isGenderOpen = false">Nam</div>
+                    <div class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors" (click)="form.get('gender')?.setValue('Nữ'); isGenderOpen = false">Nữ</div>
+                  </div>
+                  <div *ngIf="isGenderOpen" class="fixed inset-0 z-40" (click)="isGenderOpen = false"></div>
+                </div>
+                <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('gender')">Vui lòng chọn giới tính.</p>
+              </div>
             </div>
 
-            <div class="form-group">
-              <label>{{ t('management.userFormPoint') }}</label>
-              <input type="number" formControlName="point" class="form-control">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.userFormPassword') }} <span class="text-rose-500">*</span></label>
+              <input type="password" formControlName="password" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('password')">
+              <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('password')">Mật khẩu cần 8-20 ký tự, có chữ hoa, chữ thường, số và ký tự đặc biệt.</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.userFormPoint') }}</label>
+              <input type="number" formControlName="point" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow">
             </div>
 
             <!-- Captcha Section -->
-            <div class="captcha-section">
-              <div class="captcha-image" *ngIf="captchaUrl" (click)="loadCaptcha()">
-                <img [src]="captchaUrl" alt="Captcha" title="Click to reload">
+            <div class="flex flex-col md:flex-row gap-4 items-end bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
+              <div class="h-[42px] min-w-[120px] bg-white border border-slate-200 dark:border-slate-600 rounded-lg flex items-center justify-center cursor-pointer overflow-hidden shrink-0 shadow-sm" *ngIf="captchaUrl" (click)="loadCaptcha()" title="Click to reload">
+                <img [src]="captchaUrl" alt="Captcha" class="max-h-full">
               </div>
-              <div class="captcha-input-group form-group mb-0">
-                <label>Captcha <span class="required">*</span></label>
-                <input type="text" formControlName="captchaValue" class="form-control" [class.is-invalid]="isInvalid('captchaValue')">
-                <div class="error-msg" *ngIf="isInvalid('captchaValue')">Vui lòng nhập captcha.</div>
+              <div class="flex-1 w-full">
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Captcha <span class="text-rose-500">*</span></label>
+                <input type="text" formControlName="captchaValue" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('captchaValue')">
+                <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('captchaValue')">Vui lòng nhập captcha.</p>
               </div>
-            </div>
-
-            <div class="form-actions">
-              <button type="button" class="btn btn-secondary" (click)="close()">{{ t('management.invoiceFormCancel') }}</button>
-              <button type="submit" class="btn btn-primary" [disabled]="form.invalid || isSubmitting">
-                <span class="spinner-inline" *ngIf="isSubmitting"></span>
-                {{ t('management.userFormSave') }}
-              </button>
             </div>
           </form>
+        </div>
+        
+        <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3">
+          <button type="button" class="px-5 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors" (click)="close()">
+            {{ t('management.invoiceFormCancel') }}
+          </button>
+          <button type="button" class="px-5 py-2 text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 rounded-lg transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2" [disabled]="form.invalid || isSubmitting" (click)="submit()">
+            <svg *ngIf="isSubmitting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            {{ t('management.userFormSave') }}
+          </button>
         </div>
       </div>
     </div>
   `,
-  styles: [`
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1100;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.2s ease-in-out;
-      backdrop-filter: blur(2px);
-    }
-    .modal-overlay.show {
-      opacity: 1;
-      visibility: visible;
-    }
-    .modal-container {
-      background: var(--bg-card);
-      border-radius: 12px;
-      width: 100%;
-      max-width: 600px;
-      max-height: 90vh;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
-      transform: translateY(20px);
-      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .modal-overlay.show .modal-container {
-      transform: translateY(0);
-    }
-    
-    .modal-header {
-      padding: 1.25rem 1.5rem;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .modal-header h3 {
-      margin: 0;
-      font-size: 1.25rem;
-      color: var(--text-primary);
-    }
-    .close-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-secondary);
-      cursor: pointer;
-      padding: 0.5rem;
-      border-radius: 50%;
-    }
-    .close-btn:hover {
-      background: var(--hover-color);
-      color: var(--text-primary);
-    }
-
-    .modal-body {
-      padding: 1.5rem;
-      overflow-y: auto;
-    }
-    .modal-desc {
-      color: var(--text-secondary);
-      margin-top: 0;
-      margin-bottom: 1.5rem;
-      font-size: 0.95rem;
-    }
-
-    .form-row {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-    .form-row .form-group {
-      flex: 1;
-      margin-bottom: 0;
-    }
-    .form-group {
-      margin-bottom: 1rem;
-    }
-    .mb-0 {
-      margin-bottom: 0 !important;
-    }
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-      color: var(--text-primary);
-      font-size: 0.9rem;
-    }
-    .required {
-      color: #ef4444;
-    }
-    .form-control {
-      width: 100%;
-      padding: 0.6rem 0.75rem;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      background: var(--bg-card);
-      color: var(--text-primary);
-      font-size: 0.95rem;
-      transition: border-color 0.2s;
-    }
-    .form-control:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.1);
-    }
-    .form-control.is-invalid {
-      border-color: #ef4444;
-    }
-    select.form-control {
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 0.75rem center;
-    }
-    .error-msg {
-      color: #ef4444;
-      font-size: 0.8rem;
-      margin-top: 0.25rem;
-    }
-
-    .captcha-section {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-      align-items: flex-end;
-      background: rgba(0,0,0,0.02);
-      padding: 1rem;
-      border-radius: 8px;
-    }
-    :host-context(body.dark-theme) .captcha-section {
-      background: rgba(255,255,255,0.02);
-    }
-    .captcha-image {
-      background: #fff;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      height: 42px;
-      min-width: 120px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      overflow: hidden;
-    }
-    .captcha-image img {
-      max-height: 100%;
-    }
-    .captcha-input-group {
-      flex: 1;
-    }
-
-    .form-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 1rem;
-      margin-top: 2rem;
-      padding-top: 1.25rem;
-      border-top: 1px solid var(--border-color);
-    }
-    .btn {
-      padding: 0.6rem 1.5rem;
-      border-radius: 6px;
-      font-weight: 500;
-      font-size: 0.95rem;
-      cursor: pointer;
-      border: none;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .btn:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
-    .btn-secondary {
-      background: transparent;
-      border: 1px solid var(--border-color);
-      color: var(--text-primary);
-    }
-    .btn-secondary:hover:not(:disabled) {
-      background: var(--hover-color);
-    }
-    .btn-primary {
-      background: var(--primary-color);
-      color: white;
-    }
-    .btn-primary:hover:not(:disabled) {
-      filter: brightness(1.1);
-    }
-    .spinner-inline {
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 1s ease-in-out infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-  `]
+  styles: []
 })
 export class StaffCreateModalComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
@@ -324,6 +133,7 @@ export class StaffCreateModalComponent implements OnInit {
   form!: FormGroup;
   captchaId = '';
   captchaUrl = '';
+  isGenderOpen = false;
 
   ngOnInit() {
     this.initForm();

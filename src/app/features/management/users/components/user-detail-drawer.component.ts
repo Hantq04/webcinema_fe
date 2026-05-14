@@ -8,298 +8,111 @@ import { LanguageService } from '../../../../core/services/language.service';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="drawer-overlay" [class.show]="isOpen" (click)="close()">
-      <div class="drawer-content" [class.show]="isOpen" (click)="$event.stopPropagation()">
+    <div class="fixed inset-0 z-[1000] transition-all duration-300 ease-in-out flex justify-end"
+         [class.opacity-0]="!isOpen" [class.invisible]="!isOpen" [class.opacity-100]="isOpen" [class.visible]="isOpen">
+      <!-- Overlay -->
+      <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" (click)="close()"></div>
+      
+      <!-- Drawer Content -->
+      <div class="relative w-full max-w-md h-full bg-white dark:bg-slate-900 flex flex-col transition-transform duration-300 ease-in-out"
+           [class.translate-x-full]="!isOpen" [class.translate-x-0]="isOpen"
+           (click)="$event.stopPropagation()">
         
-        <div class="drawer-header">
-          <h3>{{ t('management.userDetailTitle') }}</h3>
-          <button class="close-btn" (click)="close()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900">
+          <h3 class="text-lg font-bold text-slate-800 dark:text-white m-0">{{ t('management.userDetailTitle') }}</h3>
+          <button class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 rounded-full transition-colors focus:outline-none" (click)="close()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </div>
 
-        <div class="drawer-body" *ngIf="user">
-          <div class="user-profile-header">
-            <div class="avatar">
-              <img *ngIf="user.avatarUrl" [src]="user.avatarUrl" alt="Avatar">
+        <!-- Body -->
+        <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50 dark:bg-slate-900/50" *ngIf="user">
+          
+          <div class="flex items-center gap-4 mb-8">
+            <div class="w-16 h-16 rounded-full bg-rose-600 text-white flex items-center justify-center text-2xl font-bold overflow-hidden shrink-0">
+              <img *ngIf="user.avatarUrl" [src]="user.avatarUrl" alt="Avatar" class="w-full h-full object-cover">
               <span *ngIf="!user.avatarUrl">{{ getInitial(user.name || user.userName) }}</span>
             </div>
-            <div class="profile-title">
-              <h4>{{ user.name || user.userName }}</h4>
-              <span class="role-badge" [ngClass]="getRoleClass(user.role)">
-                {{ getRoleName(user.role) }}
+            <div>
+              <h4 class="text-xl font-bold text-slate-800 dark:text-white m-0 mb-1.5">{{ user.name || user.userName }}</h4>
+              <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider" [ngClass]="getRoleClass(user)">
+                {{ getRoleName(user) }}
               </span>
             </div>
           </div>
 
-          <div class="info-section">
-            <div class="info-row">
-              <div class="info-label">{{ t('management.colUsername') }}</div>
-              <div class="info-value">{{ user.userName }}</div>
-            </div>
-            <div class="info-row">
-              <div class="info-label">{{ t('management.colEmail') }}</div>
-              <div class="info-value">{{ user.email || '-' }}</div>
-            </div>
-            <div class="info-row">
-              <div class="info-label">{{ t('management.colPhone') }}</div>
-              <div class="info-value">{{ user.phoneNumber || '-' }}</div>
-            </div>
-            <div class="info-row">
-              <div class="info-label">{{ t('management.userFormBirthDate') }}</div>
-              <div class="info-value">{{ user.birthDate ? (user.birthDate | date:'dd/MM/yyyy') : '-' }}</div>
-            </div>
-            <div class="info-row">
-              <div class="info-label">{{ t('management.userFormGender') }}</div>
-              <div class="info-value">{{ user.gender || '-' }}</div>
-            </div>
-            <div class="info-row">
-              <div class="info-label">{{ t('management.colPoint') }}</div>
-              <div class="info-value"><span class="point-badge">{{ user.point | number }}</span></div>
+          <!-- Section 1 -->
+          <div class="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl p-5 mb-6">
+            <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">{{ t('management.userDetailTitle') }}</h5>
+            
+            <div class="space-y-4">
+              <div class="flex items-start">
+                <div class="w-32 text-sm font-medium text-slate-500">{{ t('management.colUsername') }}</div>
+                <div class="flex-1 text-sm font-semibold text-slate-800 dark:text-slate-200 break-words">{{ user.userName }}</div>
+              </div>
+              <div class="flex items-start">
+                <div class="w-32 text-sm font-medium text-slate-500">{{ t('management.colEmail') }}</div>
+                <div class="flex-1 text-sm font-semibold text-slate-800 dark:text-slate-200 break-words">{{ user.email || '-' }}</div>
+              </div>
+              <div class="flex items-start">
+                <div class="w-32 text-sm font-medium text-slate-500">{{ t('management.colPhone') }}</div>
+                <div class="flex-1 text-sm font-semibold text-slate-800 dark:text-slate-200">{{ user.phoneNumber || '-' }}</div>
+              </div>
+              <div class="flex items-start">
+                <div class="w-32 text-sm font-medium text-slate-500">{{ t('management.userFormBirthDate') }}</div>
+                <div class="flex-1 text-sm font-semibold text-slate-800 dark:text-slate-200">{{ user.birthDate ? (user.birthDate | date:'dd/MM/yyyy') : '-' }}</div>
+              </div>
+              <div class="flex items-start">
+                <div class="w-32 text-sm font-medium text-slate-500">{{ t('management.userFormGender') }}</div>
+                <div class="flex-1 text-sm font-semibold text-slate-800 dark:text-slate-200">{{ getGenderTranslation(user.gender) }}</div>
+              </div>
+              <div class="flex items-start">
+                <div class="w-32 text-sm font-medium text-slate-500">{{ t('management.colPoint') }}</div>
+                <div class="flex-1">
+                  <span class="inline-block bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-500 px-2.5 py-0.5 rounded-md font-bold text-sm">
+                    {{ user.point | number }}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
           
-          <div class="info-section">
-            <h5>Địa chỉ</h5>
-            <div class="info-row" *ngIf="user.address || user.city || user.district">
-              <div class="info-value address-value">
+          <!-- Section 2 -->
+          <div class="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl p-5 mb-6">
+            <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">{{ t('management.colAddress') }}</h5>
+            
+            <div class="flex items-start" *ngIf="user.address || user.city || user.district">
+              <div class="flex-1 text-sm font-medium text-slate-800 dark:text-slate-200 leading-relaxed">
                 {{ user.address ? user.address + ', ' : '' }}
                 {{ user.district ? user.district + ', ' : '' }}
                 {{ user.city || '' }}
               </div>
             </div>
-            <div class="info-row" *ngIf="!user.address && !user.city && !user.district">
-              <div class="info-value text-muted">-</div>
+            <div class="flex items-start" *ngIf="!user.address && !user.city && !user.district">
+              <div class="flex-1 text-sm text-slate-400">-</div>
             </div>
           </div>
 
-          <!-- Add any more details as needed -->
-
         </div>
         
-        <div class="drawer-body loading-body" *ngIf="!user && isLoading">
-          <div class="spinner"></div>
-          <p>{{ t('shared.loading') }}...</p>
+        <!-- Loading State -->
+        <div class="flex-1 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900" *ngIf="!user && isLoading">
+          <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-rose-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+          <p class="text-slate-500">{{ t('shared.loading') }}...</p>
         </div>
 
-        <div class="drawer-footer">
-          <button type="button" class="btn btn-secondary" (click)="close()">{{ t('shared.close') }}</button>
+        <!-- Footer -->
+        <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 flex justify-end bg-white dark:bg-slate-900">
+          <button type="button" class="px-6 py-2 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-sm font-medium transition-colors" (click)="close()">
+            {{ t('shared.close') }}
+          </button>
         </div>
 
       </div>
     </div>
   `,
-  styles: [`
-    .drawer-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 1000;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease-in-out;
-      backdrop-filter: blur(2px);
-    }
-    .drawer-overlay.show {
-      opacity: 1;
-      visibility: visible;
-    }
-    .drawer-content {
-      position: fixed;
-      top: 0;
-      right: -400px;
-      width: 100%;
-      max-width: 400px;
-      height: 100vh;
-      background: var(--bg-card);
-      box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
-      display: flex;
-      flex-direction: column;
-      transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 1001;
-    }
-    .drawer-content.show {
-      right: 0;
-    }
-
-    .drawer-header {
-      padding: 1.5rem;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .drawer-header h3 {
-      margin: 0;
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-    .close-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-secondary);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.5rem;
-      border-radius: 50%;
-      transition: background 0.2s;
-    }
-    .close-btn:hover {
-      background: var(--hover-color);
-      color: var(--text-primary);
-    }
-
-    .drawer-body {
-      padding: 1.5rem;
-      overflow-y: auto;
-      flex: 1;
-    }
-
-    .user-profile-header {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-    .avatar {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      background: var(--primary-color);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      font-weight: bold;
-      overflow: hidden;
-    }
-    .avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .profile-title h4 {
-      margin: 0 0 0.5rem 0;
-      font-size: 1.2rem;
-      color: var(--text-primary);
-    }
-
-    .info-section {
-      background: rgba(0,0,0,0.02);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 1.25rem;
-      margin-bottom: 1.5rem;
-    }
-    :host-context(body.dark-theme) .info-section {
-      background: rgba(255,255,255,0.02);
-    }
-    .info-section h5 {
-      margin: 0 0 1rem 0;
-      font-size: 0.95rem;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .info-row {
-      display: flex;
-      margin-bottom: 1rem;
-    }
-    .info-row:last-child {
-      margin-bottom: 0;
-    }
-    .info-label {
-      width: 120px;
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-    }
-    .info-value {
-      flex: 1;
-      font-weight: 500;
-      color: var(--text-primary);
-      font-size: 0.95rem;
-      word-break: break-word;
-    }
-    .text-muted {
-      color: var(--text-secondary);
-      font-weight: normal;
-    }
-    
-    .loading-body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-secondary);
-    }
-    .spinner {
-      border: 3px solid rgba(229, 9, 20, 0.2);
-      border-radius: 50%;
-      border-top: 3px solid var(--primary-color);
-      width: 30px;
-      height: 30px;
-      animation: spin 1s linear infinite;
-      margin-bottom: 1rem;
-    }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-    .drawer-footer {
-      padding: 1.25rem 1.5rem;
-      border-top: 1px solid var(--border-color);
-      display: flex;
-      justify-content: flex-end;
-      gap: 1rem;
-    }
-
-    .btn {
-      padding: 0.6rem 1.5rem;
-      border-radius: 6px;
-      font-weight: 500;
-      font-size: 0.95rem;
-      cursor: pointer;
-      border: none;
-      transition: all 0.2s;
-    }
-    .btn-secondary {
-      background: transparent;
-      border: 1px solid var(--border-color);
-      color: var(--text-primary);
-    }
-    .btn-secondary:hover {
-      background: var(--hover-color);
-    }
-
-    /* Badges */
-    .role-badge {
-      display: inline-block;
-      padding: 0.2rem 0.6rem;
-      border-radius: 9999px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .role-admin { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
-    .role-staff { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
-    .role-user { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-    
-    .point-badge {
-      display: inline-block;
-      background: rgba(245, 158, 11, 0.15);
-      color: #f59e0b;
-      padding: 0.2rem 0.6rem;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 0.85rem;
-    }
-  `]
+  styles: []
 })
 export class UserDetailDrawerComponent {
   private readonly language = inject(LanguageService);
@@ -323,17 +136,45 @@ export class UserDetailDrawerComponent {
     return name.charAt(0).toUpperCase();
   }
 
-  getRoleClass(role: string): string {
-    const roleStr = (role || '').toUpperCase();
-    if (roleStr.includes('ADMIN')) return 'role-admin';
-    if (roleStr.includes('STAFF')) return 'role-staff';
-    return 'role-user';
+  getGenderTranslation(gender: string | null | undefined): string {
+    if (!gender) return '-';
+    const g = gender.toLowerCase();
+    if (g === 'male' || g === 'nam') return this.t('auth.male');
+    if (g === 'female' || g === 'nữ' || g === 'nu') return this.t('auth.female');
+    return gender;
   }
 
-  getRoleName(role: string): string {
-    const roleStr = (role || '').toUpperCase();
-    if (roleStr.includes('ADMIN')) return this.t('management.roleAdmin');
+  getRoleClass(user: any): string {
+    if (!user) return '';
+    const role = user.role || user.roles || user.authority || user.authorities || '';
+    const roleStr = String(role || '').toUpperCase();
+
+    if (roleStr.includes('ADMIN') || (user.userName === 'admin')) return 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400';
+    if (roleStr.includes('STAFF')) return 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400';
+
+    if (Array.isArray(role)) {
+      const roles = role.map(r => typeof r === 'string' ? r.toUpperCase() : (r.name || r.authority || '').toUpperCase());
+      if (roles.some(r => r.includes('ADMIN'))) return 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400';
+      if (roles.some(r => r.includes('STAFF'))) return 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400';
+    }
+
+    return 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400';
+  }
+
+  getRoleName(user: any): string {
+    if (!user) return '';
+    const role = user.role || user.roles || user.authority || user.authorities || '';
+    const roleStr = String(role || '').toUpperCase();
+
+    if (roleStr.includes('ADMIN') || (user.userName === 'admin')) return this.t('management.roleAdmin');
     if (roleStr.includes('STAFF')) return this.t('management.roleStaff');
+
+    if (Array.isArray(role)) {
+      const roles = role.map(r => typeof r === 'string' ? r.toUpperCase() : (r.name || r.authority || '').toUpperCase());
+      if (roles.some(r => r.includes('ADMIN'))) return this.t('management.roleAdmin');
+      if (roles.some(r => r.includes('STAFF'))) return this.t('management.roleStaff');
+    }
+
     return this.t('management.roleUser');
   }
 }
