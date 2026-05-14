@@ -49,6 +49,10 @@ export const managementRoutes: Routes = [
       {
         path: 'events',
         loadComponent: () => import('./events/management-event.component').then((m) => m.ManagementEventComponent)
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./users/management-users.component').then((m) => m.ManagementUsersComponent)
       }
     ]
   }
