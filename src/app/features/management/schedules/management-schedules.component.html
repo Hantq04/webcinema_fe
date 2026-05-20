@@ -30,7 +30,8 @@
             class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg py-1 z-50 max-h-60 overflow-y-auto">
             <div
               class="px-4 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors italic"
-              (click)="onAddressFilterChange(''); isFilterAddressOpen.set(false)">{{ t('management.allAreasFilter') }}</div>
+              (click)="onAddressFilterChange(''); isFilterAddressOpen.set(false)">{{ t('management.allAreasFilter') }}
+            </div>
             <div *ngFor="let a of addresses()"
               class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors"
               (click)="onAddressFilterChange(a); isFilterAddressOpen.set(false)">{{ a }}</div>
@@ -59,7 +60,8 @@
             class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg py-1 z-50 max-h-60 overflow-y-auto">
             <div
               class="px-4 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors italic"
-              (click)="filterCinemaName.set(''); isFilterCinemaOpen.set(false)">{{ t('management.allCinemasFilter') }}</div>
+              (click)="filterCinemaName.set(''); isFilterCinemaOpen.set(false)">{{ t('management.allCinemasFilter') }}
+            </div>
             <div *ngFor="let c of filterCinemas()"
               class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors"
               (click)="filterCinemaName.set(c); isFilterCinemaOpen.set(false)">{{ c }}</div>

@@ -4,11 +4,12 @@ import { AuthService } from '../../../core/services/auth.service';
 import { LanguageService } from '../../../core/services/language.service';
 import { NgIf, isPlatformBrowser } from '@angular/common';
 import { filter } from 'rxjs';
+import { NotificationBellComponent } from './components/notification-bell/notification-bell.component';
 
 @Component({
   selector: 'app-management-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgIf],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgIf, NotificationBellComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="management-container" [class.collapsed]="isCollapsed()">
@@ -140,10 +141,8 @@ import { filter } from 'rxjs';
             </div>
 
             <!-- Notifications -->
-            <button class="icon-btn" (click)="showAlert($event)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-              <span class="notification-badge">3</span>
-            </button>
+            <app-notification-bell></app-notification-bell>
+
 
             <!-- User Profile -->
             <div class="user-profile">

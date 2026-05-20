@@ -31,9 +31,9 @@ import { FormsModule } from '@angular/forms';
         </thead>
         <tbody>
           <tr *ngIf="users.length === 0">
-            <td colspan="9" class="empty-state">
-              <div class="empty-content">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="empty-icon"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <td colspan="9" class="p-0">
+              <div class="empty-state py-12">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--m-text-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="empty-icon"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 <p>{{ t('management.noUsersFound') }}</p>
               </div>
             </td>
@@ -189,16 +189,19 @@ import { FormsModule } from '@angular/forms';
     .empty-state {
       text-align: center;
       padding: 4rem 2rem !important;
-    }
-    .empty-content {
       display: flex;
       flex-direction: column;
       align-items: center;
-      color: var(--text-secondary);
+      justify-content: center;
+      gap: 0.75rem;
     }
     .empty-icon {
-      margin-bottom: 1rem;
-      opacity: 0.5;
+      opacity: 0.75;
+    }
+    .empty-state p {
+      font-size: 0.875rem;
+      color: var(--m-text-muted, #94a3b8);
+      margin: 0;
     }
 
     /* Dark Mode specific */

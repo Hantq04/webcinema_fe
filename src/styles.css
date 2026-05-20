@@ -77,3 +77,50 @@ body.dark-theme {
   --m-gold-text: #fbbf24;
   --m-bronze-text: #d97706;
 }
+
+/* ---- Global Spinner & State Layouts ---- */
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--m-border-color, #e2e8f0);
+  border-top-color: var(--m-brand-color, #d62f1f);
+  border-radius: 50%;
+  animation: global-spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes global-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-state,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+.loading-state span,
+.loading-state p {
+  font-size: 0.875rem;
+  color: var(--m-text-secondary, #64748b);
+  margin: 0;
+}
+
+.empty-state p {
+  font-size: 0.875rem;
+  color: var(--m-text-muted, #94a3b8);
+  margin: 0;
+}
+
+.empty-state svg {
+  color: var(--m-text-muted, #94a3b8);
+  stroke: var(--m-text-muted, #94a3b8);
+  opacity: 0.75;
+}

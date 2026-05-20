@@ -115,9 +115,9 @@
     <!-- LIST VIEW -->
     <ng-container *ngIf="currentView() === 'LIST'">
       <!-- Loading State -->
-      <div class="flex flex-col items-center justify-center py-20 text-slate-500" *ngIf="isLoadingList()">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-600 mb-4"></div>
-        <p>{{ t('shared.loading') }}...</p>
+      <div class="loading-state py-12" *ngIf="isLoadingList()">
+        <div class="spinner"></div>
+        <span>{{ t('shared.loading') }}...</span>
       </div>
 
       <!-- Table -->

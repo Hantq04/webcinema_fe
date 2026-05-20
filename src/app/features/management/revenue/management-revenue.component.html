@@ -285,23 +285,30 @@
     </div>
 
     <div class="card-body">
-      <!-- Loading skeleton -->
-      <div class="chart-skeleton" *ngIf="isLoading()">
-        <div class="skeleton skeleton-chart"></div>
+      <!-- Loading State -->
+      <div class="loading-state py-12" *ngIf="isLoading()">
+        <div class="spinner"></div>
+        <span>{{ t('management.revenueSearching') }}</span>
       </div>
 
       <!-- Empty State -->
-      <div class="empty-state" *ngIf="!isLoading() && !hasError() && summaryData().length === 0">
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="empty-icon"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
-        <p class="empty-text">{{ t('management.revenueNoData') }}</p>
-        <p class="empty-subtext">{{ t('management.revenueNoDataDesc') }}</p>
+      <div class="empty-state py-12" *ngIf="!isLoading() && !hasError() && summaryData().length === 0">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+          stroke="var(--m-text-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/>
+        </svg>
+        <p>{{ t('management.revenueNoData') }}</p>
+        <p style="font-size: 0.8rem; color: var(--m-text-muted); margin-top: -0.25rem;">{{ t('management.revenueNoDataDesc') }}</p>
       </div>
 
       <!-- Error State -->
-      <div class="error-state" *ngIf="!isLoading() && hasError()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="error-icon"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
-        <p class="empty-text">{{ t('management.revenueError') }}</p>
-        <p class="empty-subtext">{{ t('management.revenueErrorDesc') }}</p>
+      <div class="empty-state py-12" *ngIf="!isLoading() && hasError()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+          stroke="var(--m-danger-text)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>
+        </svg>
+        <p>{{ t('management.revenueError') }}</p>
+        <p style="font-size: 0.8rem; color: var(--m-text-muted); margin-top: -0.25rem;">{{ t('management.revenueErrorDesc') }}</p>
       </div>
 
       <!-- Chart Canvas -->
@@ -320,19 +327,17 @@
     <div class="card-body no-padding">
 
       <!-- Table Loading -->
-      <div class="table-loading" *ngIf="isLoading()">
-        <div *ngFor="let i of [1,2,3,4,5]" class="skeleton-row">
-          <div class="skeleton skeleton-cell"></div>
-          <div class="skeleton skeleton-cell"></div>
-          <div class="skeleton skeleton-cell"></div>
-          <div class="skeleton skeleton-cell"></div>
-          <div class="skeleton skeleton-cell-sm"></div>
-        </div>
+      <div class="loading-state py-12" *ngIf="isLoading()">
+        <div class="spinner"></div>
+        <span>{{ t('management.revenueSearching') }}</span>
       </div>
 
       <!-- Empty / Error state for table -->
-      <div class="table-empty" *ngIf="!isLoading() && (summaryData().length === 0 || hasError())">
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+      <div class="empty-state py-12" *ngIf="!isLoading() && (summaryData().length === 0 || hasError())">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+          stroke="var(--m-text-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/>
+        </svg>
         <p>{{ hasError() ? t('management.revenueError') : t('management.revenueNoTableData') }}</p>
       </div>
 

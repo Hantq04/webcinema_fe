@@ -1,6 +1,7 @@
 <div class="p-6 max-w-[1500px] mx-auto space-y-6">
   <!-- Header Section -->
-  <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+  <header
+    class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
     <div>
       <h1 class="text-xl font-bold text-slate-800 dark:text-white">{{ t('management.promotions') }}</h1>
       <p class="text-sm text-slate-500">Quản lý các chương trình khuyến mãi và mã giảm giá</p>
@@ -10,18 +11,18 @@
       <div class="relative flex-1 md:w-64">
         <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </span>
-        <input type="text" 
-               class="pl-10 w-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 text-sm outline-none focus:ring-2 focus:ring-rose-500 transition-all"
-               [placeholder]="t('management.search')"
-               [ngModel]="searchQuery()"
-               (ngModelChange)="searchQuery.set($event)">
+        <input type="text"
+          class="pl-10 w-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 text-sm outline-none focus:ring-2 focus:ring-rose-500 transition-all"
+          [placeholder]="t('management.search')" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)">
       </div>
 
-      <button class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-sm font-medium flex items-center gap-2 transition-colors shadow-sm"
-              (click)="openAddModal()">
+      <button
+        class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-sm font-medium flex items-center gap-2 transition-colors shadow-sm"
+        (click)="openAddModal()">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
@@ -31,11 +32,13 @@
   </header>
 
   <!-- Promotions List -->
-  <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+  <div
+    class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
     <div class="overflow-x-auto">
       <table class="w-full text-left border-collapse">
         <thead>
-          <tr class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">
+          <tr
+            class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">
             <th class="px-6 py-4 font-bold">Chương trình</th>
             <th class="px-6 py-4 font-bold text-center">Giảm giá</th>
             <th class="px-6 py-4 font-bold text-center">Số lượng</th>
@@ -56,7 +59,8 @@
               Không tìm thấy khuyến mãi nào
             </td>
           </tr>
-          <tr *ngFor="let p of filteredPromotions()" class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+          <tr *ngFor="let p of filteredPromotions()"
+            class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
             <td class="px-6 py-4">
               <div class="flex flex-col">
                 <span class="font-bold text-slate-800 dark:text-white">{{ p.name }}</span>
@@ -64,7 +68,8 @@
               </div>
             </td>
             <td class="px-6 py-4 text-center">
-              <span class="px-2 py-1 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-lg font-bold text-sm">
+              <span
+                class="px-2 py-1 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-lg font-bold text-sm">
                 -{{ p.percent }}%
               </span>
             </td>
@@ -78,20 +83,24 @@
               </div>
             </td>
             <td class="px-6 py-4">
-              <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg text-xs font-bold">
+              <span
+                class="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg text-xs font-bold">
                 {{ p.rankCustomerName }}
               </span>
             </td>
             <td class="px-6 py-4 text-center">
-              <span [class]="p.isActive ? 'text-emerald-500' : 'text-slate-400'" class="flex items-center justify-center gap-1.5 text-xs font-bold uppercase">
+              <span [class]="p.isActive ? 'text-emerald-500' : 'text-slate-400'"
+                class="flex items-center justify-center gap-1.5 text-xs font-bold uppercase">
                 <span class="w-2 h-2 rounded-full" [class]="p.isActive ? 'bg-emerald-500' : 'bg-slate-400'"></span>
                 {{ p.isActive ? 'Đang chạy' : 'Kết thúc' }}
               </span>
             </td>
             <td class="px-6 py-4 text-right">
               <button class="p-2 text-slate-400 hover:text-red-600 transition-colors" (click)="openDeleteModal(p)">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
               </button>
             </td>
@@ -102,140 +111,188 @@
   </div>
 
   <!-- Form Modal -->
-  <div *ngIf="showFormModal()" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-    <div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+  <div *ngIf="showFormModal()"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+    <div
+      class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in zoom-in duration-200">
       <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
         <h2 class="text-xl font-bold text-slate-800 dark:text-white">Thêm khuyến mãi mới</h2>
         <button (click)="showFormModal.set(false)" class="text-slate-400 hover:text-slate-600 transition-colors">
-          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
       </div>
 
       <form [formGroup]="promotionForm" (ngSubmit)="submitForm()" class="p-6 space-y-4">
-        <div *ngIf="fieldErrors()['_general']" class="p-3 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 rounded-xl text-xs text-red-600 dark:text-red-400">
+        <div *ngIf="fieldErrors()['_general']"
+          class="p-3 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 rounded-xl text-xs text-red-600 dark:text-red-400">
           {{ fieldErrors()['_general'] }}
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="space-y-1">
             <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Tên khuyến mãi</label>
-            <input type="text" formControlName="name" class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:ring-2 focus:ring-rose-500 transition-all" [class.border-rose-500]="(promotionForm.get('name')?.invalid && promotionForm.get('name')?.touched) || fieldErrors()['name']">
+            <input type="text" formControlName="name"
+              class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:ring-2 focus:ring-rose-500 transition-all"
+              [class.border-rose-500]="(promotionForm.get('name')?.invalid && promotionForm.get('name')?.touched) || fieldErrors()['name']">
             <p *ngIf="fieldErrors()['name']" class="text-xs text-rose-500 mt-1">{{ fieldErrors()['name'] }}</p>
           </div>
           <div class="space-y-1">
             <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Loại khuyến mãi</label>
             <div class="relative w-full">
-              <div class="w-full border border-slate-200 dark:border-slate-700 rounded-xl py-2 px-4 text-sm flex justify-between items-center cursor-pointer bg-white dark:bg-slate-800 transition-all hover:border-rose-300 dark:hover:border-rose-500"
+              <div
+                class="w-full border border-slate-200 dark:border-slate-700 rounded-xl py-2 px-4 text-sm flex justify-between items-center cursor-pointer bg-white dark:bg-slate-800 transition-all hover:border-rose-300 dark:hover:border-rose-500"
                 [class.ring-2]="isTypeDropdownOpen()" [class.ring-rose-500]="isTypeDropdownOpen()"
-                [class.border-rose-500]="(promotionForm.get('promotionType')?.invalid && promotionForm.get('promotionType')?.touched) || fieldErrors()['promotionType']" 
+                [class.border-rose-500]="(promotionForm.get('promotionType')?.invalid && promotionForm.get('promotionType')?.touched) || fieldErrors()['promotionType']"
                 (click)="isTypeDropdownOpen.set(!isTypeDropdownOpen())">
                 <span [class.text-slate-400]="!promotionForm.get('promotionType')?.value" class="font-medium">
-                  {{ promotionForm.get('promotionType')?.value === 'FOOD' ? t('management.promotionFood') : 
-                     (promotionForm.get('promotionType')?.value === 'TICKET' ? t('management.promotionTicket') : 'Chọn loại khuyến mãi') }}
+                  {{ promotionForm.get('promotionType')?.value === 'FOOD' ? t('management.promotionFood') :
+                  (promotionForm.get('promotionType')?.value === 'TICKET' ? t('management.promotionTicket') : 'Chọn loại
+                  khuyến mãi') }}
                 </span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform"
                   [class.rotate-180]="isTypeDropdownOpen()" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  <path fill-rule="evenodd"
+                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                    clip-rule="evenodd" />
                 </svg>
               </div>
-              <div *ngIf="isTypeDropdownOpen()" class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg py-1 z-50">
-                <div class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors"
+              <div *ngIf="isTypeDropdownOpen()"
+                class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg py-1 z-50">
+                <div
+                  class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors"
                   (click)="promotionForm.get('promotionType')?.setValue('FOOD'); isTypeDropdownOpen.set(false)">
                   {{ t('management.promotionFood') }}
                 </div>
-                <div class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors"
+                <div
+                  class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors"
                   (click)="promotionForm.get('promotionType')?.setValue('TICKET'); isTypeDropdownOpen.set(false)">
                   {{ t('management.promotionTicket') }}
                 </div>
               </div>
-              <div *ngIf="isTypeDropdownOpen()" class="fixed inset-0 z-40" (click)="isTypeDropdownOpen.set(false)"></div>
+              <div *ngIf="isTypeDropdownOpen()" class="fixed inset-0 z-40" (click)="isTypeDropdownOpen.set(false)">
+              </div>
             </div>
-            <p *ngIf="fieldErrors()['promotionType']" class="text-xs text-rose-500 mt-1">{{ fieldErrors()['promotionType'] }}</p>
+            <p *ngIf="fieldErrors()['promotionType']" class="text-xs text-rose-500 mt-1">{{
+              fieldErrors()['promotionType'] }}</p>
           </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="space-y-1">
             <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Phần trăm giảm (%)</label>
-            <input type="number" formControlName="percent" class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:ring-2 focus:ring-rose-500 transition-all" [class.border-rose-500]="(promotionForm.get('percent')?.invalid && promotionForm.get('percent')?.touched) || fieldErrors()['percent']">
+            <input type="number" formControlName="percent"
+              class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:ring-2 focus:ring-rose-500 transition-all"
+              [class.border-rose-500]="(promotionForm.get('percent')?.invalid && promotionForm.get('percent')?.touched) || fieldErrors()['percent']">
             <p *ngIf="fieldErrors()['percent']" class="text-xs text-rose-500 mt-1">{{ fieldErrors()['percent'] }}</p>
           </div>
           <div class="space-y-1">
             <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Số lượng mã</label>
-            <input type="number" formControlName="quantity" class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:ring-2 focus:ring-rose-500 transition-all" [class.border-rose-500]="(promotionForm.get('quantity')?.invalid && promotionForm.get('quantity')?.touched) || fieldErrors()['quantity']">
+            <input type="number" formControlName="quantity"
+              class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:ring-2 focus:ring-rose-500 transition-all"
+              [class.border-rose-500]="(promotionForm.get('quantity')?.invalid && promotionForm.get('quantity')?.touched) || fieldErrors()['quantity']">
             <p *ngIf="fieldErrors()['quantity']" class="text-xs text-rose-500 mt-1">{{ fieldErrors()['quantity'] }}</p>
           </div>
           <div class="space-y-1">
             <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Hạng khách hàng</label>
             <div class="relative w-full">
-              <div class="w-full border border-slate-200 dark:border-slate-700 rounded-xl py-2 px-4 text-sm flex justify-between items-center cursor-pointer bg-white dark:bg-slate-800 transition-all hover:border-rose-300 dark:hover:border-rose-500"
+              <div
+                class="w-full border border-slate-200 dark:border-slate-700 rounded-xl py-2 px-4 text-sm flex justify-between items-center cursor-pointer bg-white dark:bg-slate-800 transition-all hover:border-rose-300 dark:hover:border-rose-500"
                 [class.ring-2]="isRankDropdownOpen()" [class.ring-rose-500]="isRankDropdownOpen()"
-                [class.border-rose-500]="(promotionForm.get('nameRankCustomer')?.invalid && promotionForm.get('nameRankCustomer')?.touched) || fieldErrors()['nameRankCustomer']" 
+                [class.border-rose-500]="(promotionForm.get('nameRankCustomer')?.invalid && promotionForm.get('nameRankCustomer')?.touched) || fieldErrors()['nameRankCustomer']"
                 (click)="isRankDropdownOpen.set(!isRankDropdownOpen())">
                 <span [class.text-slate-400]="!promotionForm.get('nameRankCustomer')?.value" class="font-medium">
-                  {{ promotionForm.get('nameRankCustomer')?.value === 'Standard' ? t('management.rankStandard') : 
-                     (promotionForm.get('nameRankCustomer')?.value === 'VIP' ? t('management.rankVip') : 'Chọn hạng khách hàng') }}
+                  {{ promotionForm.get('nameRankCustomer')?.value === 'Standard' ? t('management.rankStandard') :
+                  (promotionForm.get('nameRankCustomer')?.value === 'VIP' ? t('management.rankVip') : 'Chọn hạng khách
+                  hàng') }}
                 </span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform"
                   [class.rotate-180]="isRankDropdownOpen()" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  <path fill-rule="evenodd"
+                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                    clip-rule="evenodd" />
                 </svg>
               </div>
-              <div *ngIf="isRankDropdownOpen()" class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg py-1 z-50">
-                <div class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors"
+              <div *ngIf="isRankDropdownOpen()"
+                class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg py-1 z-50">
+                <div
+                  class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors"
                   (click)="promotionForm.get('nameRankCustomer')?.setValue('Standard'); isRankDropdownOpen.set(false)">
                   {{ t('management.rankStandard') }}
                 </div>
-                <div class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors"
+                <div
+                  class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors"
                   (click)="promotionForm.get('nameRankCustomer')?.setValue('VIP'); isRankDropdownOpen.set(false)">
                   {{ t('management.rankVip') }}
                 </div>
               </div>
-              <div *ngIf="isRankDropdownOpen()" class="fixed inset-0 z-40" (click)="isRankDropdownOpen.set(false)"></div>
+              <div *ngIf="isRankDropdownOpen()" class="fixed inset-0 z-40" (click)="isRankDropdownOpen.set(false)">
+              </div>
             </div>
-            <p *ngIf="fieldErrors()['nameRankCustomer']" class="text-xs text-rose-500 mt-1">{{ fieldErrors()['nameRankCustomer'] }}</p>
+            <p *ngIf="fieldErrors()['nameRankCustomer']" class="text-xs text-rose-500 mt-1">{{
+              fieldErrors()['nameRankCustomer'] }}</p>
           </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="space-y-1">
             <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Bắt đầu từ</label>
-            <input type="datetime-local" formControlName="startTime" class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:ring-2 focus:ring-rose-500 transition-all text-sm" [class.border-rose-500]="(promotionForm.get('startTime')?.invalid && promotionForm.get('startTime')?.touched) || fieldErrors()['startTime']">
-            <p *ngIf="fieldErrors()['startTime']" class="text-xs text-rose-500 mt-1">{{ fieldErrors()['startTime'] }}</p>
+            <input type="datetime-local" formControlName="startTime"
+              class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:ring-2 focus:ring-rose-500 transition-all text-sm"
+              [class.border-rose-500]="(promotionForm.get('startTime')?.invalid && promotionForm.get('startTime')?.touched) || fieldErrors()['startTime']">
+            <p *ngIf="fieldErrors()['startTime']" class="text-xs text-rose-500 mt-1">{{ fieldErrors()['startTime'] }}
+            </p>
           </div>
           <div class="space-y-1">
             <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Kết thúc lúc</label>
-            <input type="datetime-local" formControlName="endTime" class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:ring-2 focus:ring-rose-500 transition-all text-sm" [class.border-rose-500]="(promotionForm.get('endTime')?.invalid && promotionForm.get('endTime')?.touched) || fieldErrors()['endTime']">
+            <input type="datetime-local" formControlName="endTime"
+              class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:ring-2 focus:ring-rose-500 transition-all text-sm"
+              [class.border-rose-500]="(promotionForm.get('endTime')?.invalid && promotionForm.get('endTime')?.touched) || fieldErrors()['endTime']">
             <p *ngIf="fieldErrors()['endTime']" class="text-xs text-rose-500 mt-1">{{ fieldErrors()['endTime'] }}</p>
           </div>
         </div>
 
         <div class="space-y-1">
           <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Mô tả chương trình</label>
-          <textarea formControlName="description" rows="2" class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:ring-2 focus:ring-rose-500 transition-all resize-none placeholder:text-slate-400" [class.border-rose-500]="(promotionForm.get('description')?.invalid && promotionForm.get('description')?.touched) || fieldErrors()['description']" placeholder="Mô tả ngắn gọn về khuyến mãi..."></textarea>
-          <p *ngIf="fieldErrors()['description']" class="text-xs text-rose-500 mt-1">{{ fieldErrors()['description'] }}</p>
+          <textarea formControlName="description" rows="2"
+            class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:ring-2 focus:ring-rose-500 transition-all resize-none placeholder:text-slate-400"
+            [class.border-rose-500]="(promotionForm.get('description')?.invalid && promotionForm.get('description')?.touched) || fieldErrors()['description']"
+            placeholder="Mô tả ngắn gọn về khuyến mãi..."></textarea>
+          <p *ngIf="fieldErrors()['description']" class="text-xs text-rose-500 mt-1">{{ fieldErrors()['description'] }}
+          </p>
         </div>
 
         <div class="pt-4 flex gap-3">
-          <button type="button" (click)="showFormModal.set(false)" class="flex-1 px-6 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold hover:bg-slate-50">Hủy</button>
-          <button type="submit" class="flex-1 px-6 py-2.5 rounded-xl bg-rose-600 text-white font-semibold hover:bg-rose-700 shadow-lg shadow-rose-600/20 transition-all">Tạo mã ngay</button>
+          <button type="button" (click)="showFormModal.set(false)"
+            class="flex-1 px-6 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold hover:bg-slate-50">Hủy</button>
+          <button type="submit"
+            class="flex-1 px-6 py-2.5 rounded-xl bg-rose-600 text-white font-semibold hover:bg-rose-700 shadow-lg shadow-rose-600/20 transition-all">Tạo
+            mã ngay</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- Delete Confirm Modal -->
-  <div *ngIf="showDeleteModal()" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+  <div *ngIf="showDeleteModal()"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
     <div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-sm p-8 text-center animate-in zoom-in duration-200">
       <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
         </svg>
       </div>
       <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Xóa khuyến mãi?</h3>
-      <p class="text-slate-500 dark:text-slate-400 mb-8">Bạn có chắc muốn xóa <span class="font-bold text-slate-800 dark:text-white">{{ promotionToDelete()?.name }}</span>? Mã này sẽ không còn hiệu lực.</p>
+      <p class="text-slate-500 dark:text-slate-400 mb-8">Bạn có chắc muốn xóa <span
+          class="font-bold text-slate-800 dark:text-white">{{ promotionToDelete()?.name }}</span>? Mã này sẽ không còn
+        hiệu lực.</p>
       <div class="flex gap-3">
-        <button (click)="showDeleteModal.set(false)" class="flex-1 px-6 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold hover:bg-slate-50">Hủy</button>
-        <button (click)="confirmDelete()" class="flex-1 px-6 py-2.5 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 shadow-lg shadow-red-600/20">Xóa ngay</button>
+        <button (click)="showDeleteModal.set(false)"
+          class="flex-1 px-6 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold hover:bg-slate-50">Hủy</button>
+        <button (click)="confirmDelete()"
+          class="flex-1 px-6 py-2.5 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 shadow-lg shadow-red-600/20">Xóa
+          ngay</button>
       </div>
     </div>
   </div>
