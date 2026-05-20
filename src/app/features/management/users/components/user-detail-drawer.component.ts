@@ -8,7 +8,7 @@ import { LanguageService } from '../../../../core/services/language.service';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="fixed inset-0 z-[1000] transition-all duration-300 ease-in-out flex justify-end"
+    <div *ngIf="isOpen" class="fixed inset-0 z-[1000] transition-all duration-300 ease-in-out flex justify-end"
          [class.opacity-0]="!isOpen" [class.invisible]="!isOpen" [class.opacity-100]="isOpen" [class.visible]="isOpen">
       <!-- Overlay -->
       <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" (click)="close()"></div>

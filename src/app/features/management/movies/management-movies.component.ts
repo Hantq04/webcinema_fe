@@ -323,10 +323,10 @@ export class ManagementMoviesComponent implements OnInit {
     
     // Format payload if needed (e.g. date conversion)
     if (payload.premiereDate && payload.premiereDate.length === 10) {
-      payload.premiereDate = `${payload.premiereDate}T00:00:00`;
+      payload.premiereDate = `${payload.premiereDate} 00:00:00`;
     }
     if (payload.endDate && payload.endDate.length === 10) {
-      payload.endDate = `${payload.endDate}T00:00:00`;
+      payload.endDate = `${payload.endDate} 00:00:00`;
     }
 
     const obs$ = this.isEditMode() 

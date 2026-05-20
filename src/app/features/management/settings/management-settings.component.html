@@ -1,0 +1,310 @@
+<div class="settings-wrapper animate-in">
+  <!-- Toast Notification -->
+  <div class="toast-notification" [class.show]="toast().show" [class.error]="toast().type === 'error'">
+    <svg *ngIf="toast().type === 'success'" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round" class="toast-icon">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+      <polyline points="22 4 12 14.01 9 11.01" />
+    </svg>
+    <svg *ngIf="toast().type === 'error'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="toast-icon">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" x2="12" y1="8" y2="12" />
+      <line x1="12" x2="12.01" y1="16" y2="16" />
+    </svg>
+    <span>{{ toast().message }}</span>
+    <div class="toast-progress" *ngIf="toast().show"></div>
+  </div>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">
+        {{ textSettingsTitle }}
+      </h1>
+    </div>
+  </div>
+
+  <!-- LEFT PANEL: General Settings Form -->
+  <div class="card settings-form-card">
+    <div class="card-header">
+      <div class="header-icon-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+          stroke="var(--m-brand-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3" />
+          <path
+            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+        </svg>
+        <h2>{{ textOperatingRules }}</h2>
+      </div>
+      <span class="badge" [class.badge-edit]="activeSettingId() !== null">
+        {{ activeSettingId() !== null
+        ? (isVi() ? 'Chế độ: Cập nhật (ID: ' + activeSettingId() + ')' : 'Mode: Edit (ID: ' + activeSettingId() + ')')
+        : (isVi() ? 'Chế độ: Thêm mới' : 'Mode: Create New') }}
+      </span>
+    </div>
+
+    <div class="card-body">
+      <form (ngSubmit)="$event.preventDefault()" class="form-grid">
+
+        <!-- Open Time -->
+        <div class="form-group">
+          <label class="form-label required">{{ textOpenTime }}</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            <input id="open-time" name="openTime" [ngModelOptions]="{standalone: true}" type="time" class="form-input"
+              [ngModel]="openTime()" (ngModelChange)="openTime.set($event)" />
+          </div>
+        </div>
+
+        <!-- Business Hours -->
+        <div class="form-group">
+          <label class="form-label required">{{ textBusinessHours }}</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 6v6l4 2" />
+            </svg>
+            <input id="business-hours" name="businessHours" [ngModelOptions]="{standalone: true}" type="number" min="1"
+              max="24" step="1" class="form-input" [ngModel]="businessHours()"
+              (ngModelChange)="businessHours.set($event)" placeholder="16" />
+          </div>
+        </div>
+
+        <!-- Computed Close Time -->
+        <div class="form-group">
+          <label class="form-label derived">
+            {{ textCloseTime }}
+            <span class="info-tooltip" [title]="textCloseTimeTooltip">ⓘ</span>
+          </label>
+          <div class="input-wrapper readonly-wrapper">
+            <svg class="input-icon text-muted" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 15 15" />
+            </svg>
+            <input id="close-time" type="time" class="form-input form-input-readonly" [value]="closeTime()" disabled />
+          </div>
+        </div>
+
+        <!-- Break Time -->
+        <div class="form-group">
+          <label class="form-label required">{{ textBreakTime }}</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            <input id="break-time" name="breakTime" [ngModelOptions]="{standalone: true}" type="time" class="form-input"
+              [ngModel]="breakTime()" (ngModelChange)="breakTime.set($event)" />
+          </div>
+        </div>
+
+        <!-- Weekend Surcharge Percent -->
+        <div class="form-group">
+          <label class="form-label required">{{ textWeekendPercent }}</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" x2="5" y1="5" y2="19" />
+              <circle cx="6.5" cy="6.5" r="2.5" />
+              <circle cx="17.5" cy="17.5" r="2.5" />
+            </svg>
+            <input id="percent-weekend" name="percentWeekend" [ngModelOptions]="{standalone: true}" type="number"
+              min="0" max="100" step="1" class="form-input" [ngModel]="percentWeekend()"
+              (ngModelChange)="percentWeekend.set($event)" placeholder="10" />
+          </div>
+        </div>
+
+        <!-- Time Begin to Change -->
+        <div class="form-group">
+          <label class="form-label required">{{ textTimeBeginToChange }}</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+            </svg>
+            <input id="time-begin-to-change" name="timeBeginToChange" [ngModelOptions]="{standalone: true}"
+              type="datetime-local" class="form-input" [ngModel]="timeBeginToChange()"
+              (ngModelChange)="timeBeginToChange.set($event)" />
+          </div>
+        </div>
+
+      </form>
+
+      <!-- Validation Messages -->
+      <div class="validation-alerts" *ngIf="formErrors().length > 0">
+        <div class="alert-item animate-in" *ngFor="let err of formErrors()">
+          <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2" />
+            <line x1="12" x2="12" y1="8" y2="12" />
+            <line x1="12" x2="12.01" y1="16" y2="16" />
+          </svg>
+          <span>{{ err }}</span>
+        </div>
+      </div>
+
+      <!-- Form Buttons -->
+      <div class="form-actions">
+        <button *ngIf="activeSettingId() === null" id="btn-save-setting" type="button" class="btn btn-primary"
+          (click)="saveSetting()" [disabled]="isSavingSetting()">
+          <svg class="btn-spinner" *ngIf="isSavingSetting()" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="3"></circle>
+          </svg>
+          <svg *ngIf="!isSavingSetting()" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+            <polyline points="17 21 17 13 7 13 7 21" />
+            <polyline points="7 3 7 8 15 8" />
+          </svg>
+          {{ textSaveRules }}
+        </button>
+
+        <button *ngIf="activeSettingId() !== null" id="btn-update-setting" type="button" class="btn btn-warning"
+          (click)="updateSetting()" [disabled]="isSavingSetting()">
+          <svg class="btn-spinner" *ngIf="isSavingSetting()" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="3"></circle>
+          </svg>
+          <svg *ngIf="!isSavingSetting()" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M21.05 2.95a5 5 0 0 0-7.07 0L2.95 13.98a1 1 0 0 0-.25.43l-.93 4.23a1 1 0 0 0 1.18 1.18l4.23-.93a1 1 0 0 0 .43-.25L18.66 7.6a5 5 0 0 0 0-7.07zm-2.12 2.12l-1.41 1.41-2.12-2.12 1.41-1.41a3 3 0 0 1 4.24 0 3 3 0 0 1 0 4.24z" />
+          </svg>
+          {{ textUpdateRules }}
+        </button>
+
+        <button type="button" id="btn-clear-setting" class="btn btn-outline" (click)="clearForm()">
+          {{ textResetForm }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- BOTTOM PANEL: History of General Settings -->
+  <div class="card history-settings-card">
+    <div class="card-header">
+      <div class="header-icon-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+          stroke="var(--m-brand-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 8v4l3 3" />
+          <circle cx="12" cy="12" r="10" />
+        </svg>
+        <h2>{{ textHistoryTitle }}</h2>
+      </div>
+      <span class="badge badge-secondary">{{ settingsList().length }} {{ textRecords }}</span>
+    </div>
+
+    <div class="card-body no-padding">
+
+      <!-- Loading General Settings -->
+      <div class="loading-state py-12" *ngIf="isLoadingSettings()">
+        <div class="spinner"></div>
+        <span>{{ textFetchingRecords }}</span>
+      </div>
+
+      <!-- Empty State General Settings -->
+      <div class="empty-state py-12" *ngIf="!isLoadingSettings() && settingsList().length === 0">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+          stroke="var(--m-text-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
+        </svg>
+        <p>{{ textNoRecords }}</p>
+      </div>
+
+      <!-- General Settings Table List -->
+      <div class="table-container" *ngIf="!isLoadingSettings() && settingsList().length > 0">
+        <table class="settings-table">
+          <thead>
+            <tr>
+              <th class="w-16">ID</th>
+              <th>{{ textColOpenTime }}</th>
+              <th>{{ textColOperatingHours }}</th>
+              <th>{{ textColCloseTime }}</th>
+              <th>{{ textColBreakTime }}</th>
+              <th>{{ textColWeekendSurcharge }}</th>
+              <th>{{ textColLockChangeTime }}</th>
+              <th class="text-right w-32">{{ textColActions }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of settingsList()" [class.active-row]="activeSettingId() === item.id">
+              <td class="font-bold">#{{ item.id }}</td>
+              <td>{{ formatTimeToHHMM(item.openTime) }}</td>
+              <td>{{ item.businessHours }} {{ textHour }}</td>
+              <td class="font-semibold text-brand">{{ formatTimeToHHMM(item.closeTime) }}</td>
+              <td>{{ formatTimeToHHMM(item.breakTime) }}</td>
+              <td>
+                <span class="badge-surcharge">
+                  +{{ item.percentWeekend }}%
+                </span>
+              </td>
+              <td>{{ item.timeBeginToChange }}</td>
+              <td class="text-right">
+                <div class="table-actions-wrapper">
+                  <button type="button" class="btn-table btn-table-edit" (click)="fillForm(item)" [title]="textEdit">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 20h9" />
+                      <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                    </svg>
+                  </button>
+                  <button type="button" class="btn-table btn-table-delete" (click)="deleteSetting(item.id!)"
+                    [title]="textDelete">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 6h18" />
+                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                      <line x1="10" x2="10" y1="11" y2="17" />
+                      <line x1="14" x2="14" y1="11" y2="17" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Delete Confirm Modal -->
+<div *ngIf="showDeleteConfirm()"
+  class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+  <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-sm shadow-xl overflow-hidden text-center animate-in">
+    <div class="p-6 pt-8 space-y-4">
+      <div class="mx-auto w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-bold text-slate-800 dark:text-white">Xóa cấu hình?</h3>
+      <p class="text-sm text-slate-500 dark:text-slate-400">Bạn có chắc chắn muốn xóa cấu hình này? Lịch sử rạp có thể
+        bị ảnh hưởng.</p>
+    </div>
+    <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 flex justify-center gap-3">
+      <button
+        class="px-5 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 font-medium flex-1"
+        (click)="cancelDelete()">Hủy</button>
+      <button class="px-5 py-2 bg-red-600 rounded-lg text-white font-medium flex-1 shadow-sm"
+        (click)="confirmDelete()">Xóa</button>
+    </div>
+  </div>
+</div>

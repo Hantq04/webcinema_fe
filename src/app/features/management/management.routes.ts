@@ -53,6 +53,14 @@ export const managementRoutes: Routes = [
       {
         path: 'users',
         loadComponent: () => import('./users/management-users.component').then((m) => m.ManagementUsersComponent)
+      },
+      {
+        path: 'revenue',
+        loadComponent: () => import('./revenue/management-revenue.component').then((m) => m.ManagementRevenueComponent)
+      },
+      {
+        path: 'settings',
+        loadComponent: () => import('./settings/management-settings.component').then((m) => m.ManagementSettingsComponent)
       }
     ]
   }
