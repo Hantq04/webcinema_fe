@@ -494,7 +494,7 @@ export class HeaderComponent {
         }
         void this.router.navigate(['/management/dashboard']);
       } else {
-        alert('Tính năng này chỉ dành cho nhân viên và quản lý');
+        alert(this.t('management.staffOnlyFeature'));
       }
     } else {
       void this.router.navigate(['/staff/account/login']);
@@ -506,7 +506,7 @@ export class HeaderComponent {
       event.preventDefault();
       event.stopPropagation();
     }
-    alert('Tính năng đang được phát triển. Vui lòng quay lại sau!');
+    alert(this.t('account.devMessage'));
   }
 
   protected isEn(): boolean {

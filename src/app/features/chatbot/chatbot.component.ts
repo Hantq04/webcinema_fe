@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild, computed, inject, signal, effect } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, computed, inject, signal, effect, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChatbotService, ChatMessage } from '../../core/services/chatbot.service';
@@ -8,7 +8,6 @@ import { LanguageService } from '../../core/services/language.service';
   selector: 'app-chatbot',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './chatbot.component.html',
   styleUrls: ['./chatbot.component.css']
 })
@@ -16,6 +15,7 @@ export class ChatbotComponent implements OnInit {
   protected readonly chatbotService = inject(ChatbotService);
   protected readonly language = inject(LanguageService);
   protected readonly t = this.language.t.bind(this.language);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
@@ -25,14 +25,21 @@ export class ChatbotComponent implements OnInit {
   isTyping = this.chatbotService.isTyping;
 
   constructor() {
-    // Effect to auto-scroll when messages change
+    // Effect to auto-scroll when messages change and notify Angular's change detection
     effect(() => {
       this.messages();
-      setTimeout(() => this.scrollToBottom(), 100);
+      this.isOpen();
+      this.isTyping();
+
+      setTimeout(() => {
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
+        this.scrollToBottom();
+      }, 50);
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   sendMessage() {
     const text = this.userInput().trim();
@@ -47,13 +54,22 @@ export class ChatbotComponent implements OnInit {
   }
 
   toggleChat() {
-    this.isOpen.update(v => !v);
+    this.isOpen.update(v => {
+      const nextVal = !v;
+      if (nextVal) {
+        setTimeout(() => {
+          this.cdr.markForCheck();
+          this.cdr.detectChanges();
+        }, 50);
+      }
+      return nextVal;
+    });
   }
 
   private scrollToBottom(): void {
     try {
       this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
-    } catch (err) {}
+    } catch (err) { }
   }
 
   formatTime(date: Date): string {

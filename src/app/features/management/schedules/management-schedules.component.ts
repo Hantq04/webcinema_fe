@@ -232,13 +232,13 @@ export class ManagementSchedulesComponent implements OnInit {
 
   // --- Actions ---
   deactivateExpired() {
-    if (confirm('Bạn có chắc chắn muốn hủy kích hoạt các suất chiếu đã hết hạn?')) {
+    if (confirm(this.t('management.confirmDeactivateExpired'))) {
       this.scheduleService.deactivateExpired().subscribe({
         next: () => {
           this.loadSchedules();
         },
         error: (err) => {
-          alert('Có lỗi xảy ra: ' + (err.error?.message || err.message));
+          alert(this.t('management.errorOccurred') + (err.error?.message || err.message));
         }
       });
     }
@@ -352,7 +352,7 @@ export class ManagementSchedulesComponent implements OnInit {
       this.deleteMovieId.set(m.id);
       this.showDeleteModal.set(true);
     } else {
-      alert('Không tìm thấy thông tin phim để xóa suất chiếu. Vui lòng thử lại sau.');
+      alert(this.t('management.movieInfoNotFoundToDeleteShowtime'));
     }
   }
 
@@ -367,7 +367,7 @@ export class ManagementSchedulesComponent implements OnInit {
         this.loadSchedules();
       },
       error: (err) => {
-        alert('Lỗi xóa: ' + (err.error?.message || err.message));
+        alert(this.t('management.deleteError') + (err.error?.message || err.message));
         this.showDeleteModal.set(false);
       }
     });

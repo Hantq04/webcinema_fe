@@ -30,12 +30,12 @@ import { AuthService } from '../../../../core/services/auth.service';
               <div>
                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.userFormUsername') }} <span class="text-rose-500">*</span></label>
                 <input type="text" formControlName="userName" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('userName')">
-                <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('userName')">Username từ 3-20 ký tự.</p>
+                <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('userName')">{{ t('auth.usernameLengthError') }}</p>
               </div>
               <div>
                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.userFormEmail') }} <span class="text-rose-500">*</span></label>
                 <input type="email" formControlName="email" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('email')">
-                <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('email')">Email không hợp lệ.</p>
+                <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('email')">{{ t('auth.invalidEmail') }}</p>
               </div>
             </div>
 
@@ -43,12 +43,12 @@ import { AuthService } from '../../../../core/services/auth.service';
               <div>
                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.userFormName') }} <span class="text-rose-500">*</span></label>
                 <input type="text" formControlName="name" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('name')">
-                <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('name')">Họ tên từ 3-20 ký tự.</p>
+                <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('name')">{{ t('auth.nameLengthError') }}</p>
               </div>
               <div>
                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.userFormPhone') }} <span class="text-rose-500">*</span></label>
                 <input type="text" formControlName="phoneNumber" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('phoneNumber')">
-                <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('phoneNumber')">SĐT phải bắt đầu bằng 0 và có 10 chữ số.</p>
+                <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('phoneNumber')">{{ t('auth.phoneLengthError') }}</p>
               </div>
             </div>
 
@@ -56,7 +56,7 @@ import { AuthService } from '../../../../core/services/auth.service';
               <div>
                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.userFormBirthDate') }} <span class="text-rose-500">*</span></label>
                 <input type="date" formControlName="birthDate" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('birthDate')">
-                <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('birthDate')">Ngày sinh là bắt buộc.</p>
+                <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('birthDate')">{{ t('auth.requiredBirthDate') }}</p>
               </div>
               <div class="relative">
                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.userFormGender') }} <span class="text-rose-500">*</span></label>
@@ -65,25 +65,27 @@ import { AuthService } from '../../../../core/services/auth.service';
                     class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 text-sm flex justify-between items-center cursor-pointer hover:border-rose-300 transition-all"
                     [class.ring-2]="isGenderOpen" [class.ring-rose-500]="isGenderOpen"
                     [class.border-rose-500]="isGenderOpen || isInvalid('gender')" (click)="isGenderOpen = !isGenderOpen">
-                    <span class="truncate" [class.text-slate-400]="!form.get('gender')?.value">{{ form.get('gender')?.value || 'Chọn giới tính' }}</span>
+                    <span class="truncate" [class.text-slate-400]="!form.get('gender')?.value">
+                      {{ form.get('gender')?.value ? (form.get('gender')?.value === 'Nam' ? t('auth.male') : t('auth.female')) : t('management.selectGender') }}
+                    </span>
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform" [class.rotate-180]="isGenderOpen" viewBox="0 0 20 20" fill="currentColor">
                       <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
                   </div>
                   <div *ngIf="isGenderOpen" class="absolute top-full left-0 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-lg py-1 z-50">
-                    <div class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors" (click)="form.get('gender')?.setValue('Nam'); isGenderOpen = false">Nam</div>
-                    <div class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors" (click)="form.get('gender')?.setValue('Nữ'); isGenderOpen = false">Nữ</div>
+                    <div class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors" (click)="form.get('gender')?.setValue('Nam'); isGenderOpen = false">{{ t('auth.male') }}</div>
+                    <div class="px-4 py-2.5 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 cursor-pointer transition-colors" (click)="form.get('gender')?.setValue('Nữ'); isGenderOpen = false">{{ t('auth.female') }}</div>
                   </div>
                   <div *ngIf="isGenderOpen" class="fixed inset-0 z-40" (click)="isGenderOpen = false"></div>
                 </div>
-                <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('gender')">Vui lòng chọn giới tính.</p>
+                <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('gender')">{{ t('auth.requiredGender') }}</p>
               </div>
             </div>
 
             <div>
               <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.userFormPassword') }} <span class="text-rose-500">*</span></label>
               <input type="password" formControlName="password" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('password')">
-              <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('password')">Mật khẩu cần 8-20 ký tự, có chữ hoa, chữ thường, số và ký tự đặc biệt.</p>
+              <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('password')">{{ t('auth.passwordComplexError') }}</p>
             </div>
 
             <div>
@@ -99,7 +101,7 @@ import { AuthService } from '../../../../core/services/auth.service';
               <div class="flex-1 w-full">
                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Captcha <span class="text-rose-500">*</span></label>
                 <input type="text" formControlName="captchaValue" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('captchaValue')">
-                <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('captchaValue')">Vui lòng nhập captcha.</p>
+                <p class="text-xs text-rose-500 mt-1" *ngIf="isInvalid('captchaValue')">{{ t('auth.captchaRequiredError') }}</p>
               </div>
             </div>
           </form>

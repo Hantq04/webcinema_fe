@@ -3,7 +3,7 @@ export interface AppNotification {
   title: string;
   content: string;
   type: string;
-  isRead: boolean;
+  read: boolean;
   createTime: string;
   readTime?: string;
 }

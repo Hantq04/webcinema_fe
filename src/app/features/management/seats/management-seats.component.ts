@@ -366,11 +366,11 @@ export class ManagementSeatsComponent implements OnInit {
         this.selectedSeatIds.set([]);
         this.isSelectionMode.set(false);
         this.refreshSeats();
-        alert('Làm mới các ghế đã chọn thành công!');
+        alert(this.t('management.seatsRefreshedSuccess'));
       },
       error: (err) => {
         this.isRefreshing.set(false);
-        alert('Lỗi khi làm mới ghế: ' + (err.error?.message || 'Không rõ lỗi'));
+        alert(this.t('management.seatsRefreshError') + (err.error?.message || this.t('management.unknownError')));
       }
     });
   }

@@ -146,6 +146,6 @@ export class FooterComponent {
   protected readonly language = inject(LanguageService);
   protected readonly t = this.language.t.bind(this.language);
   protected onDevelop(): void {
-    alert('Tính năng đang được phát triển. Vui lòng quay lại sau!');
+    alert(this.t('account.devMessage'));
   }
 }

@@ -68,7 +68,7 @@
           [class.border-rose-500]="isAddressDropdownOpen()" (click)="toggleAddressDropdown()">
           <span [class.text-slate-400]="!selectedAddress()" [class.text-slate-800]="selectedAddress()"
             [class.dark:text-white]="selectedAddress()" class="font-medium">
-            {{ selectedAddress() || 'Chọn khu vực' }}
+            {{ language.translateCity(selectedAddress()) || t('management.selectArea') }}
           </span>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform"
             [class.rotate-180]="isAddressDropdownOpen()" viewBox="0 0 20 20" fill="currentColor">
@@ -89,7 +89,7 @@
             [class.bg-rose-50]="selectedAddress() === addr" [class.dark:bg-rose-900/40]="selectedAddress() === addr"
             [class.text-rose-600]="selectedAddress() === addr" [class.font-medium]="selectedAddress() === addr"
             (click)="onAddressChange(addr); isAddressDropdownOpen.set(false)">
-            {{ addr }}
+            {{ language.translateCity(addr) }}
             <svg *ngIf="selectedAddress() === addr" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-rose-500"
               viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd"
@@ -115,7 +115,7 @@
           }" (click)="toggleCinemaDropdown()">
           <span [class.text-slate-400]="!selectedCinema()" [class.text-slate-800]="selectedCinema()"
             [class.dark:text-white]="selectedCinema()" class="font-medium">
-            {{ selectedCinema() || 'Chọn rạp' }}
+            {{ selectedCinema() || t('management.selectCinema') }}
           </span>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform"
             [class.text-slate-400]="selectedAddress()" [class.text-slate-300]="!selectedAddress()"
@@ -558,7 +558,7 @@
             </svg>
           </div>
           <p class="text-sm leading-relaxed text-amber-800 dark:text-amber-200 font-medium">
-            Lưu ý: Chỉ làm mới khi trạng thái ghế bị treo
+            {{ t('management.seatRefreshNote') }}
           </p>
         </div>
 

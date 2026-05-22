@@ -212,7 +212,7 @@ export class ManagementRevenueComponent implements OnInit, OnDestroy {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `revenue-report-${this.fromDate()}-to-${this.toDate()}.xlsx`;
+        a.download = `bao-cao-doanh-thu-${this.fromDate()}-to-${this.toDate()}.xlsx`;
         a.click();
         window.URL.revokeObjectURL(url);
         this.isExporting.set(false);
@@ -221,7 +221,7 @@ export class ManagementRevenueComponent implements OnInit, OnDestroy {
       error: () => {
         this.isExporting.set(false);
         this.cdr.markForCheck();
-        alert('Không thể xuất Excel. Vui lòng thử lại.');
+        alert(this.t('management.unableToExportExcel'));
       }
     });
   }
@@ -341,75 +341,75 @@ export class ManagementRevenueComponent implements OnInit, OnDestroy {
 
     const datasets = isArea
       ? [
-          {
-            ...commonLineProps,
-            label: 'Tổng doanh thu',
-            data: totalRevenues,
-            backgroundColor: gradientTotal,
-            borderColor: '#e63946',
-            pointBackgroundColor: '#fff',
-            pointBorderColor: '#e63946',
-            order: 1
-          },
-          {
-            ...commonLineProps,
-            label: 'Doanh thu vé',
-            data: ticketRevenues,
-            backgroundColor: gradientTicket,
-            borderColor: '#6366f1',
-            pointBackgroundColor: '#fff',
-            pointBorderColor: '#6366f1',
-            order: 2
-          },
-          {
-            ...commonLineProps,
-            label: 'Doanh thu F&B',
-            data: foodRevenues,
-            backgroundColor: gradientFood,
-            borderColor: '#10b981',
-            pointBackgroundColor: '#fff',
-            pointBorderColor: '#10b981',
-            order: 3
-          }
-        ]
+        {
+          ...commonLineProps,
+          label: 'Tổng doanh thu',
+          data: totalRevenues,
+          backgroundColor: gradientTotal,
+          borderColor: '#e63946',
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#e63946',
+          order: 1
+        },
+        {
+          ...commonLineProps,
+          label: 'Doanh thu vé',
+          data: ticketRevenues,
+          backgroundColor: gradientTicket,
+          borderColor: '#6366f1',
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#6366f1',
+          order: 2
+        },
+        {
+          ...commonLineProps,
+          label: 'Doanh thu F&B',
+          data: foodRevenues,
+          backgroundColor: gradientFood,
+          borderColor: '#10b981',
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#10b981',
+          order: 3
+        }
+      ]
       : [
-          {
-            label: 'Doanh thu vé',
-            data: ticketRevenues,
-            backgroundColor: 'rgba(99, 102, 241, 0.82)',
-            borderColor: '#6366f1',
-            borderWidth: 0,
-            borderRadius: 6,
-            borderSkipped: false,
-            order: 1
-          },
-          {
-            label: 'Doanh thu F&B',
-            data: foodRevenues,
-            backgroundColor: 'rgba(16, 185, 129, 0.82)',
-            borderColor: '#10b981',
-            borderWidth: 0,
-            borderRadius: 6,
-            borderSkipped: false,
-            order: 2
-          },
-          {
-            label: 'Tổng doanh thu',
-            data: totalRevenues,
-            type: 'line' as const,
-            fill: false,
-            tension: 0.45,
-            pointRadius: 5,
-            pointHoverRadius: 8,
-            pointBorderWidth: 2,
-            pointBackgroundColor: '#fff',
-            pointBorderColor: '#e63946',
-            borderColor: '#e63946',
-            borderWidth: 2.5,
-            borderDash: [6, 3],
-            order: 0
-          }
-        ];
+        {
+          label: 'Doanh thu vé',
+          data: ticketRevenues,
+          backgroundColor: 'rgba(99, 102, 241, 0.82)',
+          borderColor: '#6366f1',
+          borderWidth: 0,
+          borderRadius: 6,
+          borderSkipped: false,
+          order: 1
+        },
+        {
+          label: 'Doanh thu F&B',
+          data: foodRevenues,
+          backgroundColor: 'rgba(16, 185, 129, 0.82)',
+          borderColor: '#10b981',
+          borderWidth: 0,
+          borderRadius: 6,
+          borderSkipped: false,
+          order: 2
+        },
+        {
+          label: 'Tổng doanh thu',
+          data: totalRevenues,
+          type: 'line' as const,
+          fill: false,
+          tension: 0.45,
+          pointRadius: 5,
+          pointHoverRadius: 8,
+          pointBorderWidth: 2,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#e63946',
+          borderColor: '#e63946',
+          borderWidth: 2.5,
+          borderDash: [6, 3],
+          order: 0
+        }
+      ];
 
     this.chartInstance = new ChartJS(ctx, {
       type: isArea ? 'line' : 'bar',
@@ -525,26 +525,26 @@ export class ManagementRevenueComponent implements OnInit, OnDestroy {
     if (isArea) {
       // ---- AREA CHART ----
       const series = [
-        { vals: data.map(d => d.foodRevenue || 0),   color: '#10b981', rgba0: 'rgba(16,185,129,0.35)', rgba1: 'rgba(16,185,129,0.02)' },
-        { vals: data.map(d => d.ticketRevenue || 0),  color: '#6366f1', rgba0: 'rgba(99,102,241,0.40)', rgba1: 'rgba(99,102,241,0.02)' },
-        { vals: data.map(d => d.totalRevenue || 0),   color: '#e63946', rgba0: 'rgba(230,57,70,0.30)',  rgba1: 'rgba(230,57,70,0.02)' },
+        { vals: data.map(d => d.foodRevenue || 0), color: '#10b981', rgba0: 'rgba(16,185,129,0.35)', rgba1: 'rgba(16,185,129,0.02)' },
+        { vals: data.map(d => d.ticketRevenue || 0), color: '#6366f1', rgba0: 'rgba(99,102,241,0.40)', rgba1: 'rgba(99,102,241,0.02)' },
+        { vals: data.map(d => d.totalRevenue || 0), color: '#e63946', rgba0: 'rgba(230,57,70,0.30)', rgba1: 'rgba(230,57,70,0.02)' },
       ];
 
-      const smoothPath = (pts: {x:number,y:number}[]) => {
+      const smoothPath = (pts: { x: number, y: number }[]) => {
         if (pts.length < 2) return;
         ctx.moveTo(pts[0].x, pts[0].y);
         for (let i = 0; i < pts.length - 1; i++) {
-          const cp1x = pts[i].x + (pts[i+1].x - pts[i].x) * 0.45;
+          const cp1x = pts[i].x + (pts[i + 1].x - pts[i].x) * 0.45;
           const cp1y = pts[i].y;
-          const cp2x = pts[i+1].x - (pts[i+1].x - pts[i].x) * 0.45;
-          const cp2y = pts[i+1].y;
-          ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, pts[i+1].x, pts[i+1].y);
+          const cp2x = pts[i + 1].x - (pts[i + 1].x - pts[i].x) * 0.45;
+          const cp2y = pts[i + 1].y;
+          ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, pts[i + 1].x, pts[i + 1].y);
         }
       };
 
       series.forEach(s => {
         const pts = n === 1
-          ? [{x: xOf(0), y: yOf(s.vals[0])}]
+          ? [{ x: xOf(0), y: yOf(s.vals[0]) }]
           : data.map((_, i) => ({ x: xOf(i), y: yOf(s.vals[i]) }));
 
         // Gradient fill
@@ -555,7 +555,7 @@ export class ManagementRevenueComponent implements OnInit, OnDestroy {
         ctx.save();
         ctx.beginPath();
         smoothPath(pts);
-        ctx.lineTo(pts[pts.length-1].x, PAD.top + cH);
+        ctx.lineTo(pts[pts.length - 1].x, PAD.top + cH);
         ctx.lineTo(pts[0].x, PAD.top + cH);
         ctx.closePath();
         ctx.fillStyle = grad;
@@ -670,7 +670,7 @@ export class ManagementRevenueComponent implements OnInit, OnDestroy {
     if (!period) return '';
     try {
       const clean = String(period).trim();
-      
+
       // 1. Parse yyyy-MM-dd or yyyy/MM/dd (e.g. 2026-05-20)
       const dateMatch = clean.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
       if (dateMatch) {
@@ -701,7 +701,7 @@ export class ManagementRevenueComponent implements OnInit, OnDestroy {
         if (this.activeChartGroupBy() === 'WEEK') return `T${dd}/${mm}`;
         return `${dd}/${mm}`;
       }
-      
+
       return period;
     } catch {
       return period;

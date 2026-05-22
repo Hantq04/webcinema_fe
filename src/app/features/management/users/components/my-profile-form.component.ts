@@ -25,17 +25,17 @@ import { LocationService, Province, District } from '../../../../core/services/l
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5 lg:gap-x-12">
           <!-- Row 1 -->
           <div>
-            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Họ tên <span class="text-rose-500">*</span></label>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.colName') }} <span class="text-rose-500">*</span></label>
             <input type="text" formControlName="name" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('name')">
           </div>
           <div>
-            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Tỉnh/Thành phố <span class="text-rose-500">*</span></label>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('account.cityLabel') }} <span class="text-rose-500">*</span></label>
             <div class="relative w-full">
               <div class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 flex justify-between items-center cursor-pointer hover:border-rose-400 transition-all"
                 [class.ring-2]="isCityOpen" [class.ring-rose-500/10]="isCityOpen" [class.border-rose-500]="isCityOpen"
                 (click)="isCityOpen = !isCityOpen; isDistrictOpen = false; isGenderOpen = false">
                 <span class="truncate" [class.text-slate-400]="!form.get('city')?.value">
-                  {{ getProvinceName(form.get('city')?.value) || 'Vui lòng chọn...' }}
+                  {{ getProvinceName(form.get('city')?.value) || t('shared.pleaseSelect') }}
                 </span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform" [class.rotate-180]="isCityOpen" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -55,18 +55,18 @@ import { LocationService, Province, District } from '../../../../core/services/l
 
           <!-- Row 2 -->
           <div>
-            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Số điện thoại <span class="text-rose-500">*</span></label>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.colPhone') }} <span class="text-rose-500">*</span></label>
             <input type="text" formControlName="phoneNumber" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('phoneNumber')">
           </div>
           <div>
-            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Quận/Huyện <span class="text-rose-500">*</span></label>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('account.districtLabel') }} <span class="text-rose-500">*</span></label>
             <div class="relative w-full">
               <div class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 flex justify-between items-center cursor-pointer hover:border-rose-400 transition-all"
                 [class.ring-2]="isDistrictOpen" [class.ring-rose-500/10]="isDistrictOpen" [class.border-rose-500]="isDistrictOpen"
                 [class.opacity-50]="!form.get('city')?.value" [class.cursor-not-allowed]="!form.get('city')?.value"
                 (click)="form.get('city')?.value && (isDistrictOpen = !isDistrictOpen); isCityOpen = false; isGenderOpen = false">
                 <span class="truncate" [class.text-slate-400]="!form.get('district')?.value">
-                  {{ getDistrictName(form.get('district')?.value) || 'Vui lòng chọn...' }}
+                  {{ getDistrictName(form.get('district')?.value) || t('shared.pleaseSelect') }}
                 </span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform" [class.rotate-180]="isDistrictOpen" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -79,7 +79,7 @@ import { LocationService, Province, District } from '../../../../core/services/l
                   (click)="form.get('district')?.setValue(d.code.toString()); isDistrictOpen = false">
                   {{ d.name }}
                 </div>
-                <div *ngIf="districts().length === 0" class="px-3 py-2 text-sm text-slate-400 italic">Không có dữ liệu</div>
+                <div *ngIf="districts().length === 0" class="px-3 py-2 text-sm text-slate-400 italic">{{ t('shared.noData') }}</div>
               </div>
               <div *ngIf="isDistrictOpen" class="fixed inset-0 z-[105]" (click)="isDistrictOpen = false"></div>
             </div>
@@ -87,13 +87,13 @@ import { LocationService, Province, District } from '../../../../core/services/l
 
           <!-- Row 3 -->
           <div class="relative">
-            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Giới tính</label>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.userFormGender') }}</label>
             <div class="relative w-full">
               <div class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 flex justify-between items-center cursor-pointer hover:border-rose-400 transition-all"
                 [class.ring-2]="isGenderOpen" [class.ring-rose-500/10]="isGenderOpen" [class.border-rose-500]="isGenderOpen"
                 (click)="isGenderOpen = !isGenderOpen; isCityOpen = false; isDistrictOpen = false">
                 <span class="truncate" [class.text-slate-400]="!form.get('gender')?.value || form.get('gender')?.value === 'None'">
-                  {{ form.get('gender')?.value && form.get('gender')?.value !== 'None' ? form.get('gender')?.value : 'Chọn giới tính' }}
+                  {{ form.get('gender')?.value && form.get('gender')?.value !== 'None' ? (form.get('gender')?.value === 'Nam' ? t('auth.male') : t('auth.female')) : t('management.selectGender') }}
                 </span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform duration-200" [class.rotate-180]="isGenderOpen" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -106,13 +106,13 @@ import { LocationService, Province, District } from '../../../../core/services/l
                 <div class="px-3 py-2 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/20 cursor-pointer transition-colors flex items-center justify-between" 
                   [class.text-rose-600]="form.get('gender')?.value === 'Nam'"
                   (click)="form.get('gender')?.setValue('Nam'); isGenderOpen = false">
-                  <span>Nam</span>
+                  <span>{{ t('auth.male') }}</span>
                   <svg *ngIf="form.get('gender')?.value === 'Nam'" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
                 </div>
                 <div class="px-3 py-2 text-sm hover:bg-rose-50 dark:hover:bg-rose-900/20 cursor-pointer transition-colors flex items-center justify-between" 
                   [class.text-rose-600]="form.get('gender')?.value === 'Nữ'"
                   (click)="form.get('gender')?.setValue('Nữ'); isGenderOpen = false">
-                  <span>Nữ</span>
+                  <span>{{ t('auth.female') }}</span>
                   <svg *ngIf="form.get('gender')?.value === 'Nữ'" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
                 </div>
               </div>
@@ -120,19 +120,19 @@ import { LocationService, Province, District } from '../../../../core/services/l
             </div>
           </div>
           <div>
-            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Địa chỉ <span class="text-rose-500">*</span></label>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('account.addressLabel') }} <span class="text-rose-500">*</span></label>
             <input type="text" formControlName="address" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('address')">
           </div>
 
           <!-- Row 4 -->
           <div>
-            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Ngày sinh</label>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.userFormBirthDate') }}</label>
             <div class="w-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 rounded-lg py-2.5 px-3">
               {{ profile?.birthDate || 'N/A' }}
             </div>
           </div>
           <div>
-            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Mật khẩu cũ <span class="text-rose-500">*</span></label>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('account.oldPasswordLabel') }} <span class="text-rose-500">*</span></label>
             <input type="password" formControlName="oldPassword" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('oldPassword')">
           </div>
 
@@ -146,18 +146,18 @@ import { LocationService, Province, District } from '../../../../core/services/l
           <!-- Checkbox Row -->
           <div class="col-span-1 md:col-span-2 pt-2">
             <label class="flex items-center gap-2 cursor-pointer text-sm font-medium text-slate-700 dark:text-slate-300 w-fit">
-              <input type="checkbox" formControlName="wantsChangePassword" class="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500"> Tôi muốn thay đổi mật khẩu
+              <input type="checkbox" formControlName="wantsChangePassword" class="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500"> {{ t('account.changePasswordToggle') }}
             </label>
           </div>
 
           <!-- Password Row -->
           <ng-container *ngIf="form.get('wantsChangePassword')?.value">
             <div class="mt-2">
-              <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Mật khẩu mới <span class="text-rose-500">*</span></label>
+              <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('auth.newPassword') }} <span class="text-rose-500">*</span></label>
               <input type="password" formControlName="newPassword" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('newPassword')">
             </div>
             <div class="mt-2">
-              <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nhập lại mật khẩu mới <span class="text-rose-500">*</span></label>
+              <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('auth.confirmNewPassword') }} <span class="text-rose-500">*</span></label>
               <input type="password" formControlName="confirmPassword" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('confirmPassword')">
             </div>
           </ng-container>
@@ -168,7 +168,7 @@ import { LocationService, Province, District } from '../../../../core/services/l
             class="px-10 py-3 text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg transition-all shadow-md flex items-center gap-2 transform active:scale-95" 
             [disabled]="isSubmitting">
             <svg *ngIf="isSubmitting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-            Cập nhật hồ sơ
+            {{ t('management.myProfileUpdate') }}
           </button>
         </div>
       </form>
@@ -311,7 +311,7 @@ export class MyProfileFormComponent implements OnInit, OnChanges {
     const val = this.form.value;
     
     if (val.wantsChangePassword && val.newPassword !== val.confirmPassword) {
-      alert('Mật khẩu mới và Nhập lại mật khẩu không khớp');
+      alert(this.t('account.newPasswordMismatch'));
       return;
     }
 

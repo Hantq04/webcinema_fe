@@ -386,12 +386,12 @@ export class BookingComponent implements OnDestroy {
       if (this.selectedSeats().length > 0) {
         const currentType = this.selectedSeats()[0].seatType;
         if (seat.seatType !== currentType) {
-          alert('Vui lòng chọn tất cả ghế cùng loại');
+          alert(this.t('booking.selectSameSeatType'));
           return;
         }
       }
       if (this.selectedSeats().length + seatsToToggle.length > 8) {
-        alert('Bạn chỉ có thể chọn tối đa 8 ghế.');
+        alert(this.t('booking.maxSeatsLimit'));
         return;
       }
       this.selectedSeats.update(seats => [...seats, ...seatsToToggle]);
@@ -480,7 +480,7 @@ export class BookingComponent implements OnDestroy {
         }
 
         if (hasGap) {
-          alert('Vui lòng không chừa 1 ghế trống bên trái hoặc bên phải của các ghế bạn đã chọn.');
+          alert(this.t('booking.seatGapWarning'));
           return;
         }
       }
@@ -499,19 +499,19 @@ export class BookingComponent implements OnDestroy {
       this.loading.set(true);
       this.bookingService.createTicket(payload).subscribe({
         next: (res) => {
-          if (res.status === 200) {
+          if (res.status === 200 || res.status === 'SUCCESS' || res.status === 'success' || res.status === 201 || res.code === 200 || res.code === 201) {
             this.currentTicketCodes.set(res.data.ticketCodes || []);
             this.remainingSeconds.set(res.data.remainingSeconds || 600);
             this.startTimer();
             this.bookingStep.set(3);
           } else {
-            alert(res.message || 'Lỗi khi giữ ghế');
+            alert(res.message || this.t('booking.holdSeatsError'));
           }
           this.loading.set(false);
         },
         error: (err) => {
           console.error(err);
-          alert('Lỗi kết nối khi giữ ghế');
+          alert(this.t('booking.holdSeatsConnectionError'));
           this.loading.set(false);
         }
       });
@@ -531,7 +531,7 @@ export class BookingComponent implements OnDestroy {
         promotionCode: ""
       }).pipe(
         switchMap(res => {
-          if (res.status === 200) {
+          if (res.status === 200 || res.status === 'SUCCESS' || res.status === 'success' || res.status === 201 || res.code === 200 || res.code === 201) {
             const tradingCode = res.data.tradingCode;
             return this.bookingService.submitPayment(tradingCode);
           }
@@ -543,12 +543,12 @@ export class BookingComponent implements OnDestroy {
           if (paymentUrl) {
             window.location.href = paymentUrl;
           } else {
-            alert('Không lấy được link thanh toán');
+            alert(this.t('booking.cannotRetrievePaymentLink'));
           }
         },
         error: (err: any) => {
           console.error(err);
-          alert(err.message || 'Lỗi xử lý thanh toán');
+          alert(err.message || this.t('booking.paymentProcessingError'));
         }
       });
     }
@@ -560,7 +560,7 @@ export class BookingComponent implements OnDestroy {
       this.remainingSeconds.update(s => {
         if (s <= 1) {
           this.stopTimer();
-          alert('Thời gian giữ ghế đã hết. Vui lòng chọn lại ghế');
+          alert(this.t('booking.seatHoldExpired'));
           this.goBackToSeats();
           return 0;
         }
@@ -653,6 +653,6 @@ export class BookingComponent implements OnDestroy {
   }
 
   protected onDevelop(): void {
-    alert('Tính năng đang được phát triển. Vui lòng quay lại sau!');
+    alert(this.t('account.devMessage'));
   }
 }

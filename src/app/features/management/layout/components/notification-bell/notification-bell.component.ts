@@ -29,6 +29,13 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
   isOpen = signal<boolean>(false);
   isLoading = signal<boolean>(false);
 
+  // Modal State Signals
+  showAllModal = signal<boolean>(false);
+  modalNotifications = signal<AppNotification[]>([]);
+  modalCurrentPage = signal<number>(0);
+  modalTotalPages = signal<number>(0);
+  modalIsLoading = signal<boolean>(false);
+
   private autoRefreshSub?: Subscription;
 
   protected readonly t = this.language.t.bind(this.language);
@@ -38,7 +45,7 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
   }
 
   get textNotifications() { return this.isVi() ? 'Thông báo' : 'Notifications'; }
-  get textMarkAllRead() { return this.isVi() ? 'Đánh dấu tất cả là đã đọc' : 'Mark all as read'; }
+  get textMarkAllRead() { return this.isVi() ? 'Đánh dấu tất cả' : 'Mark all as read'; }
   get textViewAll() { return this.isVi() ? 'Xem tất cả' : 'View all'; }
   get textNoNotifications() { return this.isVi() ? 'Không có thông báo nào' : 'No notifications available'; }
   get textLoading() { return this.isVi() ? 'Đang tải...' : 'Loading...'; }
@@ -62,6 +69,9 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.autoRefreshSub) {
       this.autoRefreshSub.unsubscribe();
+    }
+    if (typeof document !== 'undefined') {
+      document.body.classList.remove('modal-open');
     }
   }
 
@@ -87,8 +97,8 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
     this.isLoading.set(true);
     this.cdr.detectChanges();
 
-    // Fetch the 8 most recent notifications for the quick access panel
-    this.notificationService.getAllNotifications(0, 8).subscribe({
+    // Fetch the 5 most recent notifications for the quick access panel
+    this.notificationService.getAllNotifications(0, 5).subscribe({
       next: (res) => {
         this.notifications.set(res.content);
         this.isLoading.set(false);
@@ -104,13 +114,17 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
 
   markRead(notification: AppNotification, event: Event): void {
     event.stopPropagation();
-    if (notification.isRead) return;
+    if (notification.read) return;
 
     this.notificationService.markAsRead(notification.id).subscribe({
       next: () => {
         // Update local status
         this.notifications.update(list => 
-          list.map(n => n.id === notification.id ? { ...n, isRead: true } : n)
+          list.map(n => n.id === notification.id ? { ...n, read: true } : n)
+        );
+        // Update modal status
+        this.modalNotifications.update(list => 
+          list.map(n => n.id === notification.id ? { ...n, read: true } : n)
         );
         // Decrease count
         this.unreadCount.update(count => Math.max(0, count - 1));
@@ -122,13 +136,20 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
 
   markAllRead(event: Event): void {
     event.stopPropagation();
-    if (this.unreadCount() === 0) return;
+    if (this.unreadCount() === 0) {
+      alert(this.t('management.allNotificationsRead'));
+      return;
+    }
 
     this.notificationService.markAllAsRead().subscribe({
       next: () => {
         // Update local list
         this.notifications.update(list => 
-          list.map(n => ({ ...n, isRead: true }))
+          list.map(n => ({ ...n, read: true }))
+        );
+        // Update modal list
+        this.modalNotifications.update(list => 
+          list.map(n => ({ ...n, read: true }))
         );
         // Reset unread count
         this.unreadCount.set(0);
@@ -141,9 +162,56 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
   viewAll(event: Event): void {
     event.stopPropagation();
     this.isOpen.set(false);
+    this.showAllModal.set(true);
+    if (typeof document !== 'undefined') {
+      document.body.classList.add('modal-open');
+    }
+    this.modalCurrentPage.set(0);
+    this.loadModalNotifications();
     this.cdr.detectChanges();
-    // Navigate to full notifications page if available, else alert/log
-    void this.router.navigate(['/management/notifications']);
+  }
+
+  loadModalNotifications(): void {
+    this.modalIsLoading.set(true);
+    this.cdr.detectChanges();
+
+    this.notificationService.getAllNotifications(this.modalCurrentPage(), 10).subscribe({
+      next: (res) => {
+        this.modalNotifications.set(res.content);
+        // Cap total pages at 20 as requested
+        const total = Math.min(20, res.totalPages);
+        this.modalTotalPages.set(total);
+        this.modalIsLoading.set(false);
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error loading modal notifications:', err);
+        this.modalIsLoading.set(false);
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  modalPrevPage(): void {
+    if (this.modalCurrentPage() > 0) {
+      this.modalCurrentPage.update(p => p - 1);
+      this.loadModalNotifications();
+    }
+  }
+
+  modalNextPage(): void {
+    if (this.modalCurrentPage() < this.modalTotalPages() - 1) {
+      this.modalCurrentPage.update(p => p + 1);
+      this.loadModalNotifications();
+    }
+  }
+
+  closeModal(): void {
+    this.showAllModal.set(false);
+    if (typeof document !== 'undefined') {
+      document.body.classList.remove('modal-open');
+    }
+    this.cdr.detectChanges();
   }
 
   onNotificationClick(notification: AppNotification, event: Event): void {

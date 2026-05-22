@@ -124,3 +124,12 @@ body.dark-theme {
   stroke: var(--m-text-muted, #94a3b8);
   opacity: 0.75;
 }
+
+/* Custom fix for modal layering in Management Layout */
+body.modal-open .top-header {
+  z-index: 10000 !important;
+}
+
+body.modal-open {
+  overflow: hidden;
+}

@@ -1426,11 +1426,11 @@ export class HomeComponent {
         if (status) {
           let message = '';
           if (status === 'success') {
-            message = 'Thanh toán thành công';
+            message = this.t('home.paymentSuccess');
           } else if (status === 'cancel') {
-            message = 'Hủy thanh toán thành công';
+            message = this.t('home.paymentCancelled');
           } else if (status === 'fail') {
-            message = 'Thanh toán thất bại';
+            message = this.t('home.paymentFailed');
           }
 
           if (message) {
@@ -1450,7 +1450,7 @@ export class HomeComponent {
     if (slide && slide.title) {
       void this.router.navigate(['/movies', slide.title]);
     } else {
-      alert('Thông tin đang được cập nhật');
+      alert(this.t('home.informationUpdating'));
     }
   }
 
@@ -1601,7 +1601,7 @@ export class HomeComponent {
       event.preventDefault();
       event.stopPropagation();
     }
-    alert('Tính năng đang được phát triển. Vui lòng quay lại sau!');
+    alert(this.t('account.devMessage'));
   }
 
   private syncCarouselIndex(movieCount: number): void {

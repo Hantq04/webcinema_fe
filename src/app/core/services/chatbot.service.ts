@@ -1,5 +1,7 @@
-import { Injectable, signal } from '@angular/core';
-import { Observable, delay, of } from 'rxjs';
+import { Injectable, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { ApiService } from './api.service';
+import { LanguageService } from './language.service';
 
 export interface ChatMessage {
   id: string;
@@ -14,20 +16,27 @@ export interface ChatMessage {
   providedIn: 'root'
 })
 export class ChatbotService {
+  private readonly http = inject(HttpClient);
+  private readonly apiService = inject(ApiService);
+  private readonly language = inject(LanguageService);
+
   messages = signal<ChatMessage[]>([]);
   isTyping = signal(false);
 
   private readonly botName = 'CineGo Assistant';
   private readonly botAvatar = 'https://api.dicebear.com/7.x/bottts/svg?seed=CineGo';
+  private readonly t = this.language.t.bind(this.language);
 
   constructor() {
-    // Initial welcome message
-    this.addBotMessage('Xin chào! Tôi là CineGo Assistant. Tôi có thể giúp gì cho bạn hôm nay?', 'quick_replies', {
+    this.resetChat();
+  }
+
+  resetChat() {
+    this.messages.set([]);
+    this.addBotMessage(this.t('chatbot.welcome'), 'quick_replies', {
       replies: [
-        { label: '🎬 Tìm phim', action: 'find_movies' },
-        { label: '📅 Xem suất chiếu', action: 'showtimes' },
-        { label: '🎟️ Vé của tôi', action: 'my_bookings' },
-        { label: '💡 Hỏi đáp FAQ', action: 'faq' }
+        { label: this.t('chatbot.promoLabel'), action: 'promo' },
+        { label: this.t('chatbot.faqLabel'), action: 'faq' }
       ]
     });
   }
@@ -41,60 +50,87 @@ export class ChatbotService {
       type: 'text'
     };
     this.messages.update(msgs => [...msgs, userMsg]);
-    
+
     this.processQuery(text);
   }
 
   private processQuery(query: string) {
     this.isTyping.set(true);
-    const lowerQuery = query.toLowerCase();
 
-    // Mock delay for "thinking"
-    setTimeout(() => {
-      if (lowerQuery.includes('phim') || lowerQuery.includes('movie')) {
-        this.sendMovieRecommendations();
-      } else if (lowerQuery.includes('suất chiếu') || lowerQuery.includes('showtime')) {
-        this.sendShowtimes();
-      } else if (lowerQuery.includes('vé') || lowerQuery.includes('booking')) {
-        this.sendBookingStatus();
-      } else if (lowerQuery.includes('khuyến mãi') || lowerQuery.includes('promo')) {
-        this.sendPromotions();
-      } else if (lowerQuery.includes('faq') || lowerQuery.includes('hỏi') || lowerQuery.includes('giúp')) {
-        this.sendFAQ();
-      } else {
-        this.addBotMessage('Tôi chưa hiểu ý bạn lắm. Bạn có thể chọn một trong các gợi ý dưới đây nhé:', 'quick_replies', {
-          replies: [
-            { label: '🎬 Tìm phim', action: 'find_movies' },
-            { label: '📅 Xem suất chiếu', action: 'showtimes' },
-            { label: '🎟️ Vé của tôi', action: 'my_bookings' },
-            { label: '📞 Liên hệ hỗ trợ', action: 'contact' }
-          ]
-        });
+    const payload = {
+      userId: 2, // Mặc định là 2 như cấu hình trong tài liệu Postman của Backend
+      message: query
+    };
+
+    this.http.post<any>(this.apiService.apiUrl('/api/v1/chat-bot/ask'), payload).subscribe({
+      next: (res) => {
+        // Lấy câu trả lời linh hoạt từ nhiều định dạng response của BE
+        const replyText = res?.data?.reply || res?.reply || res?.message || (typeof res === 'string' ? res : '');
+
+        if (replyText) {
+          this.addBotMessage(replyText);
+        } else {
+          this.addBotMessage(this.t('chatbot.systemError'));
+        }
+        this.isTyping.set(false);
+      },
+      error: (err) => {
+        console.error('Chatbot API Error:', err);
+        this.addBotMessage(this.t('chatbot.networkError'));
+        this.isTyping.set(false);
       }
-      this.isTyping.set(false);
-    }, 1500);
+    });
   }
 
   handleAction(action: string) {
     switch (action) {
-      case 'find_movies':
-        this.sendMessage('Tìm phim đang chiếu');
-        break;
-      case 'showtimes':
-        this.sendMessage('Xem suất chiếu hôm nay');
-        break;
-      case 'my_bookings':
-        this.sendMessage('Tra cứu vé của tôi');
-        break;
-      case 'promo':
-        this.sendMessage('Xem khuyến mãi');
-        break;
       case 'faq':
         this.sendFAQ();
         break;
+      case 'promo':
+        this.sendMessage(this.t('chatbot.promoQuery'));
+        break;
+
+      // Các câu hỏi FAQ xử lý offline tại FE
+      case 'refund_policy':
+        this.addUserMessage(this.t('chatbot.refundPolicyLabel'));
+        this.showFaqResponse(this.t('chatbot.refundPolicyDesc'));
+        break;
+      case 'payment_methods':
+        this.addUserMessage(this.t('chatbot.paymentMethodsLabel'));
+        this.showFaqResponse(this.t('chatbot.paymentMethodsDesc'));
+        break;
+      case 'membership':
+        this.addUserMessage(this.t('chatbot.membershipLabel'));
+        this.showFaqResponse(this.t('chatbot.membershipDesc'));
+        break;
+      case 'locations':
+        this.addUserMessage(this.t('chatbot.locationsLabel'));
+        this.showFaqResponse(this.t('chatbot.locationsDesc'));
+        break;
+
       default:
-        this.addBotMessage('Tính năng này đang được phát triển.');
+        this.sendMessage(action); // Các action khác tự động gửi lên BE
     }
+  }
+
+  private addUserMessage(text: string) {
+    const userMsg: ChatMessage = {
+      id: Date.now().toString(),
+      sender: 'user',
+      text,
+      timestamp: new Date(),
+      type: 'text'
+    };
+    this.messages.update(msgs => [...msgs, userMsg]);
+  }
+
+  private showFaqResponse(reply: string) {
+    this.isTyping.set(true);
+    setTimeout(() => {
+      this.addBotMessage(reply);
+      this.isTyping.set(false);
+    }, 600);
   }
 
   private addBotMessage(text: string, type: ChatMessage['type'] = 'text', metadata?: any) {
@@ -109,77 +145,13 @@ export class ChatbotService {
     this.messages.update(msgs => [...msgs, botMsg]);
   }
 
-  private sendMovieRecommendations() {
-    this.addBotMessage('Đây là một số phim hot đang chiếu tại rạp:', 'movie_list', {
-      movies: [
-        {
-          id: 1,
-          title: 'Avengers: Endgame',
-          genre: 'Action, Sci-Fi',
-          rating: 8.4,
-          duration: '181 min',
-          poster: 'https://image.tmdb.org/t/p/w500/or06vSaeEbDb3WEzGCO7fkpVIw.jpg'
-        },
-        {
-          id: 2,
-          title: 'The Dark Knight',
-          genre: 'Action, Crime, Drama',
-          rating: 9.0,
-          duration: '152 min',
-          poster: 'https://image.tmdb.org/t/p/w500/qJ2tW6WMUDp9QmUvdbK6NINUpSI.jpg'
-        },
-        {
-          id: 3,
-          title: 'Inception',
-          genre: 'Action, Adventure, Sci-Fi',
-          rating: 8.8,
-          duration: '148 min',
-          poster: 'https://image.tmdb.org/t/p/w500/9gk7Fn9sVAsS9Te6G1NEE3lyOBt.jpg'
-        }
-      ]
-    });
-  }
-
-  private sendShowtimes() {
-    this.addBotMessage('Lịch chiếu hôm nay tại CineGo Central:', 'showtimes', {
-      showtimes: [
-        { time: '14:30', room: 'P01', format: '2D Digital' },
-        { time: '17:15', room: 'P03', format: '3D IMAX' },
-        { time: '20:00', room: 'P01', format: '2D Digital' },
-        { time: '22:45', room: 'P02', format: '2D Digital' }
-      ]
-    });
-  }
-
-  private sendBookingStatus() {
-    this.addBotMessage('Vui lòng nhập mã đặt vé hoặc số điện thoại để tôi kiểm tra nhé. Hoặc xem lịch sử đặt vé gần nhất của bạn:', 'booking_status', {
-      lastBooking: {
-        id: 'CGV123456789',
-        movie: 'Avengers: Endgame',
-        date: '2026-04-29',
-        time: '20:00',
-        seats: 'H12, H13',
-        status: 'Confirmed'
-      }
-    });
-  }
-
-  private sendPromotions() {
-    this.addBotMessage('Hiện đang có các chương trình ưu đãi hấp dẫn dành cho bạn:', 'promo', {
-      promos: [
-        { title: 'Thứ 2 Vui Vẻ', desc: 'Đồng giá vé 45k cho mọi suất chiếu.', code: 'HAPPYMON' },
-        { title: 'Combo Couple', desc: 'Giảm 20% khi mua 2 vé + 1 bắp nước lớn.', code: 'COUPLE20' }
-      ]
-    });
-  }
-
   private sendFAQ() {
-    this.addBotMessage('Bạn có thể tìm thấy câu trả lời cho các vấn đề thường gặp tại đây:', 'quick_replies', {
+    this.addBotMessage(this.t('chatbot.faqIntro'), 'quick_replies', {
       replies: [
-        { label: 'Chính sách hoàn vé', action: 'refund_policy' },
-        { label: 'Phương thức thanh toán', action: 'payment_methods' },
-        { label: 'Quyền lợi thành viên', action: 'membership' },
-        { label: 'Địa điểm rạp', action: 'locations' }
+        { label: this.t('chatbot.refundPolicyLabel'), action: 'refund_policy' },
+        { label: this.t('chatbot.paymentMethodsLabel'), action: 'payment_methods' },
+        { label: this.t('chatbot.membershipLabel'), action: 'membership' },
+        { label: this.t('chatbot.locationsLabel'), action: 'locations' }
       ]
     });
   }

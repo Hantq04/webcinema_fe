@@ -142,7 +142,7 @@
   padding: 0.75rem 1rem;
   font-size: 0.925rem;
   line-height: 1.5;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
 .user-bubble {
@@ -165,14 +165,63 @@
 }
 
 /* Rich Content Styling */
+.rich-content-group {
+  max-width: 85% !important;
+  width: 100%;
+  min-width: 0 !important;
+  /* Cực kỳ quan trọng để flex container co lại và kích hoạt overflow-x */
+}
+
+.rich-content {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0 !important;
+  /* Cực kỳ quan trọng */
+  overflow: hidden;
+}
+
+.movie-carousel {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto !important;
+  overflow-y: hidden;
+  width: 100%;
+  min-width: 0 !important;
+  /* Cực kỳ quan trọng */
+  padding-bottom: 0.75rem;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+}
+
+/* Custom horizontal scrollbar for movie-carousel */
+.movie-carousel::-webkit-scrollbar {
+  height: 6px;
+  /* Siêu mỏng tinh tế */
+}
+
+.movie-carousel::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 99px;
+}
+
+.movie-carousel::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 99px;
+  transition: background 0.2s;
+}
+
+.movie-carousel::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
 .movie-card {
-  min-width: 160px;
-  max-width: 160px;
+  flex: 0 0 160px;
   background: white;
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid #e2e8f0;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  scroll-snap-align: start;
 }
 
 .movie-poster {
@@ -355,22 +404,49 @@
   animation: typing 1.4s infinite ease-in-out;
 }
 
-.typing-bubble span:nth-child(2) { animation-delay: 0.2s; }
-.typing-bubble span:nth-child(3) { animation-delay: 0.4s; }
+.typing-bubble span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-bubble span:nth-child(3) {
+  animation-delay: 0.4s;
+}
 
 @keyframes typing {
-  0%, 60%, 100% { transform: translateY(0); }
-  30% { transform: translateY(-6px); }
+
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+
+  30% {
+    transform: translateY(-6px);
+  }
 }
 
 @keyframes slideInRight {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes slideInLeft {
-  from { opacity: 0; transform: translateX(-20px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* Mobile Adjustments */
@@ -378,6 +454,7 @@
   .chatbot-page-container {
     padding: 0;
   }
+
   .chatbot-window {
     height: 100vh;
     border-radius: 0;
@@ -388,6 +465,7 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;

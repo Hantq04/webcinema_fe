@@ -16,7 +16,7 @@
           (click)="toggleAddressDropdown()">
           <span [class.text-slate-400]="!selectedAddress()" [class.text-slate-800]="selectedAddress()"
             [class.dark:text-white]="selectedAddress()" class="font-medium truncate">
-            {{ selectedAddress() || 'Chọn khu vực' }}
+            {{ selectedAddress() || t('management.selectArea') }}
           </span>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform shrink-0"
             [class.rotate-180]="isAddressDropdownOpen()" viewBox="0 0 20 20" fill="currentColor">
@@ -470,7 +470,7 @@
                   [class.border-rose-500]="isRoomTypeDropdownOpen()"
                   (click)="isRoomTypeDropdownOpen.set(!isRoomTypeDropdownOpen())">
                   <span class="truncate font-medium" [class.text-slate-400]="!roomForm.get('type')?.value">{{
-                    roomForm.get('type')?.value || 'Chọn loại phòng' }}</span>
+                    roomForm.get('type')?.value || t('management.selectRoomType') }}</span>
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform"
                     [class.rotate-180]="isRoomTypeDropdownOpen()" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd"

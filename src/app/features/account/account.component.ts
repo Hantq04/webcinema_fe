@@ -915,14 +915,14 @@ export class AccountComponent {
               alert(this.t('account.updatedSuccessfully'));
               this.refreshProfile();
             },
-            error: (err) => alert(err.error?.message || 'Lỗi cập nhật mật khẩu')
+            error: (err) => alert(err.error?.message || this.t('account.errorUpdatingPassword'))
           });
         } else {
           alert(this.t('account.updatedSuccessfully'));
           this.refreshProfile();
         }
       },
-      error: (err) => alert(err.error?.message || 'Lỗi cập nhật thông tin')
+      error: (err) => alert(err.error?.message || this.t('account.errorUpdatingProfile'))
     });
   }
 

@@ -196,7 +196,7 @@ export class ManagementBillsComponent implements OnInit {
       if (code) {
         this.billService.updateBill({ ...payload, tradingCode: code }).subscribe({
           next: () => {
-            alert('Cập nhật thành công! (Dữ liệu local chưa được refresh do dùng mock)');
+            alert(this.t('management.invoiceUpdatedSuccessMock'));
             this.fieldErrors.set({});
             this.closeFormModal();
           },
@@ -232,7 +232,7 @@ export class ManagementBillsComponent implements OnInit {
             foods: payload.foods.map((f: string) => ({code: f}))
           };
           this.bills.update(b => [newBill, ...b]);
-          alert('Tạo hóa đơn thành công! Mã: ' + res.tradingCode);
+          alert(this.t('management.invoiceCreatedSuccess') + res.tradingCode);
           this.closeFormModal();
         },
         error: (err) => {
@@ -271,7 +271,7 @@ export class ManagementBillsComponent implements OnInit {
     if (code) {
       this.billService.cancelBill(code).subscribe({
         next: () => {
-          alert('Đã hủy hóa đơn thành công');
+          alert(this.t('management.invoiceCancelledSuccess'));
           this.closeCancelModal();
           // Update mock data
           this.bills.update(list => list.map(b => b.tradingCode === code ? { ...b, status: {code: 'CANCELLED', descriptionVi: 'Đã hủy', descriptionEn: 'Cancelled'} } : b));
@@ -281,7 +281,7 @@ export class ManagementBillsComponent implements OnInit {
         },
         error: (err) => {
           console.error(err);
-          alert('Lỗi: ' + (err.error?.message || 'Không thể hủy'));
+          alert(this.t('management.errorPrefix') + (err.error?.message || this.t('management.cannotCancel')));
         }
       });
     }
@@ -305,7 +305,7 @@ export class ManagementBillsComponent implements OnInit {
     if (code) {
       this.billService.deleteBill(code).subscribe({
         next: () => {
-          alert('Đã xóa hóa đơn thành công');
+          alert(this.t('management.invoiceDeletedSuccess'));
           this.closeDeleteModal();
           // Update mock data
           this.bills.update(list => list.filter(b => b.tradingCode !== code));
@@ -314,7 +314,7 @@ export class ManagementBillsComponent implements OnInit {
         },
         error: (err) => {
           console.error(err);
-          alert('Lỗi: ' + (err.error?.message || 'Không thể xóa'));
+          alert(this.t('management.errorPrefix') + (err.error?.message || this.t('management.cannotDelete')));
         }
       });
     }
@@ -328,12 +328,12 @@ export class ManagementBillsComponent implements OnInit {
           if (url && url.startsWith('http')) {
             window.location.href = url;
           } else {
-            alert('Thanh toán thành công: ' + url);
+            alert(this.t('management.paymentSuccessPrefix') + url);
           }
         },
         error: (err) => {
           console.error(err);
-          alert('Lỗi tạo URL thanh toán VNPay');
+          alert(this.t('management.errorCreatingVNPayUrl'));
         }
       });
     }
