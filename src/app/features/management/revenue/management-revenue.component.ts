@@ -113,12 +113,38 @@ export class ManagementRevenueComponent implements OnInit, OnDestroy {
 
   private getDefaultFromDate(): string {
     const d = new Date();
-    d.setDate(d.getDate() - 29);
-    return d.toISOString().split('T')[0];
+    // Ngày 1 của tháng hiện tại
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
   }
 
   private getDefaultToDate(): string {
-    return new Date().toISOString().split('T')[0];
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+
+  formatToShow(dateStr: string | null | undefined): string {
+    if (!dateStr) return '';
+    const datePart = dateStr.split(' ')[0];
+    const parts = datePart.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return dateStr;
+  }
+
+  formatPeriod(period: string | null | undefined): string {
+    if (!period) return '';
+    const parts = period.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    } else if (parts.length === 2) {
+      if (parts[1].startsWith('W')) {
+        return `Tuần ${parts[1].substring(1)}, ${parts[0]}`;
+      } else {
+        return `${parts[1]}/${parts[0]}`;
+      }
+    }
+    return period;
   }
 
   private loadDropdowns(): void {

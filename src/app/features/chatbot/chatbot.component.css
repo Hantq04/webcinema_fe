@@ -143,6 +143,7 @@
   font-size: 0.925rem;
   line-height: 1.5;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  white-space: pre-wrap;
 }
 
 .user-bubble {
@@ -469,4 +470,96 @@
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Movie Text List Interactive Cards */
+.movie-text-card {
+  cursor: pointer;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 12px 14px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.movie-text-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #d62f1f 0%, #a52418 100%);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.movie-text-card:hover {
+  transform: translateY(-2px);
+  border-color: #fca5a5;
+  box-shadow: 0 8px 20px rgba(214, 47, 31, 0.06);
+}
+
+.movie-text-card:hover::before {
+  opacity: 1;
+}
+
+.movie-text-card-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.movie-text-card-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: #d62f1f;
+  background: #fff1f2;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  border: 1px solid #fee2e2;
+  transition: all 0.2s;
+}
+
+.movie-text-card:hover .movie-text-card-badge {
+  background: #d62f1f;
+  color: white;
+  border-color: #d62f1f;
+}
+
+.movie-text-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: #64748b;
+}
+
+.movie-text-card-info-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.movie-text-card-info-icon {
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.movie-text-card-info-label {
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.movie-text-card-info-value {
+  color: #475569;
+  font-weight: 600;
 }

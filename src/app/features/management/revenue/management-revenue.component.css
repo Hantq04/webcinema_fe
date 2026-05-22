@@ -832,3 +832,35 @@
 .table-empty svg {
   color: var(--m-border-color, #e2e8f0);
 }
+
+/* Custom overlay date inputs */
+.date-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.date-input-wrapper .filter-input-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+  background-color: var(--m-bg-primary);
+  border: 1px solid var(--m-border-color);
+  border-radius: 8px;
+  height: 38px;
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  color: var(--m-text-primary);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.date-input-wrapper input[type="date"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 10;
+}

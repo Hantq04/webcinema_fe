@@ -45,6 +45,7 @@ export interface AuthSession {
   authenticated: boolean;
   accessToken: string | null;
   expiresIn: number | null;
+  userId: number | null;
   userName: string | null;
   email: string | null;
   phoneNumber: string | null;
@@ -66,6 +67,7 @@ export class AuthService {
   private readonly session = signal<AuthSession>(this.readSession());
 
   readonly isAuthenticated = computed(() => this.session().authenticated);
+  readonly currentUserId = computed(() => this.session().userId);
   readonly currentUserName = computed(() => this.session().userName);
   readonly currentUserEmail = computed(() => this.session().email);
   readonly currentUserPhone = computed(() => this.session().phoneNumber);
@@ -122,6 +124,7 @@ export class AuthService {
       authenticated: false,
       accessToken: null,
       expiresIn: null,
+      userId: null,
       userName: null,
       email: null,
       phoneNumber: null,
@@ -145,6 +148,7 @@ export class AuthService {
         authenticated: false,
         accessToken: null,
         expiresIn: null,
+        userId: null,
         userName: null,
         email: null,
         phoneNumber: null,
@@ -159,6 +163,7 @@ export class AuthService {
         authenticated: false,
         accessToken: null,
         expiresIn: null,
+        userId: null,
         userName: null,
         email: null,
         phoneNumber: null,
@@ -172,6 +177,7 @@ export class AuthService {
         authenticated: Boolean(parsed.authenticated),
         accessToken: typeof parsed.accessToken === 'string' ? parsed.accessToken : null,
         expiresIn: typeof parsed.expiresIn === 'number' && Number.isFinite(parsed.expiresIn) ? parsed.expiresIn : null,
+        userId: typeof parsed.userId === 'number' && Number.isFinite(parsed.userId) ? parsed.userId : null,
         userName: typeof parsed.userName === 'string' ? parsed.userName : null,
         email: typeof parsed.email === 'string' ? parsed.email : null,
         phoneNumber: typeof parsed.phoneNumber === 'string' ? parsed.phoneNumber : null,
@@ -182,6 +188,7 @@ export class AuthService {
         authenticated: false,
         accessToken: null,
         expiresIn: null,
+        userId: null,
         userName: null,
         email: null,
         phoneNumber: null,
@@ -211,6 +218,11 @@ export class AuthService {
       this.firstNumber(responseData, ['expiresIn', 'expires_in']) ??
       this.firstNumber(responseResult, ['expiresIn', 'expires_in']) ??
       this.firstNumber(responsePayload, ['expiresIn', 'expires_in']);
+    const userId =
+      this.firstNumber(responseObject, ['userId', 'user_id', 'id']) ??
+      this.firstNumber(responseData, ['userId', 'user_id', 'id']) ??
+      this.firstNumber(responseResult, ['userId', 'user_id', 'id']) ??
+      this.firstNumber(responsePayload, ['userId', 'user_id', 'id']);
     const userName =
       this.firstString(responseObject, ['userName', 'username', 'fullName', 'name']) ??
       this.firstString(responseData, ['userName', 'username', 'fullName', 'name']) ??
@@ -222,13 +234,11 @@ export class AuthService {
       this.firstString(responseData, ['role', 'userRole']) ??
       this.firstString(responseResult, ['role', 'userRole']) ??
       this.firstString(responsePayload, ['role', 'userRole']);
-
     const email =
       this.firstString(responseObject, ['email', 'emailAddress']) ??
       this.firstString(responseData, ['email', 'emailAddress']) ??
       this.firstString(responseResult, ['email', 'emailAddress']) ??
       this.firstString(responsePayload, ['email', 'emailAddress']);
-
     const phoneNumber =
       this.firstString(responseObject, ['phoneNumber', 'phone', 'mobile']) ??
       this.firstString(responseData, ['phoneNumber', 'phone', 'mobile']) ??
@@ -239,6 +249,7 @@ export class AuthService {
       authenticated: true,
       accessToken,
       expiresIn,
+      userId,
       userName,
       email,
       phoneNumber,

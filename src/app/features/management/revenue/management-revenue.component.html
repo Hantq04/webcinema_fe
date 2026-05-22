@@ -13,48 +13,53 @@
       <!-- From Date -->
       <div class="filter-group">
         <label class="filter-label">{{ t('management.revenueFromDate') }}</label>
-        <input
-          id="revenue-from-date"
-          type="date"
-          class="filter-input"
-          [ngModel]="fromDate()"
-          (ngModelChange)="fromDate.set($event)"
-        />
+        <div class="date-input-wrapper cursor-pointer" (click)="revenueFromInput.showPicker()">
+          <div class="filter-input-display">
+            <span>{{ formatToShow(fromDate()) }}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="text-slate-400">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+          </div>
+          <input #revenueFromInput id="revenue-from-date" type="date" lang="vi" [ngModel]="fromDate()"
+            (ngModelChange)="fromDate.set($event)" />
+        </div>
       </div>
 
+      <!-- To Date -->
       <div class="filter-group">
         <label class="filter-label">{{ t('management.revenueToDate') }}</label>
-        <input
-          id="revenue-to-date"
-          type="date"
-          class="filter-input"
-          [ngModel]="toDate()"
-          (ngModelChange)="toDate.set($event)"
-        />
+        <div class="date-input-wrapper cursor-pointer" (click)="revenueToInput.showPicker()">
+          <div class="filter-input-display">
+            <span>{{ formatToShow(toDate()) }}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="text-slate-400">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+          </div>
+          <input #revenueToInput id="revenue-to-date" type="date" lang="vi" [ngModel]="toDate()"
+            (ngModelChange)="toDate.set($event)" />
+        </div>
       </div>
 
       <!-- Group By -->
       <div class="filter-group">
         <label class="filter-label">{{ t('management.revenueGroupBy') }}</label>
         <div class="group-by-toggle">
-          <button
-            id="groupby-day"
-            class="group-by-btn"
-            [class.active]="groupBy() === 'DAY'"
-            (click)="setGroupBy('DAY')"
-          >{{ t('management.revenueGroupByDay') }}</button>
-          <button
-            id="groupby-week"
-            class="group-by-btn"
-            [class.active]="groupBy() === 'WEEK'"
-            (click)="setGroupBy('WEEK')"
-          >{{ t('management.revenueGroupByWeek') }}</button>
-          <button
-            id="groupby-month"
-            class="group-by-btn"
-            [class.active]="groupBy() === 'MONTH'"
-            (click)="setGroupBy('MONTH')"
-          >{{ t('management.revenueGroupByMonth') }}</button>
+          <button id="groupby-day" class="group-by-btn" [class.active]="groupBy() === 'DAY'"
+            (click)="setGroupBy('DAY')">{{ t('management.revenueGroupByDay') }}</button>
+          <button id="groupby-week" class="group-by-btn" [class.active]="groupBy() === 'WEEK'"
+            (click)="setGroupBy('WEEK')">{{ t('management.revenueGroupByWeek') }}</button>
+          <button id="groupby-month" class="group-by-btn" [class.active]="groupBy() === 'MONTH'"
+            (click)="setGroupBy('MONTH')">{{ t('management.revenueGroupByMonth') }}</button>
         </div>
       </div>
 
@@ -63,36 +68,31 @@
         <label class="filter-label">{{ t('management.revenueCinema') }}</label>
         <div class="custom-select-wrapper">
           <!-- Trigger -->
-          <div
-            class="custom-select-trigger"
-            [class.open]="isCinemaDropdownOpen()"
-            (click)="isCinemaDropdownOpen.set(!isCinemaDropdownOpen())"
-          >
+          <div class="custom-select-trigger" [class.open]="isCinemaDropdownOpen()"
+            (click)="isCinemaDropdownOpen.set(!isCinemaDropdownOpen())">
             <span class="custom-select-value" [class.placeholder]="!selectedCinemaId()">
               {{ selectedCinemaId() ? getSelectedCinemaName() : t('management.revenueSelectCinema') }}
             </span>
-            <svg class="custom-select-chevron" [class.rotated]="isCinemaDropdownOpen()" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg class="custom-select-chevron" [class.rotated]="isCinemaDropdownOpen()"
+              xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
           </div>
           <!-- Dropdown list -->
           <div class="custom-select-list" *ngIf="isCinemaDropdownOpen()">
-            <div
-              class="custom-select-option all-option"
-              [class.selected]="isCinemaSelected(null)"
-              (click)="onCinemaChange(''); isCinemaDropdownOpen.set(false)"
-            >
+            <div class="custom-select-option all-option" [class.selected]="isCinemaSelected(null)"
+              (click)="onCinemaChange(''); isCinemaDropdownOpen.set(false)">
               -- {{ t('management.revenueAllCinemas') }} --
             </div>
-            <div
-              *ngFor="let c of cinemas()"
-              class="custom-select-option"
-              [class.selected]="isCinemaSelected(c.code)"
-              (click)="onCinemaChange(c.code); isCinemaDropdownOpen.set(false)"
-            >
+            <div *ngFor="let c of cinemas()" class="custom-select-option" [class.selected]="isCinemaSelected(c.code)"
+              (click)="onCinemaChange(c.code); isCinemaDropdownOpen.set(false)">
               {{ c.nameOfCinema }}
             </div>
           </div>
           <!-- Backdrop -->
-          <div *ngIf="isCinemaDropdownOpen()" class="custom-select-backdrop" (click)="isCinemaDropdownOpen.set(false)"></div>
+          <div *ngIf="isCinemaDropdownOpen()" class="custom-select-backdrop" (click)="isCinemaDropdownOpen.set(false)">
+          </div>
         </div>
       </div>
 
@@ -101,36 +101,31 @@
         <label class="filter-label">{{ t('management.revenueMovie') }}</label>
         <div class="custom-select-wrapper">
           <!-- Trigger -->
-          <div
-            class="custom-select-trigger"
-            [class.open]="isMovieDropdownOpen()"
-            (click)="isMovieDropdownOpen.set(!isMovieDropdownOpen())"
-          >
+          <div class="custom-select-trigger" [class.open]="isMovieDropdownOpen()"
+            (click)="isMovieDropdownOpen.set(!isMovieDropdownOpen())">
             <span class="custom-select-value" [class.placeholder]="!selectedMovieId()">
               {{ selectedMovieId() ? getSelectedMovieName() : t('management.revenueSelectMovie') }}
             </span>
-            <svg class="custom-select-chevron" [class.rotated]="isMovieDropdownOpen()" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg class="custom-select-chevron" [class.rotated]="isMovieDropdownOpen()"
+              xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
           </div>
           <!-- Dropdown list -->
           <div class="custom-select-list" *ngIf="isMovieDropdownOpen()">
-            <div
-              class="custom-select-option all-option"
-              [class.selected]="isMovieSelected(null)"
-              (click)="onMovieChange(''); isMovieDropdownOpen.set(false)"
-            >
+            <div class="custom-select-option all-option" [class.selected]="isMovieSelected(null)"
+              (click)="onMovieChange(''); isMovieDropdownOpen.set(false)">
               -- {{ t('management.revenueAllMovies') }} --
             </div>
-            <div
-              *ngFor="let m of movies()"
-              class="custom-select-option"
-              [class.selected]="isMovieSelected(m.id)"
-              (click)="onMovieChange(m.id); isMovieDropdownOpen.set(false)"
-            >
+            <div *ngFor="let m of movies()" class="custom-select-option" [class.selected]="isMovieSelected(m.id)"
+              (click)="onMovieChange(m.id); isMovieDropdownOpen.set(false)">
               {{ m.name }}
             </div>
           </div>
           <!-- Backdrop -->
-          <div *ngIf="isMovieDropdownOpen()" class="custom-select-backdrop" (click)="isMovieDropdownOpen.set(false)"></div>
+          <div *ngIf="isMovieDropdownOpen()" class="custom-select-backdrop" (click)="isMovieDropdownOpen.set(false)">
+          </div>
         </div>
       </div>
 
@@ -138,14 +133,13 @@
       <div class="filter-group filter-actions">
         <label class="filter-label">&nbsp;</label>
         <div class="action-btns">
-          <button
-            id="revenue-search-btn"
-            class="btn-primary"
-            (click)="search()"
-            [disabled]="isLoading()"
-          >
+          <button id="revenue-search-btn" class="btn-primary" (click)="search()" [disabled]="isLoading()">
             <ng-container *ngIf="!isLoading()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
               {{ t('management.revenueSearch') }}
             </ng-container>
             <ng-container *ngIf="isLoading()">
@@ -154,14 +148,15 @@
             </ng-container>
           </button>
 
-          <button
-            id="revenue-export-btn"
-            class="btn-outline"
-            (click)="exportExcel()"
-            [disabled]="isExporting() || summaryData().length === 0"
-          >
+          <button id="revenue-export-btn" class="btn-outline" (click)="exportExcel()"
+            [disabled]="isExporting() || summaryData().length === 0">
             <ng-container *ngIf="!isExporting()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" x2="12" y1="15" y2="3" />
+              </svg>
               {{ t('management.revenueExport') }}
             </ng-container>
             <ng-container *ngIf="isExporting()">
@@ -180,7 +175,10 @@
       <div class="kpi-header">
         <span class="kpi-label">{{ t('management.revenueTotalRevenue') }}</span>
         <div class="kpi-icon kpi-icon-red">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+          </svg>
         </div>
       </div>
       <ng-container *ngIf="!isLoading(); else kpiSkeleton">
@@ -195,7 +193,11 @@
       <div class="kpi-header">
         <span class="kpi-label">{{ t('management.revenueTicketRevenue') }}</span>
         <div class="kpi-icon kpi-icon-blue">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
+          </svg>
         </div>
       </div>
       <ng-container *ngIf="!isLoading(); else kpiSkeleton2">
@@ -210,7 +212,14 @@
       <div class="kpi-header">
         <span class="kpi-label">{{ t('management.revenueFoodRevenue') }}</span>
         <div class="kpi-icon kpi-icon-green">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 9A6 6 0 0 0 6 9h12A6 6 0 0 0 12 9z"/><path d="M6 20V10"/><path d="M12 20V10"/><path d="M6 20h12"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 20V10" />
+            <path d="M12 9A6 6 0 0 0 6 9h12A6 6 0 0 0 12 9z" />
+            <path d="M6 20V10" />
+            <path d="M12 20V10" />
+            <path d="M6 20h12" />
+          </svg>
         </div>
       </div>
       <ng-container *ngIf="!isLoading(); else kpiSkeleton3">
@@ -225,7 +234,13 @@
       <div class="kpi-header">
         <span class="kpi-label">{{ t('management.revenueTicketCount') }}</span>
         <div class="kpi-icon kpi-icon-orange">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
         </div>
       </div>
       <ng-container *ngIf="!isLoading(); else kpiSkeleton4">
@@ -244,24 +259,22 @@
       <div class="chart-controls">
         <!-- Chart Type Toggle -->
         <div class="chart-type-toggle">
-          <button
-            id="chart-type-area"
-            class="chart-type-btn"
-            [class.active]="chartType() === 'area'"
-            (click)="setChartType('area')"
-            [title]="t('management.revenueChartArea')"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <button id="chart-type-area" class="chart-type-btn" [class.active]="chartType() === 'area'"
+            (click)="setChartType('area')" [title]="t('management.revenueChartArea')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+            </svg>
             {{ t('management.revenueChartArea') }}
           </button>
-          <button
-            id="chart-type-bar"
-            class="chart-type-btn"
-            [class.active]="chartType() === 'bar'"
-            (click)="setChartType('bar')"
-            [title]="t('management.revenueChartBar')"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="4" height="12" rx="1"/><rect x="10" y="5" width="4" height="16" rx="1"/><rect x="17" y="2" width="4" height="19" rx="1"/></svg>
+          <button id="chart-type-bar" class="chart-type-btn" [class.active]="chartType() === 'bar'"
+            (click)="setChartType('bar')" [title]="t('management.revenueChartBar')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="9" width="4" height="12" rx="1" />
+              <rect x="10" y="5" width="4" height="16" rx="1" />
+              <rect x="17" y="2" width="4" height="19" rx="1" />
+            </svg>
             {{ t('management.revenueChartBar') }}
           </button>
         </div>
@@ -295,20 +308,28 @@
       <div class="empty-state py-12" *ngIf="!isLoading() && !hasError() && summaryData().length === 0">
         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
           stroke="var(--m-text-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/>
+          <rect width="18" height="18" x="3" y="3" rx="2" />
+          <path d="M3 9h18" />
+          <path d="M3 15h18" />
+          <path d="M9 3v18" />
+          <path d="M15 3v18" />
         </svg>
         <p>{{ t('management.revenueNoData') }}</p>
-        <p style="font-size: 0.8rem; color: var(--m-text-muted); margin-top: -0.25rem;">{{ t('management.revenueNoDataDesc') }}</p>
+        <p style="font-size: 0.8rem; color: var(--m-text-muted); margin-top: -0.25rem;">{{
+          t('management.revenueNoDataDesc') }}</p>
       </div>
 
       <!-- Error State -->
       <div class="empty-state py-12" *ngIf="!isLoading() && hasError()">
         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
           stroke="var(--m-danger-text)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" x2="12" y1="8" y2="12" />
+          <line x1="12" x2="12.01" y1="16" y2="16" />
         </svg>
         <p>{{ t('management.revenueError') }}</p>
-        <p style="font-size: 0.8rem; color: var(--m-text-muted); margin-top: -0.25rem;">{{ t('management.revenueErrorDesc') }}</p>
+        <p style="font-size: 0.8rem; color: var(--m-text-muted); margin-top: -0.25rem;">{{
+          t('management.revenueErrorDesc') }}</p>
       </div>
 
       <!-- Chart Canvas -->
@@ -322,7 +343,8 @@
   <div class="card">
     <div class="card-header">
       <h2 class="card-title">{{ t('management.revenueTableTitle') }}</h2>
-      <span class="row-count" *ngIf="summaryData().length > 0">{{ summaryData().length }} {{ t('management.revenuePeriods') }}</span>
+      <span class="row-count" *ngIf="summaryData().length > 0">{{ summaryData().length }} {{
+        t('management.revenuePeriods') }}</span>
     </div>
     <div class="card-body no-padding">
 
@@ -336,7 +358,8 @@
       <div class="empty-state py-12" *ngIf="!isLoading() && (summaryData().length === 0 || hasError())">
         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
           stroke="var(--m-text-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/>
+          <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
+          <polyline points="13 2 13 9 20 9" />
         </svg>
         <p>{{ hasError() ? t('management.revenueError') : t('management.revenueNoTableData') }}</p>
       </div>
@@ -355,7 +378,7 @@
           </thead>
           <tbody>
             <tr *ngFor="let row of summaryData(); let i = index" [class.row-even]="i % 2 === 0">
-              <td class="period-cell">{{ row.period }}</td>
+              <td class="period-cell">{{ formatPeriod(row.period) }}</td>
               <td class="revenue-total">{{ formatCurrency(row.totalRevenue) }}</td>
               <td class="revenue-ticket">{{ formatCurrency(row.ticketRevenue) }}</td>
               <td class="revenue-food">{{ formatCurrency(row.foodRevenue) }}</td>

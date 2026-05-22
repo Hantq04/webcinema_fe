@@ -71,6 +71,27 @@
                 </div>
               </div>
 
+              <!-- Movie Text List (Formatted BE response) -->
+              <div *ngIf="msg.type === 'movie_text_list'" class="flex flex-col gap-3">
+                <div *ngFor="let movie of msg.metadata.movies"
+                  (click)="handleQuickReply(movie.title)"
+                  class="movie-text-card">
+                  <h4 class="movie-text-card-title">{{ movie.title }}</h4>
+                  <div class="movie-text-card-info">
+                    <div class="movie-text-card-info-item" *ngIf="movie.genre">
+                      <span class="movie-text-card-info-icon">🎭</span>
+                      <span class="movie-text-card-info-label">{{ t('movies.genre') }}:</span>
+                      <span class="movie-text-card-info-value">{{ movie.genre }}</span>
+                    </div>
+                    <div class="movie-text-card-info-item" *ngIf="movie.releaseDate">
+                      <span class="movie-text-card-info-icon">📅</span>
+                      <span class="movie-text-card-info-label">{{ t('movies.releaseDate') }}:</span>
+                      <span class="movie-text-card-info-value">{{ movie.releaseDate }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <!-- Showtimes -->
               <div *ngIf="msg.type === 'showtimes'" class="grid grid-cols-2 gap-2">
                 <div *ngFor="let st of msg.metadata.showtimes" class="showtime-tag">

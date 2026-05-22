@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ApiService } from './api.service';
+import { AuthService } from './auth.service';
 import { LanguageService } from './language.service';
 
 export interface ChatMessage {
@@ -8,7 +9,7 @@ export interface ChatMessage {
   sender: 'bot' | 'user';
   text: string;
   timestamp: Date;
-  type: 'text' | 'movie_list' | 'showtimes' | 'booking_status' | 'promo' | 'quick_replies';
+  type: 'text' | 'movie_list' | 'showtimes' | 'booking_status' | 'promo' | 'quick_replies' | 'movie_text_list';
   metadata?: any;
 }
 
@@ -19,6 +20,7 @@ export class ChatbotService {
   private readonly http = inject(HttpClient);
   private readonly apiService = inject(ApiService);
   private readonly language = inject(LanguageService);
+  private readonly authService = inject(AuthService);
 
   messages = signal<ChatMessage[]>([]);
   isTyping = signal(false);
@@ -58,17 +60,18 @@ export class ChatbotService {
     this.isTyping.set(true);
 
     const payload = {
-      userId: 2, // Mặc định là 2 như cấu hình trong tài liệu Postman của Backend
+      userId: this.authService.currentUserId() ?? 0,
       message: query
     };
 
     this.http.post<any>(this.apiService.apiUrl('/api/v1/chat-bot/ask'), payload).subscribe({
       next: (res) => {
         // Lấy câu trả lời linh hoạt từ nhiều định dạng response của BE
-        const replyText = res?.data?.reply || res?.reply || res?.message || (typeof res === 'string' ? res : '');
+        const replyText = res?.data?.reply || res?.reply || res?.response || res?.message || (typeof res === 'string' ? res : '');
 
         if (replyText) {
-          this.addBotMessage(replyText);
+          const parsed = this.parseBeResponse(replyText);
+          this.addBotMessage(parsed.text, parsed.type, parsed.metadata);
         } else {
           this.addBotMessage(this.t('chatbot.systemError'));
         }
@@ -154,5 +157,47 @@ export class ChatbotService {
         { label: this.t('chatbot.locationsLabel'), action: 'locations' }
       ]
     });
+  }
+
+  private parseBeResponse(replyText: string): { text: string; type: ChatMessage['type']; metadata?: any } {
+    if ((replyText.includes('Các phim đang chiếu hiện tại:') || replyText.includes('phim đang chiếu')) && replyText.includes('|')) {
+      const lines = replyText.split('\n');
+      const intro = lines[0];
+      const movies: Array<{ title: string; genre: string; releaseDate: string }> = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        let line = lines[i].trim();
+        if (line.startsWith('-')) {
+          line = line.substring(1).trim();
+          const parts = line.split('|').map(p => p.trim());
+          if (parts.length >= 1) {
+            const title = parts[0];
+            let genre = '';
+            let releaseDate = '';
+
+            for (let j = 1; j < parts.length; j++) {
+              const part = parts[j];
+              if (part.toLowerCase().includes('thể loại') || part.toLowerCase().includes('genre')) {
+                genre = part.replace(/thể loại:|genre:/gi, '').trim();
+              } else if (part.toLowerCase().includes('khởi chiếu') || part.toLowerCase().includes('release') || part.toLowerCase().includes('premiere')) {
+                releaseDate = part.replace(/khởi chiếu:|release:|premiere:/gi, '').trim();
+              }
+            }
+
+            movies.push({ title, genre, releaseDate });
+          }
+        }
+      }
+
+      if (movies.length > 0) {
+        return {
+          text: intro,
+          type: 'movie_text_list',
+          metadata: { movies }
+        };
+      }
+    }
+
+    return { text: replyText, type: 'text' };
   }
 }
