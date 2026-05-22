@@ -113,7 +113,6 @@ export class ManagementRevenueComponent implements OnInit, OnDestroy {
 
   private getDefaultFromDate(): string {
     const d = new Date();
-    // Ngày 1 của tháng hiện tại
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
   }
 
