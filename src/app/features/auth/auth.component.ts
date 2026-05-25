@@ -62,8 +62,8 @@ export class AuthComponent implements OnInit, OnDestroy {
   protected readonly showResetConfirmPassword = signal(false);
 
   protected readonly loginForm = this.formBuilder.group({
-    userName: [''],
-    passWord: [''],
+    userName: ['', [Validators.required]],
+    passWord: ['', [Validators.required]],
     captchaValue: ['', [Validators.required]]
   });
 
@@ -474,6 +474,28 @@ export class AuthComponent implements OnInit, OnDestroy {
     const mappedErrors = fieldErrors.reduce<Record<string, string>>((accumulator, item) => {
       if (item.field && item.message) {
         accumulator[item.field] = item.message;
+
+        const lowerField = item.field.toLowerCase();
+        accumulator[lowerField] = item.message;
+
+        if (lowerField === 'username') {
+          accumulator['userName'] = item.message;
+          accumulator['username'] = item.message;
+        } else if (lowerField === 'password') {
+          accumulator['password'] = item.message;
+          accumulator['passWord'] = item.message;
+        } else if (lowerField === 'phonenumber') {
+          accumulator['phoneNumber'] = item.message;
+        } else if (lowerField === 'birthday' || lowerField === 'birthmonth' || lowerField === 'birthyear' || lowerField === 'birthdate') {
+          accumulator['birthDay'] = item.message;
+          accumulator['birthMonth'] = item.message;
+          accumulator['birthYear'] = item.message;
+          accumulator['birthDate'] = item.message;
+        } else if (lowerField === 'newpassword') {
+          accumulator['newPassWord'] = item.message;
+        } else if (lowerField === 'confirmpassword') {
+          accumulator['confirmPassWord'] = item.message;
+        }
       }
 
       return accumulator;

@@ -20,7 +20,7 @@
 .auth-page {
   background: #f6f0df;
   color: #201b16;
-  padding: 1.5rem 1rem 2rem;
+  padding: 1.5rem 1rem 8rem;
 }
 
 .auth-shell {
@@ -215,22 +215,23 @@
   font-weight: 700;
 }
 
-.captcha-row {
-  display: grid;
-  gap: 0.35rem;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
+.field input:not([type='radio']):not([type='checkbox']).input-error,
+.birth-selects select.input-error {
+  border-color: #d92f20 !important;
+  box-shadow: 0 0 0 3px rgba(217, 47, 32, 0.12) !important;
 }
 
-.captcha-input {
+.captcha-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.captcha-row > input[type='text'] {
+  flex: 1;
   min-width: 0;
   max-width: 20rem;
-}
-
-.auth-form-register .captcha-row>input[type='text'] {
-  justify-self: start;
-  min-width: 0;
-  width: min(20rem, 100%);
 }
 
 .captcha-box {
@@ -328,14 +329,23 @@
 
 .birth-selects select {
   appearance: none;
-  background: #fff;
+  -webkit-appearance: none;
+  background: #fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%232a2118' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>") no-repeat right 0.5rem center;
+  background-size: 1.1rem;
   border: 1px solid #d9d0bd;
   border-radius: 2px;
   color: #2a2118;
   font-family: inherit;
   font-size: 0.98rem;
   min-height: 2.5rem;
-  padding: 0.45rem 0.6rem;
+  padding: 0.45rem 1.8rem 0.45rem 0.6rem;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.birth-selects select:focus {
+  border-color: #eb1c14;
+  box-shadow: 0 0 0 3px rgba(235, 28, 20, 0.12);
+  outline: none;
 }
 
 .gender-group {

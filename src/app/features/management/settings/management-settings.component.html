@@ -47,6 +47,18 @@
     </div>
 
     <div class="card-body">
+      <!-- General Backend Error -->
+      <div *ngIf="fieldErrors()['_general']"
+        class="alert-item animate-in" style="margin-bottom: 1.25rem;">
+        <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2" />
+          <line x1="12" x2="12" y1="8" y2="12" />
+          <line x1="12" x2="12.01" y1="16" y2="16" />
+        </svg>
+        <span>{{ fieldErrors()['_general'] }}</span>
+      </div>
+
       <form (ngSubmit)="$event.preventDefault()" class="form-grid">
 
         <!-- Open Time -->
@@ -59,8 +71,9 @@
               <polyline points="12 6 12 12 16 14" />
             </svg>
             <input id="open-time" name="openTime" [ngModelOptions]="{standalone: true}" type="time" class="form-input"
-              [ngModel]="openTime()" (ngModelChange)="openTime.set($event)" />
+              [ngModel]="openTime()" (ngModelChange)="openTime.set($event)" [class.form-input-error]="fieldErrors()['openTime']" />
           </div>
+          <span class="field-error-msg animate-in" *ngIf="fieldErrors()['openTime']">{{ fieldErrors()['openTime'] }}</span>
         </div>
 
         <!-- Business Hours -->
@@ -74,8 +87,9 @@
             </svg>
             <input id="business-hours" name="businessHours" [ngModelOptions]="{standalone: true}" type="number" min="1"
               max="24" step="1" class="form-input" [ngModel]="businessHours()"
-              (ngModelChange)="businessHours.set($event)" placeholder="16" />
+              (ngModelChange)="businessHours.set($event)" placeholder="16" [class.form-input-error]="fieldErrors()['businessHours']" />
           </div>
+          <span class="field-error-msg animate-in" *ngIf="fieldErrors()['businessHours']">{{ fieldErrors()['businessHours'] }}</span>
         </div>
 
         <!-- Computed Close Time -->
@@ -105,8 +119,9 @@
               <polyline points="12 6 12 12 16 14" />
             </svg>
             <input id="break-time" name="breakTime" [ngModelOptions]="{standalone: true}" type="time" class="form-input"
-              [ngModel]="breakTime()" (ngModelChange)="breakTime.set($event)" />
+              [ngModel]="breakTime()" (ngModelChange)="breakTime.set($event)" [class.form-input-error]="fieldErrors()['breakTime']" />
           </div>
+          <span class="field-error-msg animate-in" *ngIf="fieldErrors()['breakTime']">{{ fieldErrors()['breakTime'] }}</span>
         </div>
 
         <!-- Weekend Surcharge Percent -->
@@ -121,8 +136,9 @@
             </svg>
             <input id="percent-weekend" name="percentWeekend" [ngModelOptions]="{standalone: true}" type="number"
               min="0" max="100" step="1" class="form-input" [ngModel]="percentWeekend()"
-              (ngModelChange)="percentWeekend.set($event)" placeholder="10" />
+              (ngModelChange)="percentWeekend.set($event)" placeholder="10" [class.form-input-error]="fieldErrors()['percentWeekend']" />
           </div>
+          <span class="field-error-msg animate-in" *ngIf="fieldErrors()['percentWeekend']">{{ fieldErrors()['percentWeekend'] }}</span>
         </div>
 
         <!-- Time Begin to Change -->
@@ -135,8 +151,9 @@
             </svg>
             <input id="time-begin-to-change" name="timeBeginToChange" [ngModelOptions]="{standalone: true}"
               type="datetime-local" class="form-input" [ngModel]="timeBeginToChange()"
-              (ngModelChange)="timeBeginToChange.set($event)" />
+              (ngModelChange)="timeBeginToChange.set($event)" [class.form-input-error]="fieldErrors()['timeBeginToChange']" />
           </div>
+          <span class="field-error-msg animate-in" *ngIf="fieldErrors()['timeBeginToChange']">{{ fieldErrors()['timeBeginToChange'] }}</span>
         </div>
 
       </form>

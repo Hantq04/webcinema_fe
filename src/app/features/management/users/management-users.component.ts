@@ -55,6 +55,7 @@ export class ManagementUsersComponent implements OnInit {
   myProfileData = signal<UserProfileResponse | null>(null);
   isLoadingProfile = signal(false);
   isSubmittingProfile = signal(false);
+  profileFieldErrors = signal<Record<string, string>>({});
 
   // Pagination (client side)
   currentPage = signal(1);
@@ -115,6 +116,7 @@ export class ManagementUsersComponent implements OnInit {
   // --- Views ---
 
   switchToProfile() {
+    this.profileFieldErrors.set({});
     this.currentView.set('MY_PROFILE');
     this.loadMyProfile();
   }
@@ -242,6 +244,7 @@ export class ManagementUsersComponent implements OnInit {
 
   updateMyProfile(formData: FormData) {
     this.isSubmittingProfile.set(true);
+    this.profileFieldErrors.set({});
     this.userService.updateProfile(formData).subscribe({
       next: () => {
         this.isSubmittingProfile.set(false);
@@ -251,7 +254,17 @@ export class ManagementUsersComponent implements OnInit {
       error: (err) => {
         console.error('Update profile error', err);
         this.isSubmittingProfile.set(false);
-        this.showToast(err.error?.message || 'Không thể cập nhật hồ sơ', 'error');
+        const apiError = err.error;
+        if (apiError && apiError.errors && Array.isArray(apiError.errors)) {
+          const newErrors: Record<string, string> = {};
+          apiError.errors.forEach((e: any) => {
+            if (e.field) newErrors[e.field] = e.message;
+          });
+          this.profileFieldErrors.set(newErrors);
+        } else {
+          this.profileFieldErrors.set({ _general: apiError?.message || 'Không thể cập nhật hồ sơ' });
+        }
+        this.showToast(apiError?.message || 'Không thể cập nhật hồ sơ', 'error');
       }
     });
   }

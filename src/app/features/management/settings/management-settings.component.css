@@ -547,3 +547,16 @@
     transform: translateY(0);
   }
 }
+
+/* Field specific error styling */
+.form-input-error {
+  border-color: #ef4444 !important;
+}
+
+.field-error-msg {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  font-weight: 500;
+  display: block;
+}

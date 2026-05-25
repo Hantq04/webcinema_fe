@@ -22,17 +22,23 @@ import { LocationService, Province, District } from '../../../../core/services/l
       </div>
 
       <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="!isLoading">
+        <div *ngIf="fieldErrors && fieldErrors['_general']"
+          class="mb-5 p-3 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 rounded-xl text-xs text-red-600 dark:text-red-400 animate-in fade-in slide-in-from-top-1 duration-200">
+          {{ fieldErrors['_general'] }}
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5 lg:gap-x-12">
           <!-- Row 1 -->
           <div>
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.colName') }} <span class="text-rose-500">*</span></label>
-            <input type="text" formControlName="name" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('name')">
+            <input type="text" formControlName="name" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('name') || (fieldErrors && fieldErrors['name'])">
+            <p *ngIf="fieldErrors && fieldErrors['name']" class="text-xs text-rose-500 mt-1">{{ fieldErrors['name'] }}</p>
           </div>
           <div>
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('account.cityLabel') }} <span class="text-rose-500">*</span></label>
             <div class="relative w-full">
               <div class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 flex justify-between items-center cursor-pointer hover:border-rose-400 transition-all"
-                [class.ring-2]="isCityOpen" [class.ring-rose-500/10]="isCityOpen" [class.border-rose-500]="isCityOpen"
+                [class.ring-2]="isCityOpen" [class.ring-rose-500/10]="isCityOpen" [class.border-rose-500]="isCityOpen || (fieldErrors && fieldErrors['city'])"
                 (click)="isCityOpen = !isCityOpen; isDistrictOpen = false; isGenderOpen = false">
                 <span class="truncate" [class.text-slate-400]="!form.get('city')?.value">
                   {{ getProvinceName(form.get('city')?.value) || t('shared.pleaseSelect') }}
@@ -51,18 +57,20 @@ import { LocationService, Province, District } from '../../../../core/services/l
               </div>
               <div *ngIf="isCityOpen" class="fixed inset-0 z-[105]" (click)="isCityOpen = false"></div>
             </div>
+            <p *ngIf="fieldErrors && fieldErrors['city']" class="text-xs text-rose-500 mt-1">{{ fieldErrors['city'] }}</p>
           </div>
 
           <!-- Row 2 -->
           <div>
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.colPhone') }} <span class="text-rose-500">*</span></label>
-            <input type="text" formControlName="phoneNumber" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('phoneNumber')">
+            <input type="text" formControlName="phoneNumber" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('phoneNumber') || (fieldErrors && fieldErrors['phoneNumber'])">
+            <p *ngIf="fieldErrors && fieldErrors['phoneNumber']" class="text-xs text-rose-500 mt-1">{{ fieldErrors['phoneNumber'] }}</p>
           </div>
           <div>
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('account.districtLabel') }} <span class="text-rose-500">*</span></label>
             <div class="relative w-full">
               <div class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 flex justify-between items-center cursor-pointer hover:border-rose-400 transition-all"
-                [class.ring-2]="isDistrictOpen" [class.ring-rose-500/10]="isDistrictOpen" [class.border-rose-500]="isDistrictOpen"
+                [class.ring-2]="isDistrictOpen" [class.ring-rose-500/10]="isDistrictOpen" [class.border-rose-500]="isDistrictOpen || (fieldErrors && fieldErrors['district'])"
                 [class.opacity-50]="!form.get('city')?.value" [class.cursor-not-allowed]="!form.get('city')?.value"
                 (click)="form.get('city')?.value && (isDistrictOpen = !isDistrictOpen); isCityOpen = false; isGenderOpen = false">
                 <span class="truncate" [class.text-slate-400]="!form.get('district')?.value">
@@ -83,6 +91,7 @@ import { LocationService, Province, District } from '../../../../core/services/l
               </div>
               <div *ngIf="isDistrictOpen" class="fixed inset-0 z-[105]" (click)="isDistrictOpen = false"></div>
             </div>
+            <p *ngIf="fieldErrors && fieldErrors['district']" class="text-xs text-rose-500 mt-1">{{ fieldErrors['district'] }}</p>
           </div>
 
           <!-- Row 3 -->
@@ -90,7 +99,7 @@ import { LocationService, Province, District } from '../../../../core/services/l
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.userFormGender') }}</label>
             <div class="relative w-full">
               <div class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 flex justify-between items-center cursor-pointer hover:border-rose-400 transition-all"
-                [class.ring-2]="isGenderOpen" [class.ring-rose-500/10]="isGenderOpen" [class.border-rose-500]="isGenderOpen"
+                [class.ring-2]="isGenderOpen" [class.ring-rose-500/10]="isGenderOpen" [class.border-rose-500]="isGenderOpen || (fieldErrors && fieldErrors['gender'])"
                 (click)="isGenderOpen = !isGenderOpen; isCityOpen = false; isDistrictOpen = false">
                 <span class="truncate" [class.text-slate-400]="!form.get('gender')?.value || form.get('gender')?.value === 'None'">
                   {{ form.get('gender')?.value && form.get('gender')?.value !== 'None' ? (form.get('gender')?.value === 'Nam' ? t('auth.male') : t('auth.female')) : t('management.selectGender') }}
@@ -118,10 +127,12 @@ import { LocationService, Province, District } from '../../../../core/services/l
               </div>
               <div *ngIf="isGenderOpen" class="fixed inset-0 z-[90]" (click)="isGenderOpen = false"></div>
             </div>
+            <p *ngIf="fieldErrors && fieldErrors['gender']" class="text-xs text-rose-500 mt-1">{{ fieldErrors['gender'] }}</p>
           </div>
           <div>
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('account.addressLabel') }} <span class="text-rose-500">*</span></label>
-            <input type="text" formControlName="address" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('address')">
+            <input type="text" formControlName="address" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('address') || (fieldErrors && fieldErrors['address'])">
+            <p *ngIf="fieldErrors && fieldErrors['address']" class="text-xs text-rose-500 mt-1">{{ fieldErrors['address'] }}</p>
           </div>
 
           <!-- Row 4 -->
@@ -133,13 +144,15 @@ import { LocationService, Province, District } from '../../../../core/services/l
           </div>
           <div>
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('account.oldPasswordLabel') }} <span class="text-rose-500">*</span></label>
-            <input type="password" formControlName="oldPassword" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('oldPassword')">
+            <input type="password" formControlName="oldPassword" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('oldPassword') || (fieldErrors && fieldErrors['oldPassword'])">
+            <p *ngIf="fieldErrors && fieldErrors['oldPassword']" class="text-xs text-rose-500 mt-1">{{ fieldErrors['oldPassword'] }}</p>
           </div>
 
           <!-- Row 5 -->
           <div>
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email <span class="text-rose-500">*</span></label>
-            <input type="email" formControlName="email" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('email')">
+            <input type="email" formControlName="email" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('email') || (fieldErrors && fieldErrors['email'])">
+            <p *ngIf="fieldErrors && fieldErrors['email']" class="text-xs text-rose-500 mt-1">{{ fieldErrors['email'] }}</p>
           </div>
           <div class="hidden md:block"></div> <!-- Empty right column space -->
           
@@ -154,15 +167,17 @@ import { LocationService, Province, District } from '../../../../core/services/l
           <ng-container *ngIf="form.get('wantsChangePassword')?.value">
             <div class="mt-2">
               <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('auth.newPassword') }} <span class="text-rose-500">*</span></label>
-              <input type="password" formControlName="newPassword" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('newPassword')">
+              <input type="password" formControlName="newPassword" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('newPassword') || (fieldErrors && fieldErrors['newPassword'])">
+              <p *ngIf="fieldErrors && fieldErrors['newPassword']" class="text-xs text-rose-500 mt-1">{{ fieldErrors['newPassword'] }}</p>
             </div>
             <div class="mt-2">
               <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('auth.confirmNewPassword') }} <span class="text-rose-500">*</span></label>
-              <input type="password" formControlName="confirmPassword" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('confirmPassword')">
+              <input type="password" formControlName="confirmPassword" class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow" [class.border-rose-500]="isInvalid('confirmPassword') || (fieldErrors && fieldErrors['confirmPassword'])">
+              <p *ngIf="fieldErrors && fieldErrors['confirmPassword']" class="text-xs text-rose-500 mt-1">{{ fieldErrors['confirmPassword'] }}</p>
             </div>
           </ng-container>
         </div>
-        
+
         <div class="mt-10 flex justify-center w-full">
           <button type="submit" 
             class="px-10 py-3 text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg transition-all shadow-md flex items-center gap-2 transform active:scale-95" 
@@ -184,6 +199,7 @@ export class MyProfileFormComponent implements OnInit, OnChanges {
   @Input() profile: UserProfileResponse | null = null;
   @Input() isLoading = false;
   @Input() isSubmitting = false;
+  @Input() fieldErrors: Record<string, string> = {};
 
   @Output() updateProfile = new EventEmitter<FormData>();
 

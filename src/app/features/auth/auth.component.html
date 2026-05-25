@@ -30,9 +30,10 @@
       <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="submitLogin()" novalidate>
         <label class="field">
           <span>{{ t('auth.username') }}</span>
-          <input type="text" formControlName="userName" [placeholder]="t('auth.username')" autocomplete="username" />
+          <input type="text" formControlName="userName" [placeholder]="t('auth.username')" autocomplete="username"
+            [class.input-error]="(loginForm.controls.userName.touched && loginForm.controls.userName.invalid) || serverFieldError('login', 'userName')" />
           @if (loginForm.controls.userName.touched && loginForm.controls.userName.invalid) {
-          <small class="field-error">{{ t('auth.requiredUsername') }}</small>
+          <small class="field-error">Tên người dùng bắt buộc nhập</small>
           }
           @if (serverFieldError('login', 'userName')) {
           <small class="field-error">{{ serverFieldError('login', 'userName') }}</small>
@@ -43,7 +44,8 @@
           <span>{{ t('auth.password') }}</span>
           <div class="password-wrapper">
             <input [type]="showLoginPassword() ? 'text' : 'password'" formControlName="passWord"
-              [placeholder]="t('auth.password')" autocomplete="current-password" />
+              [placeholder]="t('auth.password')" autocomplete="current-password"
+              [class.input-error]="(loginForm.controls.passWord.touched && loginForm.controls.passWord.invalid) || serverFieldError('login', 'passWord')" />
             <button type="button" class="password-toggle" (click)="togglePasswordVisibility('login')"
               [aria-label]="showLoginPassword() ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'">
               @if (showLoginPassword()) {
@@ -54,38 +56,38 @@
             </button>
           </div>
           @if (loginForm.controls.passWord.touched && loginForm.controls.passWord.invalid) {
-          <small class="field-error">{{ t('auth.requiredPassword') }}</small>
+          <small class="field-error">Mật khẩu bắt buộc nhập</small>
           }
           @if (serverFieldError('login', 'passWord')) {
           <small class="field-error">{{ serverFieldError('login', 'passWord') }}</small>
           }
         </label>
 
-        <div class="captcha-row">
-          <label class="field captcha-input">
-            <span>{{ t('auth.captchaPrompt') }}</span>
+        <div class="field">
+          <span>{{ t('auth.captchaPrompt') }}</span>
+          <div class="captcha-row">
             <input type="text" formControlName="captchaValue" [placeholder]="t('auth.captchaInput')"
-              autocomplete="off" />
-            @if (loginForm.controls.captchaValue.touched && loginForm.controls.captchaValue.invalid) {
-            <small class="field-error">{{ t('auth.requiredCaptcha') }}</small>
-            }
-            @if (serverFieldError('login', 'captchaValue')) {
-            <small class="field-error">{{ serverFieldError('login', 'captchaValue') }}</small>
-            }
-          </label>
+              autocomplete="off"
+              [class.input-error]="(loginForm.controls.captchaValue.touched && loginForm.controls.captchaValue.invalid) || serverFieldError('login', 'captchaValue')" />
+            <div class="captcha-box">
+              @if (captchaLoading()) {
+              <div class="captcha-placeholder">{{ t('auth.loadingCaptcha') }}</div>
+              } @else if (loginCaptchaImage()) {
+              <img class="captcha-image" [src]="loginCaptchaImage()" alt="Captcha" />
+              } @else {
+              <div class="captcha-placeholder">{{ t('auth.noCaptcha') }}</div>
+              }
 
-          <div class="captcha-box">
-            @if (captchaLoading()) {
-            <div class="captcha-placeholder">{{ t('auth.loadingCaptcha') }}</div>
-            } @else if (loginCaptchaImage()) {
-            <img class="captcha-image" [src]="loginCaptchaImage()" alt="Captcha" />
-            } @else {
-            <div class="captcha-placeholder">{{ t('auth.noCaptcha') }}</div>
-            }
-
-            <button type="button" class="captcha-refresh" (click)="refreshCaptcha()"
-              aria-label="Tải lại captcha">↻</button>
+              <button type="button" class="captcha-refresh" (click)="refreshCaptcha()"
+                aria-label="Tải lại captcha">↻</button>
+            </div>
           </div>
+          @if (loginForm.controls.captchaValue.touched && loginForm.controls.captchaValue.invalid) {
+          <small class="field-error">{{ t('auth.requiredCaptcha') }}</small>
+          }
+          @if (serverFieldError('login', 'captchaValue')) {
+          <small class="field-error">{{ serverFieldError('login', 'captchaValue') }}</small>
+          }
         </div>
 
         <input type="hidden" [value]="loginCaptchaId()" />
@@ -100,34 +102,50 @@
       <form class="auth-form auth-form-register" [formGroup]="registerForm" (ngSubmit)="submitRegister()" novalidate>
         <label class="field">
           <span>{{ t('auth.name') }}<span class="required-mark">*</span></span>
-          <input type="text" formControlName="name" [placeholder]="t('auth.name')" autocomplete="name" />
+          <input type="text" formControlName="name" [placeholder]="t('auth.name')" autocomplete="name"
+            [class.input-error]="(registerForm.controls.name.touched && registerForm.controls.name.invalid) || serverFieldError('register', 'name')" />
           @if (registerForm.controls.name.touched && registerForm.controls.name.invalid) {
           <small class="field-error">{{ t('auth.requiredName') }}</small>
+          }
+          @if (serverFieldError('register', 'name')) {
+          <small class="field-error">{{ serverFieldError('register', 'name') }}</small>
           }
         </label>
 
         <label class="field">
           <span>{{ t('auth.username') }}<span class="required-mark">*</span></span>
-          <input type="text" formControlName="userName" [placeholder]="t('auth.username')" autocomplete="username" />
+          <input type="text" formControlName="userName" [placeholder]="t('auth.username')" autocomplete="username"
+            [class.input-error]="(registerForm.controls.userName.touched && registerForm.controls.userName.invalid) || serverFieldError('register', 'userName')" />
           @if (registerForm.controls.userName.touched && registerForm.controls.userName.invalid) {
           <small class="field-error">{{ t('auth.requiredUsername') }}</small>
+          }
+          @if (serverFieldError('register', 'userName')) {
+          <small class="field-error">{{ serverFieldError('register', 'userName') }}</small>
           }
         </label>
 
         <label class="field">
           <span>{{ t('auth.phoneNumber') }}<span class="required-mark">*</span></span>
-          <input type="text" formControlName="phoneNumber" [placeholder]="t('auth.phoneNumber')" autocomplete="tel" />
+          <input type="text" formControlName="phoneNumber" [placeholder]="t('auth.phoneNumber')" autocomplete="tel"
+            [class.input-error]="(registerForm.controls.phoneNumber.touched && registerForm.controls.phoneNumber.invalid) || serverFieldError('register', 'phoneNumber')" />
           @if (registerForm.controls.phoneNumber.touched && registerForm.controls.phoneNumber.invalid) {
           <small class="field-error">{{ t('auth.requiredPhone') }}</small>
+          }
+          @if (serverFieldError('register', 'phoneNumber')) {
+          <small class="field-error">{{ serverFieldError('register', 'phoneNumber') }}</small>
           }
         </label>
 
         <label class="field">
           <span>{{ t('auth.email') }}<span class="required-mark">*</span></span>
-          <input type="email" formControlName="email" [placeholder]="t('auth.email')" autocomplete="email" />
+          <input type="email" formControlName="email" [placeholder]="t('auth.email')" autocomplete="email"
+            [class.input-error]="(registerForm.controls.email.touched && registerForm.controls.email.invalid) || serverFieldError('register', 'email')" />
           @if (registerForm.controls.email.touched && registerForm.controls.email.invalid) {
           <small class="field-error">{{ registerForm.controls.email.hasError('email') ? t('auth.invalidEmail') :
             t('auth.requiredEmail') }}</small>
+          }
+          @if (serverFieldError('register', 'email')) {
+          <small class="field-error">{{ serverFieldError('register', 'email') }}</small>
           }
         </label>
 
@@ -135,7 +153,8 @@
           <span>{{ t('auth.password') }}<span class="required-mark">*</span></span>
           <div class="password-wrapper">
             <input [type]="showRegisterPassword() ? 'text' : 'password'" formControlName="password"
-              [placeholder]="t('auth.password')" autocomplete="new-password" />
+              [placeholder]="t('auth.password')" autocomplete="new-password"
+              [class.input-error]="(registerForm.controls.password.touched && registerForm.controls.password.invalid) || serverFieldError('register', 'password')" />
             <button type="button" class="password-toggle" (click)="togglePasswordVisibility('register')"
               [aria-label]="showRegisterPassword() ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'">
               @if (showRegisterPassword()) {
@@ -148,25 +167,28 @@
           @if (registerForm.controls.password.touched && registerForm.controls.password.invalid) {
           <small class="field-error">{{ t('auth.requiredPassword') }}</small>
           }
+          @if (serverFieldError('register', 'password')) {
+          <small class="field-error">{{ serverFieldError('register', 'password') }}</small>
+          }
         </label>
 
         <div class="birth-gender-row">
           <div class="field birth-group">
             <span>{{ t('auth.birthDate') }}<span class="required-mark">*</span></span>
             <div class="birth-selects">
-              <select formControlName="birthDay">
+              <select formControlName="birthDay" [class.input-error]="birthDateInvalid || serverFieldError('register', 'birthDate')">
                 <option value="">{{ t('auth.day') }}</option>
                 @for (day of dayOptions; track day) {
                 <option [value]="day">{{ day }}</option>
                 }
               </select>
-              <select formControlName="birthMonth">
+              <select formControlName="birthMonth" [class.input-error]="birthDateInvalid || serverFieldError('register', 'birthDate')">
                 <option value="">{{ t('auth.month') }}</option>
                 @for (month of monthOptions; track month) {
                 <option [value]="month">{{ month }}</option>
                 }
               </select>
-              <select formControlName="birthYear">
+              <select formControlName="birthYear" [class.input-error]="birthDateInvalid || serverFieldError('register', 'birthDate')">
                 <option value="">{{ t('auth.year') }}</option>
                 @for (year of yearOptions; track year) {
                 <option [value]="year">{{ year }}</option>
@@ -175,6 +197,9 @@
             </div>
             @if (birthDateInvalid) {
             <small class="field-error">{{ t('auth.requiredBirthDate') }}</small>
+            }
+            @if (serverFieldError('register', 'birthDate')) {
+            <small class="field-error">{{ serverFieldError('register', 'birthDate') }}</small>
             }
           </div>
 
@@ -189,6 +214,9 @@
             @if (genderInvalid) {
             <small class="field-error">{{ t('auth.requiredGender') }}</small>
             }
+            @if (serverFieldError('register', 'gender')) {
+            <small class="field-error">{{ serverFieldError('register', 'gender') }}</small>
+            }
           </div>
         </div>
 
@@ -196,7 +224,8 @@
           <span>{{ t('auth.captchaPrompt') }}</span>
           <div class="captcha-row">
             <input type="text" formControlName="captchaValue" [placeholder]="t('auth.captchaInput')"
-              autocomplete="off" />
+              autocomplete="off"
+              [class.input-error]="(registerForm.controls.captchaValue.touched && registerForm.controls.captchaValue.invalid) || serverFieldError('register', 'captchaValue')" />
             <div class="captcha-box">
               @if (captchaLoading()) {
               <div class="captcha-placeholder">{{ t('auth.loadingCaptcha') }}</div>
@@ -212,6 +241,9 @@
           </div>
           @if (registerForm.controls.captchaValue.touched && registerForm.controls.captchaValue.invalid) {
           <small class="field-error">{{ t('auth.requiredCaptcha') }}</small>
+          }
+          @if (serverFieldError('register', 'captchaValue')) {
+          <small class="field-error">{{ serverFieldError('register', 'captchaValue') }}</small>
           }
         </div>
 
@@ -263,7 +295,8 @@
 
         <label class="field">
           <span>{{ t('auth.email') }}</span>
-          <input type="email" formControlName="email" [placeholder]="t('auth.email')" autocomplete="email" />
+          <input type="email" formControlName="email" [placeholder]="t('auth.email')" autocomplete="email"
+            [class.input-error]="(forgotPasswordForm.controls.email.touched && forgotPasswordForm.controls.email.invalid) || serverFieldError('forgotpassword', 'email')" />
           @if (forgotPasswordForm.controls.email.touched && forgotPasswordForm.controls.email.invalid) {
           <small class="field-error">{{ forgotPasswordForm.controls.email.hasError('email') ? t('auth.invalidEmail') : t('auth.requiredEmail') }}</small>
           }
@@ -284,7 +317,8 @@
 
         <label class="field">
           <span>{{ t('auth.otpLabel') }}</span>
-          <input type="text" formControlName="otp" [placeholder]="t('auth.otpLabel')" autocomplete="off" />
+          <input type="text" formControlName="otp" [placeholder]="t('auth.otpLabel')" autocomplete="off"
+            [class.input-error]="(resetPasswordForm.controls.otp.touched && resetPasswordForm.controls.otp.invalid) || serverFieldError('changepassword', 'otp')" />
           @if (resetPasswordForm.controls.otp.touched && resetPasswordForm.controls.otp.invalid) {
           <small class="field-error">{{ t('auth.requiredOtp') }}</small>
           }
@@ -297,7 +331,8 @@
           <span>{{ t('auth.newPassword') }}</span>
           <div class="password-wrapper">
             <input [type]="showResetNewPassword() ? 'text' : 'password'" formControlName="newPassWord"
-              [placeholder]="t('auth.newPassword')" autocomplete="new-password" />
+              [placeholder]="t('auth.newPassword')" autocomplete="new-password"
+              [class.input-error]="(resetPasswordForm.controls.newPassWord.touched && resetPasswordForm.controls.newPassWord.invalid) || serverFieldError('changepassword', 'newPassWord')" />
             <button type="button" class="password-toggle" (click)="togglePasswordVisibility('resetNew')"
               [aria-label]="showResetNewPassword() ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'">
               @if (showResetNewPassword()) {
@@ -319,7 +354,8 @@
           <span>{{ t('auth.confirmNewPassword') }}</span>
           <div class="password-wrapper">
             <input [type]="showResetConfirmPassword() ? 'text' : 'password'" formControlName="confirmPassWord"
-              [placeholder]="t('auth.confirmNewPassword')" autocomplete="new-password" />
+              [placeholder]="t('auth.confirmNewPassword')" autocomplete="new-password"
+              [class.input-error]="(resetPasswordForm.controls.confirmPassWord.touched && resetPasswordForm.controls.confirmPassWord.invalid) || serverFieldError('changepassword', 'confirmPassWord')" />
             <button type="button" class="password-toggle" (click)="togglePasswordVisibility('resetConfirm')"
               [aria-label]="showResetConfirmPassword() ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'">
               @if (showResetConfirmPassword()) {

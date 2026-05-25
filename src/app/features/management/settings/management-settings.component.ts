@@ -40,6 +40,7 @@ export class ManagementSettingsComponent implements OnInit {
 
   // Form Validations & Toast States
   formErrors = signal<string[]>([]);
+  fieldErrors = signal<Record<string, string>>({});
   toast = signal<{ show: boolean, message: string, type: 'success' | 'error' }>({ show: false, message: '', type: 'success' });
 
   // Delete confirmation states
@@ -178,6 +179,7 @@ export class ManagementSettingsComponent implements OnInit {
     this.loadedTimeBeginToChange = setting.timeBeginToChange || null;
     this.activeSettingId.set(setting.id || null);
     this.formErrors.set([]);
+    this.fieldErrors.set({});
     this.cdr.detectChanges();
   }
 
@@ -190,10 +192,12 @@ export class ManagementSettingsComponent implements OnInit {
     this.loadedTimeBeginToChange = null;
     this.activeSettingId.set(null);
     this.formErrors.set([]);
+    this.fieldErrors.set({});
     this.cdr.detectChanges();
   }
 
   saveSetting() {
+    this.fieldErrors.set({});
     if (!this.validateForm()) return;
 
     const payload = this.preparePayload();
@@ -211,7 +215,17 @@ export class ManagementSettingsComponent implements OnInit {
       error: (err) => {
         console.error('Save setting error', err);
         this.isSavingSetting.set(false);
-        this.showToast(err.error?.message || 'Lỗi khi lưu cấu hình', 'error');
+        const apiError = err.error;
+        if (apiError && apiError.errors && Array.isArray(apiError.errors)) {
+          const newErrors: Record<string, string> = {};
+          apiError.errors.forEach((e: any) => {
+            if (e.field) newErrors[e.field] = e.message;
+          });
+          this.fieldErrors.set(newErrors);
+        } else {
+          this.fieldErrors.set({ _general: apiError?.message || 'Lỗi khi lưu cấu hình' });
+        }
+        this.showToast(apiError?.message || 'Lỗi khi lưu cấu hình', 'error');
         this.cdr.detectChanges();
       }
     });
@@ -221,6 +235,7 @@ export class ManagementSettingsComponent implements OnInit {
     const id = this.activeSettingId();
     if (!id) return;
 
+    this.fieldErrors.set({});
     if (!this.validateForm()) return;
 
     const payload = this.preparePayload(id);
@@ -238,7 +253,17 @@ export class ManagementSettingsComponent implements OnInit {
       error: (err) => {
         console.error('Update setting error', err);
         this.isSavingSetting.set(false);
-        this.showToast(err.error?.message || 'Lỗi khi cập nhật cấu hình', 'error');
+        const apiError = err.error;
+        if (apiError && apiError.errors && Array.isArray(apiError.errors)) {
+          const newErrors: Record<string, string> = {};
+          apiError.errors.forEach((e: any) => {
+            if (e.field) newErrors[e.field] = e.message;
+          });
+          this.fieldErrors.set(newErrors);
+        } else {
+          this.fieldErrors.set({ _general: apiError?.message || 'Lỗi khi cập nhật cấu hình' });
+        }
+        this.showToast(apiError?.message || 'Lỗi khi cập nhật cấu hình', 'error');
         this.cdr.detectChanges();
       }
     });

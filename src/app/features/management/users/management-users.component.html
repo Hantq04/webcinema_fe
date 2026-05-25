@@ -162,7 +162,7 @@
     <ng-container *ngIf="currentView() === 'MY_PROFILE'">
       <div class="p-6">
         <app-my-profile-form [profile]="myProfileData()" [isLoading]="isLoadingProfile()"
-          [isSubmitting]="isSubmittingProfile()" (updateProfile)="updateMyProfile($event)">
+          [isSubmitting]="isSubmittingProfile()" [fieldErrors]="profileFieldErrors()" (updateProfile)="updateMyProfile($event)">
         </app-my-profile-form>
       </div>
     </ng-container>
