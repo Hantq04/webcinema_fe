@@ -113,43 +113,111 @@ import { Router } from '@angular/router';
             <div class="payment-selection">
               <div class="payment-main">
                 <div class="payment-section">
-                  <div class="payment-section__header">Bước 1: GIẢM GIÁ</div>
+                  <div class="payment-section__header">{{ t('booking.step1Discount') }}</div>
                   <div class="payment-option-list">
                     <div class="payment-option" (click)="onDevelop()">CGV Voucher</div>
-                    <div class="payment-option" (click)="onDevelop()">Mã giảm giá</div>
-                    <div class="payment-option" (click)="onDevelop()">Điểm CGV</div>
-                    <div class="payment-option" (click)="onDevelop()">Đối tác</div>
+                    
+                    <!-- Accordion Item for Discount Code -->
+                    <div class="payment-option payment-option--accordion" 
+                         [class.expanded]="isDiscountCodeExpanded()"
+                         (click)="toggleDiscountCode()">
+                      <span>{{ t('booking.discountCode') }}</span>
+                      <span class="accordion-arrow">{{ isDiscountCodeExpanded() ? '▲' : '▼' }}</span>
+                    </div>
+                    
+                    @if (isDiscountCodeExpanded()) {
+                      <div class="discount-accordion-content">
+                        <div class="discount-columns">
+                          <!-- Ticket Column -->
+                          <div class="discount-col">
+                            <div class="col-header-row">
+                              <span class="col-main-title">{{ t('booking.movieVoucherTitle') }}</span>
+                              <button type="button" class="col-register-btn" (click)="openRegisterModal('Ticket')">{{ t('booking.registerBtn') }}</button>
+                            </div>
+                            <div class="col-subheader-row">
+                              <span class="sub-title-left">{{ t('booking.unusedStatus') }}</span>
+                              <span class="sub-title-right">{{ t('booking.expiryDateLabel') }}</span>
+                            </div>
+                            
+                            @if (ticketCoupons().length > 0) {
+                              @for (c of ticketCoupons(); track c.code) {
+                                <div class="voucher-item voucher-item--clickable" 
+                                     [class.applied]="isCouponApplied(c.code)"
+                                     (click)="toggleCoupon(c)">
+                                  <div class="voucher-info-row">
+                                    <span class="voucher-name">{{ c.name }}</span>
+                                    <span class="voucher-date">{{ formatCouponDate(c.expDate) }}</span>
+                                  </div>
+                                </div>
+                              }
+                            } @else {
+                              <div class="no-coupons-message">{{ t('booking.noMovieCoupons') }}</div>
+                            }
+                          </div>
+
+                          <!-- Food Column -->
+                          <div class="discount-col">
+                            <div class="col-header-row">
+                              <span class="col-main-title">{{ t('booking.foodVoucherTitle') }}</span>
+                              <button type="button" class="col-register-btn" (click)="openRegisterModal('Food')">{{ t('booking.registerBtn') }}</button>
+                            </div>
+                            <div class="col-subheader-row">
+                              <span class="sub-title-left">{{ t('booking.unusedStatus') }}</span>
+                              <span class="sub-title-right">{{ t('booking.expiryDateLabel') }}</span>
+                            </div>
+                            
+                            @if (foodCoupons().length > 0) {
+                              @for (c of foodCoupons(); track c.code) {
+                                <div class="voucher-item voucher-item--clickable" 
+                                     [class.applied]="isCouponApplied(c.code)"
+                                     (click)="toggleCoupon(c)">
+                                  <div class="voucher-info-row">
+                                    <span class="voucher-name">{{ c.name }}</span>
+                                    <span class="voucher-date">{{ formatCouponDate(c.expDate) }}</span>
+                                  </div>
+                                </div>
+                              }
+                            } @else {
+                              <div class="no-coupons-message">Không có mã giảm giá bắp nước</div>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    }
+
+                    <div class="payment-option" (click)="onDevelop()">{{ t('booking.points') }}</div>
+                    <div class="payment-option" (click)="onDevelop()">{{ t('booking.partners') }}</div>
                   </div>
                 </div>
 
                 <div class="payment-section">
-                  <div class="payment-section__header">Bước 2: HÌNH THỨC THANH TOÁN</div>
+                  <div class="payment-section__header">{{ t('booking.step2PaymentMethod') }}</div>
                   <div class="payment-methods">
                     <label class="method-item">
                       <input type="radio" name="payment" value="atm" disabled>
                       <span class="method-icon atm"></span>
-                      <span class="method-name">ATM card (Thẻ nội địa) <small>(Chưa hỗ trợ)</small></span>
+                      <span class="method-name">{{ t('booking.atmCard') }} <small>({{ t('booking.notSupported') }})</small></span>
                     </label>
                     <label class="method-item">
                       <input type="radio" name="payment" value="visa" disabled>
                       <span class="method-icon visa"></span>
-                      <span class="method-name">Thẻ quốc tế (Visa, Master...) <small>(Chưa hỗ trợ)</small></span>
+                      <span class="method-name">{{ t('booking.intlCard') }} <small>({{ t('booking.notSupported') }})</small></span>
                     </label>
                     <label class="method-item">
                       <input type="radio" name="payment" value="momo" disabled>
                       <span class="method-icon momo"></span>
-                      <span class="method-name">MoMo <small>(Chưa hỗ trợ)</small></span>
+                      <span class="method-name">{{ t('booking.momoWallet') }} <small>({{ t('booking.notSupported') }})</small></span>
                     </label>
                     <label class="method-item" (click)="$event.preventDefault(); togglePaymentMethod('vnpay')">
                       <input type="radio" name="payment" value="vnpay" 
                              [checked]="selectedPaymentMethod() === 'vnpay'">
                       <span class="method-icon vnpay"></span>
-                      <span class="method-name">VNPAY</span>
+                      <span class="method-name">{{ t('booking.vnpayGate') }}</span>
                     </label>
                     <label class="method-item">
                       <input type="radio" name="payment" value="shopeepay" disabled>
                       <span class="method-icon shopeepay"></span>
-                      <span class="method-name">ShopeePay <small>(Chưa hỗ trợ)</small></span>
+                      <span class="method-name">{{ t('booking.shopeepayWallet') }} <small>({{ t('booking.notSupported') }})</small></span>
                     </label>
                   </div>
                 </div>
@@ -157,28 +225,28 @@ import { Router } from '@angular/router';
 
               <div class="payment-sidebar">
                 <div class="side-box">
-                  <div class="side-box__title">Tổng cộng</div>
+                  <div class="side-box__title">{{ t('booking.totalAmount') }}</div>
                   <div class="side-box__val">{{ totalPrice() | number:'1.0-0' }} ₫</div>
                 </div>
                 <div class="side-box">
-                  <div class="side-box__title">Khuyến mãi</div>
-                  <div class="side-box__val">0 ₫</div>
+                  <div class="side-box__title">{{ t('booking.discountAmount') }}</div>
+                  <div class="side-box__val">{{ totalDiscount() | number:'1.0-0' }} ₫</div>
                 </div>
                 <div class="side-box side-box--total">
-                  <div class="side-box__title">Tổng số tiền thanh toán</div>
-                  <div class="side-box__val">{{ totalPrice() | number:'1.0-0' }} ₫</div>
+                  <div class="side-box__title">{{ t('booking.paymentAmount') }}</div>
+                  <div class="side-box__val">{{ finalPriceToPay() | number:'1.0-0' }} ₫</div>
                 </div>
                 
                 <div class="timer-box">
-                  <p>Countdown Clock</p>
+                  <p>{{ t('booking.countdownClock') }}</p>
                   <div class="timer-display">
                     <div class="timer-unit">
                       <span class="timer-num">{{ formatMinutes(remainingSeconds()) }}</span>
-                      <span class="timer-label">Minutes</span>
+                      <span class="timer-label">{{ t('booking.minutesUnit') }}</span>
                     </div>
                     <div class="timer-unit">
                       <span class="timer-num">{{ formatSeconds(remainingSeconds()) }}</span>
-                      <span class="timer-label">Seconds</span>
+                      <span class="timer-label">{{ t('booking.secondsUnit') }}</span>
                     </div>
                   </div>
                 </div>
@@ -223,7 +291,7 @@ import { Router } from '@angular/router';
               <div class="summary-col">
                 <div class="summary-row"><span class="label">{{ t('booking.movieLabel') }}</span> <strong>{{ (totalPrice() - totalFoodPrice()) | number:'1.0-0' }} ₫</strong></div>
                 <div class="summary-row"><span class="label">Combo</span> <strong>{{ totalFoodPrice() | number:'1.0-0' }} ₫</strong></div>
-                <div class="summary-row"><span class="label">{{ t('booking.totalLabel') }}</span> <strong class="total-price">{{ totalPrice() | number:'1.0-0' }} ₫</strong></div>
+                <div class="summary-row"><span class="label">{{ t('booking.totalLabel') }}</span> <strong class="total-price">{{ finalPriceToPay() | number:'1.0-0' }} ₫</strong></div>
               </div>
             </div>
           </div>
@@ -254,6 +322,37 @@ import { Router } from '@angular/router';
               <div class="modal-footer">
                 <button class="btn-modal-cancel" (click)="showConfirmModal.set(false)">Hủy</button>
                 <button class="btn-modal-confirm" (click)="confirmBooking()">Đồng Ý</button>
+              </div>
+            </div>
+          </div>
+        }
+
+        @if (showRegisterModal()) {
+          <div class="register-modal-overlay" (click)="showRegisterModal.set(false)">
+            <div class="register-modal-panel" (click)="$event.stopPropagation()">
+              <button type="button" class="register-modal-close-btn" (click)="showRegisterModal.set(false)">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+
+              <div class="register-modal-header">
+                <h3>{{ registerModalTitle() }}</h3>
+              </div>
+              
+              <div class="register-modal-body">
+                <div class="register-form-row">
+                  <label class="register-label">{{ registerModalLabel() }}</label>
+                  <input type="text" 
+                         class="register-input" 
+                         [value]="registerCouponCode()" 
+                         (input)="onCouponCodeInput($event)">
+                </div>
+              </div>
+              
+              <div class="register-modal-footer">
+                <button type="button" class="register-submit-btn" (click)="submitRegisterCoupon()">{{ t('booking.registerSubmitBtn') }}</button>
               </div>
             </div>
           </div>
@@ -292,6 +391,37 @@ export class BookingComponent implements OnDestroy {
 
   protected readonly foodItems = signal<Array<{ id: string; name: string; description: string; price: number; imageUrl: string; quantity: number }>>([]);
 
+  // Mock coupons identical to the ones in account section
+  protected readonly coupons = signal<Array<{ name: string; code: string; regDate: string; expDate: string; status: string; type: 'Ticket' | 'Food' }>>([
+    { name: 'Vé xem phim miễn phí (CineGo Welcome)', code: 'CGWELCOME2026', regDate: '2026-05-20', expDate: '2026-08-20', status: 'Chưa sử dụng', type: 'Ticket' },
+    { name: 'Giảm 50% Combo Bắp nước CineGo', code: 'CGCOMBO50', regDate: '2026-05-15', expDate: '2026-06-15', status: 'Chưa sử dụng', type: 'Food' }
+  ]);
+
+  protected readonly isDiscountCodeExpanded = signal(false);
+  protected readonly appliedTicketCoupon = signal<{ name: string; code: string } | null>(null);
+  protected readonly appliedFoodCoupon = signal<{ name: string; code: string } | null>(null);
+
+  protected readonly ticketCoupons = computed(() => this.coupons().filter(c => c.type === 'Ticket'));
+  protected readonly foodCoupons = computed(() => this.coupons().filter(c => c.type === 'Food'));
+
+  // CGV Vouchers signals
+  protected readonly isCgvVoucherExpanded = signal(false);
+  protected readonly showRegisterModal = signal(false);
+  protected readonly registerModalTitle = signal('Đăng ký Coupon');
+  protected readonly registerModalLabel = signal('Số Coupon *');
+  protected readonly registerCouponCode = signal('');
+  protected registerModalType: 'Ticket' | 'Food' | 'VoucherTicket' | 'VoucherFood' = 'Ticket';
+
+  protected readonly cgvVouchers = signal<Array<{ name: string; code: string; regDate: string; expDate: string; status: string; type: 'Ticket' | 'Food' }>>([
+    { name: '2D ALL DAYS (A)', code: 'VCHR2D1', regDate: '2018-01-01', expDate: '2018-01-31', status: 'Chưa sử dụng', type: 'Ticket' },
+    { name: '2D ALL DAYS (A)', code: 'VCHR2D2', regDate: '2018-01-01', expDate: '2018-01-31', status: 'Chưa sử dụng', type: 'Ticket' }
+  ]);
+
+  protected readonly appliedVouchers = signal<string[]>([]);
+
+  protected readonly cgvTicketVouchers = computed(() => this.cgvVouchers().filter(v => v.type === 'Ticket'));
+  protected readonly cgvFoodVouchers = computed(() => this.cgvVouchers().filter(v => v.type === 'Food'));
+
   protected readonly totalFoodPrice = computed(() => {
     return this.foodItems().reduce((sum, item) => sum + (item.price * item.quantity), 0);
   });
@@ -299,6 +429,43 @@ export class BookingComponent implements OnDestroy {
   protected readonly totalPrice = computed(() => {
     const seatPrice = this.selectedSeats().reduce((sum, seat) => sum + (seat.priceTicket || 0), 0);
     return seatPrice + this.totalFoodPrice();
+  });
+
+  protected readonly appliedTicketDiscount = computed(() => {
+    if (!this.appliedTicketCoupon()) return 0;
+    // Discount one ticket's price (since coupon gives 1 free ticket)
+    return this.selectedSeats().length > 0 ? (this.selectedSeats()[0].priceTicket || 0) : 0;
+  });
+
+  protected readonly appliedFoodDiscount = computed(() => {
+    if (!this.appliedFoodCoupon()) return 0;
+    return Math.round(this.totalFoodPrice() * 0.5);
+  });
+
+  protected readonly appliedVoucherTicketDiscount = computed(() => {
+    const activeTicketVouchers = this.cgvVouchers().filter(v => v.type === 'Ticket' && this.appliedVouchers().includes(v.code));
+    let discount = 0;
+    const sortedSeats = [...this.selectedSeats()];
+    for (let i = 0; i < Math.min(activeTicketVouchers.length, sortedSeats.length); i++) {
+      discount += (sortedSeats[i].priceTicket || 0);
+    }
+    return discount;
+  });
+
+  protected readonly appliedVoucherFoodDiscount = computed(() => {
+    const activeFoodVouchers = this.cgvVouchers().filter(v => v.type === 'Food' && this.appliedVouchers().includes(v.code));
+    if (activeFoodVouchers.length > 0) {
+      return this.totalFoodPrice();
+    }
+    return 0;
+  });
+
+  protected readonly totalDiscount = computed(() => {
+    return this.appliedTicketDiscount() + this.appliedFoodDiscount() + this.appliedVoucherTicketDiscount() + this.appliedVoucherFoodDiscount();
+  });
+
+  protected readonly finalPriceToPay = computed(() => {
+    return Math.max(0, this.totalPrice() - this.totalDiscount());
   });
 
   protected readonly seatRows = computed(() => {
@@ -436,10 +603,14 @@ export class BookingComponent implements OnDestroy {
 
       setTimeout(() => {
         this.stopTimer();
-        // Clear selected items when returning to seat selection
         this.selectedSeats.set([]);
         this.foodItems.update(items => items.map(item => ({ ...item, quantity: 0 })));
         this.selectedPaymentMethod.set('');
+        this.appliedTicketCoupon.set(null);
+        this.appliedFoodCoupon.set(null);
+        this.appliedVouchers.set([]);
+        this.isDiscountCodeExpanded.set(false);
+        this.isCgvVoucherExpanded.set(false);
         this.bookingStep.set(1);
         this.loading.set(false);
       }, 300);
@@ -523,12 +694,14 @@ export class BookingComponent implements OnDestroy {
         .map(f => ({ name: f.name, quantity: f.quantity }));
       const tickets = this.currentTicketCodes();
 
+      const promoCode = [this.appliedTicketCoupon()?.code, this.appliedFoodCoupon()?.code].filter(Boolean).join(',');
+
       this.loading.set(true);
       this.bookingService.createBill({
         customerName,
         foods,
         tickets,
-        promotionCode: ""
+        promotionCode: promoCode
       }).pipe(
         switchMap(res => {
           if (res.status === 200 || res.status === 'SUCCESS' || res.status === 'success' || res.status === 201 || res.code === 200 || res.code === 201) {
@@ -583,6 +756,11 @@ export class BookingComponent implements OnDestroy {
     this.selectedSeats.set([]);
     this.foodItems.update(items => items.map(item => ({ ...item, quantity: 0 })));
     this.selectedPaymentMethod.set('');
+    this.appliedTicketCoupon.set(null);
+    this.appliedFoodCoupon.set(null);
+    this.appliedVouchers.set([]);
+    this.isDiscountCodeExpanded.set(false);
+    this.isCgvVoucherExpanded.set(false);
     this.bookingStep.set(1);
     this.loading.set(false);
   }
@@ -650,6 +828,140 @@ export class BookingComponent implements OnDestroy {
     } else {
       this.selectedPaymentMethod.set(method);
     }
+  }
+
+  protected toggleDiscountCode(): void {
+    this.isDiscountCodeExpanded.update(val => !val);
+  }
+
+  protected isCouponApplied(code: string): boolean {
+    return this.appliedTicketCoupon()?.code === code || this.appliedFoodCoupon()?.code === code;
+  }
+
+  protected toggleCoupon(c: any): void {
+    if (c.type === 'Ticket') {
+      if (this.appliedTicketCoupon()?.code === c.code) {
+        this.appliedTicketCoupon.set(null);
+      } else {
+        if (this.appliedFoodCoupon() || this.appliedTicketCoupon()) {
+          alert(this.t('booking.onlyOneDiscountCode'));
+          return;
+        }
+        this.appliedTicketCoupon.set({ name: c.name, code: c.code });
+      }
+    } else if (c.type === 'Food') {
+      if (this.appliedFoodCoupon()?.code === c.code) {
+        this.appliedFoodCoupon.set(null);
+      } else {
+        if (this.appliedTicketCoupon() || this.appliedFoodCoupon()) {
+          alert(this.t('booking.onlyOneDiscountCode'));
+          return;
+        }
+        this.appliedFoodCoupon.set({ name: c.name, code: c.code });
+      }
+    }
+  }
+
+  protected formatCouponDate(dateStr: string): string {
+    if (!dateStr) return '';
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return dateStr;
+  }
+
+  protected toggleCgvVoucher(): void {
+    this.isCgvVoucherExpanded.update(val => !val);
+  }
+
+  protected isVoucherApplied(code: string): boolean {
+    return this.appliedVouchers().includes(code);
+  }
+
+  protected toggleVoucher(v: any): void {
+    this.appliedVouchers.update(applied => {
+      if (applied.includes(v.code)) {
+        return applied.filter(code => code !== v.code);
+      } else {
+        if (v.type === 'Ticket') {
+          const currentTicketCount = this.cgvVouchers().filter(item => item.type === 'Ticket' && applied.includes(item.code)).length;
+          if (currentTicketCount >= this.selectedSeats().length) {
+            alert('Số lượng voucher không thể vượt quá số lượng ghế đã chọn!');
+            return applied;
+          }
+        }
+        return [...applied, v.code];
+      }
+    });
+  }
+
+  protected openRegisterModal(type: 'Ticket' | 'Food' | 'VoucherTicket' | 'VoucherFood'): void {
+    this.registerModalType = type;
+    this.registerCouponCode.set('');
+    if (type.startsWith('Voucher')) {
+      this.registerModalTitle.set(this.t('booking.registerModalVoucherTitle'));
+      this.registerModalLabel.set(this.t('booking.registerModalVoucherLabel'));
+    } else {
+      this.registerModalTitle.set(this.t('booking.registerModalCouponTitle'));
+      this.registerModalLabel.set(this.t('booking.registerModalCouponLabel'));
+    }
+    this.showRegisterModal.set(true);
+  }
+
+  protected onCouponCodeInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.registerCouponCode.set(input.value);
+  }
+
+  protected submitRegisterCoupon(): void {
+    const code = this.registerCouponCode().trim();
+    if (!code) {
+      alert(this.t('booking.pleaseEnterCode'));
+      return;
+    }
+    if (this.registerModalType === 'Ticket') {
+      const newCoupon = {
+        name: `Vé xem phim miễn phí (CineGo Coupon ${code})`,
+        code: code,
+        regDate: '2026-05-25',
+        expDate: '2026-08-25',
+        status: 'Chưa sử dụng',
+        type: 'Ticket' as const
+      };
+      this.coupons.update(list => [...list, newCoupon]);
+    } else if (this.registerModalType === 'Food') {
+      const newCoupon = {
+        name: `Giảm 50% Combo Bắp nước (CineGo Coupon ${code})`,
+        code: code,
+        regDate: '2026-05-25',
+        expDate: '2026-08-25',
+        status: 'Chưa sử dụng',
+        type: 'Food' as const
+      };
+      this.coupons.update(list => [...list, newCoupon]);
+    } else if (this.registerModalType === 'VoucherTicket') {
+      const newVoucher = {
+        name: `2D ALL DAYS (${code})`,
+        code: code,
+        regDate: '2018-01-01',
+        expDate: '2018-01-31',
+        status: 'Chưa sử dụng',
+        type: 'Ticket' as const
+      };
+      this.cgvVouchers.update(list => [...list, newVoucher]);
+    } else if (this.registerModalType === 'VoucherFood') {
+      const newVoucher = {
+        name: `Concession (${code})`,
+        code: code,
+        regDate: '2018-01-01',
+        expDate: '2018-01-31',
+        status: 'Chưa sử dụng',
+        type: 'Food' as const
+      };
+      this.cgvVouchers.update(list => [...list, newVoucher]);
+    }
+    this.showRegisterModal.set(false);
   }
 
   protected onDevelop(): void {

@@ -3,6 +3,7 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet, NavigationEnd } fro
 import { AuthService } from '../../../core/services/auth.service';
 import { LanguageService } from '../../../core/services/language.service';
 import { NgIf, isPlatformBrowser } from '@angular/common';
+import { Title } from '@angular/platform-browser';
 import { filter } from 'rxjs';
 import { NotificationBellComponent } from './components/notification-bell/notification-bell.component';
 
@@ -177,8 +178,17 @@ export class ManagementLayoutComponent implements OnInit {
   protected readonly router = inject(Router);
   protected readonly t = this.language.t.bind(this.language);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly titleService = inject(Title);
 
   ngOnInit() {
+    this.titleService.setTitle('CineGo Management');
+    
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.titleService.setTitle('CineGo Management');
+    });
+
     if (isPlatformBrowser(this.platformId)) {
       const savedTheme = localStorage.getItem('management_theme');
       if (savedTheme === 'dark') {

@@ -31,4 +31,8 @@ export interface BillResponse {
   tickets: any[];
   foods: any[];
   promotionCode?: string;
+  cinemaName?: string;
+  address?: string;
+  items?: any[];
 }
+

@@ -52,4 +52,17 @@ export class ManagementBillService {
   deleteFood(id: string | number): Observable<any> {
     return this.http.delete<any>(this.apiService.apiUrl(`/api/v1/bill/food/delete?id=${id}`));
   }
+
+  getBills(params: { cinemaName?: string; page: number; size: number }): Observable<any> {
+    let url = `/api/v1/bill/list?page=${params.page}&size=${params.size}`;
+    if (params.cinemaName) {
+      url += `&cinemaName=${encodeURIComponent(params.cinemaName)}`;
+    }
+    return this.http.get<any>(this.apiService.apiUrl(url));
+  }
+
+
+  getBillDetail(tradingCode: string): Observable<any> {
+    return this.http.get<any>(this.apiService.apiUrl(`/api/v1/bill/detail?tradingCode=${tradingCode}`));
+  }
 }

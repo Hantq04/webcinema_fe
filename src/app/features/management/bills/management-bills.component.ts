@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { LanguageService } from '../../../core/services/language.service';
 import { ManagementBillService } from '../../../core/services/management-bill.service';
+import { CinemaService, CinemaDTO } from '../../../core/services/cinema.service';
 import { BillResponse, BillHoldResponse } from '../../../core/models/bill.model';
 
 @Component({
@@ -17,6 +18,7 @@ export class ManagementBillsComponent implements OnInit {
   protected readonly language = inject(LanguageService);
   private fb = inject(FormBuilder);
   private billService = inject(ManagementBillService);
+  private cinemaService = inject(CinemaService);
 
   t(key: string) { return this.language.t(key); }
   isEn() { return this.language.isActive('en'); }
@@ -24,11 +26,28 @@ export class ManagementBillsComponent implements OnInit {
   // State
   bills = signal<BillResponse[]>([]);
   statuses = signal<any[]>([]);
+  allCinemas = signal<CinemaDTO[]>([]);
   
   // Filters
   searchQuery = signal<string>('');
   filterStatus = signal<string>('');
   isStatusDropdownOpen = signal(false);
+  addresses = signal<string[]>([]);
+  filterAddress = signal<string>('');
+  filterCinemaName = signal<string>('');
+  filterCinemas = signal<string[]>([]);
+  isFilterAddressOpen = signal(false);
+  isFilterCinemaOpen = signal(false);
+
+  // Pagination & Loading State
+  currentPage = signal(0);
+  pageSize = signal(100);
+  totalPages = signal(0);
+  totalElements = signal(0);
+  isLoadingList = signal(false);
+  isLoadingDetail = signal(false);
+  listError = signal<string | null>(null);
+  detailError = signal<string | null>(null);
 
   // Modals & Selection
   selectedBillCode = signal<string | null>(null);
@@ -60,15 +79,22 @@ export class ManagementBillsComponent implements OnInit {
     if (status) {
       result = result.filter(b => b.status && b.status.code === status);
     }
+
+    // Note: Area (Address) is primarily used for loading Cinemas from backend, 
+    // but we can also filter locally as a fallback.
+    const addr = this.filterAddress();
+    if (addr) {
+      result = result.filter(b => !b.address || b.address === addr);
+    }
+
     return result;
   });
-
-  totalElements = computed(() => this.filteredBills().length);
 
   ngOnInit(): void {
     this.initForm();
     this.loadStatuses();
-    this.loadMockBills(); // Load mock data since GET list endpoint is missing
+    this.loadDropdownData();
+    this.loadBills();
   }
 
   private initForm() {
@@ -117,7 +143,9 @@ export class ManagementBillsComponent implements OnInit {
         totalMoney: 150000,
         status: { code: 'PAID', name: 'Đã thanh toán', descriptionEn: 'Paid', descriptionVi: 'Đã thanh toán' },
         tickets: [{ id: 1, code: 'T1', price: 150000 }],
-        foods: []
+        foods: [],
+        address: 'Hà Nội',
+        cinemaName: 'CineGo Ocean Park'
       },
       {
         tradingCode: 'BILL-1002',
@@ -127,7 +155,9 @@ export class ManagementBillsComponent implements OnInit {
         totalMoney: 300000,
         status: { code: 'HOLD', name: 'Đang giữ chỗ', descriptionEn: 'Hold', descriptionVi: 'Đang giữ chỗ' },
         tickets: [{ id: 2, code: 'T2', price: 150000 }, { id: 3, code: 'T3', price: 150000 }],
-        foods: []
+        foods: [],
+        address: 'Hà Nội',
+        cinemaName: 'CineGo Ba Đình'
       },
       {
         tradingCode: 'BILL-1003',
@@ -137,16 +167,207 @@ export class ManagementBillsComponent implements OnInit {
         totalMoney: 0,
         status: { code: 'CANCELLED', name: 'Đã hủy', descriptionEn: 'Cancelled', descriptionVi: 'Đã hủy' },
         tickets: [],
-        foods: []
+        foods: [],
+        address: 'Hồ Chí Minh',
+        cinemaName: 'CineGo Hùng Vương'
       }
     ];
     this.bills.set(mockData);
   }
 
+  private loadDropdownData() {
+    this.cinemaService.getAllAddresses().subscribe({
+      next: (a) => this.addresses.set(a),
+      error: (err) => console.error('Error loading addresses', err)
+    });
+    this.cinemaService.getAllCinemas().subscribe({
+      next: (c) => this.allCinemas.set(c),
+      error: (err) => console.error('Error loading cinemas', err)
+    });
+  }
+
+  private mapBillResponse(b: any): BillResponse {
+    if (!b) return b;
+    const statusStr = (b.billStatus || b.status?.code || b.status || '').toLowerCase();
+    let mappedStatus = {
+      code: 'HOLD',
+      name: 'Đang giữ chỗ',
+      descriptionVi: 'Đang giữ chỗ',
+      descriptionEn: 'Hold'
+    };
+
+    if (statusStr === 'success' || statusStr === 'paid') {
+      mappedStatus = {
+        code: 'PAID',
+        name: 'Đã thanh toán',
+        descriptionVi: 'Đã thanh toán',
+        descriptionEn: 'Paid'
+      };
+    } else if (statusStr === 'cancel' || statusStr === 'cancelled') {
+      mappedStatus = {
+        code: 'CANCELLED',
+        name: 'Đã hủy',
+        descriptionVi: 'Đã hủy',
+        descriptionEn: 'Cancelled'
+      };
+    } else if (statusStr === 'fail' || statusStr === 'failure') {
+      mappedStatus = {
+        code: 'FAILURE',
+        name: 'Thất bại',
+        descriptionVi: 'Thất bại',
+        descriptionEn: 'Failure'
+      };
+    } else if (statusStr === 'pending' || statusStr === 'hold') {
+      mappedStatus = {
+        code: 'HOLD',
+        name: 'Đang giữ chỗ',
+        descriptionVi: 'Đang giữ chỗ',
+        descriptionEn: 'Hold'
+      };
+    }
+
+    return {
+      tradingCode: b.tradingCode || b.id?.toString(),
+      customerName: b.customerName || b.name || '',
+      createTime: b.createTime,
+      updateTime: b.updateTime,
+      paidAt: b.paidAt,
+      totalMoney: b.totalMoney || 0,
+      name: b.name || b.customerName || '',
+      status: mappedStatus,
+      tickets: b.tickets && b.tickets.length > 0 ? b.tickets : (b.items ? b.items.map((it: any) => ({ code: it.seatCode, price: it.unitPrice, cinemaName: it.cinemaName, roomCode: it.roomCode, showTime: it.showTime })) : []),
+      foods: b.foods || [],
+      promotionCode: b.promotionCode,
+      cinemaName: b.cinemaName,
+      address: b.address,
+      items: b.items || []
+    } as any;
+  }
+
+  loadBills() {
+    this.isLoadingList.set(true);
+    this.listError.set(null);
+
+    const cinemaName = this.filterCinemaName() || undefined;
+
+    this.billService.getBills({
+      cinemaName,
+      page: this.currentPage(),
+      size: this.pageSize()
+    }).subscribe({
+      next: (res: any) => {
+        const data = res?.data || res;
+        let dataList = [];
+        let total = 0;
+        let totalP = 1;
+
+        if (data?.content) {
+          dataList = data.content;
+          total = data.totalElements ?? dataList.length;
+          totalP = data.totalPages ?? 1;
+        } else if (Array.isArray(data)) {
+          dataList = data;
+          total = dataList.length;
+          totalP = 1;
+        } else if (res?.content) {
+          dataList = res.content;
+          total = res.totalElements ?? dataList.length;
+          totalP = res.totalPages ?? 1;
+        }
+
+        const mappedList = dataList.map((b: any) => this.mapBillResponse(b));
+
+        this.totalElements.set(total);
+        this.totalPages.set(totalP);
+        this.bills.set(mappedList);
+        this.isLoadingList.set(false);
+
+        // Auto select first invoice if data exists
+        if (mappedList.length > 0) {
+          this.selectBill(mappedList[0].tradingCode);
+        } else {
+          this.selectedBillCode.set(null);
+          this.selectedBillDetail.set(null);
+        }
+      },
+      error: (err) => {
+        console.error('Error loading bills from API, using fallback mock data:', err);
+        this.listError.set('Không thể tải danh sách hóa đơn từ máy chủ.');
+        this.isLoadingList.set(false);
+        this.loadMockBills();
+        
+        // Auto select first mock bill if exists
+        const dataList = this.bills();
+        if (dataList.length > 0) {
+          this.selectBill(dataList[0].tradingCode);
+        }
+      }
+    });
+  }
+
+  loadBillDetail(code: string) {
+    this.isLoadingDetail.set(true);
+    this.detailError.set(null);
+    this.billService.getBillDetail(code).subscribe({
+      next: (res: any) => {
+        const detail = res?.data || res;
+        const mappedDetail = this.mapBillResponse(detail);
+        this.selectedBillDetail.set(mappedDetail);
+        this.isLoadingDetail.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading bill detail from API:', err);
+        this.detailError.set('Không thể tải chi tiết hóa đơn từ máy chủ.');
+        this.isLoadingDetail.set(false);
+        
+        // Fallback to local search in bills list
+        const localDetail = this.bills().find(b => b.tradingCode === code) || null;
+        this.selectedBillDetail.set(localDetail);
+      }
+    });
+  }
+
+  onAddressFilterChange(address: string) {
+    this.filterAddress.set(address);
+    this.filterCinemaName.set(''); // Reset cinema filter when address changes
+    this.currentPage.set(0); // Reset page
+    if (address) {
+      this.cinemaService.getCinemasByAddress(address).subscribe({
+        next: (cList) => {
+          this.filterCinemas.set(cList);
+          this.loadBills();
+        },
+        error: (err) => console.error('Error loading cinemas', err)
+      });
+    } else {
+      this.filterCinemas.set([]);
+      this.loadBills();
+    }
+  }
+
+  onCinemaFilterChange(cinema: string) {
+    this.filterCinemaName.set(cinema);
+    this.currentPage.set(0); // Reset page
+    this.loadBills();
+  }
+
   selectBill(code: string) {
     this.selectedBillCode.set(code);
-    const detail = this.bills().find(b => b.tradingCode === code) || null;
-    this.selectedBillDetail.set(detail);
+    this.loadBillDetail(code);
+  }
+
+  nextPage() {
+    if (this.currentPage() < this.totalPages() - 1) {
+      this.currentPage.update(p => p + 1);
+      this.loadBills();
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage() > 0) {
+      this.currentPage.update(p => p - 1);
+      this.loadBills();
+    }
   }
 
   // --- Form Actions ---

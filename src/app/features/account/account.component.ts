@@ -472,7 +472,7 @@ export type AccountView = 'general' | 'details' | 'history' | 'coupon';
       background: transparent;
     }
     .content-header {
-      background: #333;
+      background: #1a1a1a;
       color: white;
       padding: 0.5rem 1rem;
       font-weight: 800;
@@ -482,7 +482,7 @@ export type AccountView = 'general' | 'details' | 'history' | 'coupon';
       text-transform: uppercase;
     }
     .black-header {
-      background: #222 !important;
+      background: #1a1a1a !important;
     }
     .details-form {
       background: transparent;
