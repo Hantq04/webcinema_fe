@@ -144,6 +144,34 @@ export class ManagementSchedulesComponent implements OnInit {
     return dateStr;
   }
 
+  formatDateTimeToShow(dateTimeStr: string | null | undefined): string {
+    if (!dateTimeStr) return '';
+    const normalized = dateTimeStr.replace('T', ' ');
+    const parts = normalized.split(' ');
+    const datePart = parts[0];
+    const timePart = parts[1] || '';
+
+    const dateParts = datePart.split('-');
+    if (dateParts.length !== 3) return dateTimeStr;
+
+    const yyyy = dateParts[0];
+    const mm = dateParts[1];
+    const dd = dateParts[2];
+
+    const timeParts = timePart.split(':');
+    if (timeParts.length >= 2) {
+      let hours = parseInt(timeParts[0], 10);
+      const minutes = timeParts[1];
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12;
+      const formattedHours = hours.toString().padStart(2, '0');
+      return `${dd}/${mm}/${yyyy} ${formattedHours}:${minutes} ${ampm}`;
+    }
+
+    return `${dd}/${mm}/${yyyy}`;
+  }
+
   // --- Data Loading ---
   loadDropdownData() {
     // Load movies

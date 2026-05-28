@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService, UserProfile } from '../../core/services/auth.service';
 import { LanguageService } from '../../core/services/language.service';
 import { LocationService, Province, District } from '../../core/services/location.service';
+import { ManagementBillService } from '../../core/services/management-bill.service';
 import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
@@ -217,48 +218,70 @@ export type AccountView = 'general' | 'details' | 'history' | 'coupon';
               </div>
 
               <div class="history-toolbar">
-                <span class="results-count">{{ t('account.productsCount').replace('{{count}}', '1') }}</span>
+                <span class="results-count">{{ t('account.productsCount').replace('{{count}}', historyTotal().toString()) }}</span>
                 <div class="display-filter">
                   <label>{{ t('account.displayLabel') }}</label>
-                  <select>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="50">50</option>
+                  <select [ngModel]="historyPageSize()" (ngModelChange)="historyPageSize.set(+$event); historyPage.set(0); loadTransactionHistory()">
+                    <option [value]="5">5</option>
+                    <option [value]="10">10</option>
+                    <option [value]="20">20</option>
                   </select>
                 </div>
               </div>
 
               <div class="history-list">
-                <div class="history-item">
-                  <div class="item-header">
-                    {{ t('account.bookingCode') }} <strong>718372312</strong>
-                    <span class="status">({{ t('account.statusLabel') }} <span class="completed">{{ t('account.statusCompleted') }}</span>)</span>
-                    <svg class="phone-icon" viewBox="0 0 24 24" width="16" height="16" fill="red"><path d="M17 2H7c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-5 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm5-4H7V6h10v10z"/></svg>
-                  </div>
-                  <div class="item-body">
-                    <img src="/movie/michael.jpg" alt="Michael" class="movie-poster">
-                    <div class="item-details">
-                      <h4 class="movie-title">MICHAEL</h4>
-                      <span class="rating-badge">K</span>
-                      <p class="movie-date">27/04/2026</p>
-                      <p class="movie-time">{{ t('account.fromLabel') }} 08:45 AM ~ {{ t('account.toLabel') }} 11:07 AM</p>
-                      <p class="cinema-name">CineGo Machinco</p>
-                      <p class="seats-info">Cinema 3 (F6, F7)</p>
-                      <p class="total-price">110.500,00 {{ t('account.totalAmount') }}</p>
-                      <button class="view-item-btn" (click)="onDevelop()">Xem</button>
+                @for (item of historyList(); track item.ticketCode) {
+                  <div class="history-item">
+                    <div class="item-header">
+                      {{ t('account.bookingCode') }} <strong>{{ item.ticketCode }}</strong>
+                      <span class="status">({{ t('account.statusLabel') }} 
+                        <span class="completed" [style.color]="item.status === 'success' ? 'green' : 'red'">
+                          {{ item.status === 'success' ? t('account.statusCompleted') : item.status }}
+                        </span>)
+                      </span>
+                      <svg class="phone-icon" viewBox="0 0 24 24" width="16" height="16" fill="red"><path d="M17 2H7c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-5 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm5-4H7V6h10v10z"/></svg>
+                    </div>
+                    <div class="item-body">
+                      <img [src]="item.image || '/movie/default.jpg'" [alt]="item.movieName" class="movie-poster">
+                      <div class="item-details">
+                        <h4 class="movie-title">{{ item.movieName }}</h4>
+                        <span class="rating-badge">{{ item.rate || 'K' }}</span>
+                        <p class="movie-date">{{ item.showDate }}</p>
+                        <p class="movie-time">Từ {{ item.startAt }} ~ Đến {{ item.endAt }}</p>
+                        <p class="cinema-name">{{ item.cinemaName }}</p>
+                        <p class="seats-info">{{ item.roomCode }}{{ item.seat ? ' (' + item.seat + ')' : '' }}</p>
+                        <p class="total-price">{{ item.totalMoney | number }} đ</p>
+                        <button class="view-item-btn" (click)="onDevelop()">Xem</button>
+                      </div>
                     </div>
                   </div>
-                </div>
+                } @empty {
+                  @if (isLoadingHistory()) {
+                    <div class="loading-history" style="display: flex; justify-content: center; padding: 2rem;">
+                      <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #e71a0f; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite;"></div>
+                    </div>
+                    <style>
+                      @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                      }
+                    </style>
+                  } @else {
+                    <div class="no-history" style="text-align: center; padding: 2rem; color: #888; font-style: italic; font-weight: 600;">
+                      Bạn chưa có giao dịch nào
+                    </div>
+                  }
+                }
               </div>
 
               <div class="history-toolbar bottom">
-                <span class="results-count">{{ t('account.productsCount').replace('{{count}}', '1') }}</span>
+                <span class="results-count">{{ t('account.productsCount').replace('{{count}}', historyTotal().toString()) }}</span>
                 <div class="display-filter">
                   <label>{{ t('account.displayLabel') }}</label>
-                  <select>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="50">50</option>
+                  <select [ngModel]="historyPageSize()" (ngModelChange)="historyPageSize.set(+$event); historyPage.set(0); loadTransactionHistory()">
+                    <option [value]="5">5</option>
+                    <option [value]="10">10</option>
+                    <option [value]="20">20</option>
                   </select>
                 </div>
               </div>
@@ -307,12 +330,13 @@ export type AccountView = 'general' | 'details' | 'history' | 'coupon';
 
                 <div class="coupon-filters-bar secondary">
                   <div class="filter-item btn-group">
+                    <button type="button" class="category-btn" [class.active]="searchType === 'all'" (click)="toggleSearchType('all')">Tất cả</button>
                     <button type="button" class="category-btn" [class.active]="searchType === 'Ticket'" (click)="toggleSearchType('Ticket')">{{ t('account.movieNameBtn') }}</button>
                     <button type="button" class="category-btn" [class.active]="searchType === 'Food'" (click)="toggleSearchType('Food')">{{ t('account.popcornDrinkBtn') }}</button>
                   </div>
 
                   <div class="filter-item dropdown-select-row">
-                    <select [(ngModel)]="searchStatus" name="status">
+                    <select [ngModel]="searchStatus" (ngModelChange)="searchStatus = $event; filterStatus.set($event)">
                       <option value="Tất cả">{{ t('account.allOption') }}</option>
                       <option value="Chưa sử dụng">{{ t('account.unusedOption') }}</option>
                       <option value="Đã sử dụng">{{ t('account.usedOption') }}</option>
@@ -825,7 +849,7 @@ export type AccountView = 'general' | 'details' | 'history' | 'coupon';
     }
     .movie-title {
       font-size: 1rem;
-      font-weight: 800;
+      font-weight: 600;
       color: #333;
       margin: 0;
     }
@@ -1310,7 +1334,7 @@ export type AccountView = 'general' | 'details' | 'history' | 'coupon';
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      font-weight: 800 !important;
+      font-weight: 600 !important;
       color: #1e293b !important;
     }
 
@@ -1384,10 +1408,18 @@ export class AccountComponent {
   private readonly route = inject(ActivatedRoute);
   protected readonly language = inject(LanguageService);
   private readonly title = inject(Title);
+  private readonly billService = inject(ManagementBillService);
   protected readonly t = this.language.t.bind(this.language);
 
   protected readonly activeView = signal<AccountView>('general');
   protected readonly wantsChangePassword = signal(false);
+
+  // Transaction history signals
+  protected readonly historyList = signal<any[]>([]);
+  protected readonly historyPage = signal(0);
+  protected readonly historyPageSize = signal(5);
+  protected readonly historyTotal = signal(0);
+  protected readonly isLoadingHistory = signal(false);
   protected readonly profile = signal<UserProfile | null>(null);
   protected readonly provinces = signal<Province[]>([]);
   protected readonly districts = signal<District[]>([]);
@@ -1449,12 +1481,9 @@ export class AccountComponent {
     this.filterStatus.set(this.searchStatus);
   }
 
-  protected toggleSearchType(type: 'Ticket' | 'Food'): void {
-    if (this.searchType === type) {
-      this.searchType = 'all';
-    } else {
-      this.searchType = type;
-    }
+  protected toggleSearchType(type: 'all' | 'Ticket' | 'Food'): void {
+    this.searchType = type;
+    this.filterType.set(type);
   }
 
   protected readonly filteredCoupons = computed(() => {
@@ -1598,9 +1627,42 @@ export class AccountComponent {
       if (currentView === 'general') viewTitle = this.t('account.infoGeneral');
       else if (currentView === 'details') viewTitle = this.t('account.details');
       else if (currentView === 'coupon') viewTitle = this.t('account.couponManageTitle');
-      else viewTitle = this.t('account.history');
+      else {
+        viewTitle = this.t('account.history');
+        this.loadTransactionHistory();
+      }
 
       this.title.setTitle(viewTitle);
+    });
+  }
+
+  protected loadTransactionHistory(): void {
+    this.isLoadingHistory.set(true);
+    this.billService.getTransactionHistory(this.historyPage(), this.historyPageSize()).subscribe({
+      next: (res: any) => {
+        const data = res?.data || res;
+        let contentList = [];
+        let total = 0;
+
+        if (data?.content) {
+          contentList = data.content;
+          total = data.totalElements ?? contentList.length;
+        } else if (Array.isArray(data)) {
+          contentList = data;
+          total = contentList.length;
+        } else if (res?.content) {
+          contentList = res.content;
+          total = res.totalElements ?? contentList.length;
+        }
+
+        this.historyList.set(contentList);
+        this.historyTotal.set(total);
+        this.isLoadingHistory.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading transaction history', err);
+        this.isLoadingHistory.set(false);
+      }
     });
   }
 

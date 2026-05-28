@@ -64,7 +64,11 @@ export class ChatbotService {
       message: query
     };
 
-    this.http.post<any>(this.apiService.apiUrl('/api/v1/chat-bot/ask'), payload).subscribe({
+    const headers = {
+      'Accept-Language': this.language.currentLanguage()
+    };
+
+    this.http.post<any>(this.apiService.apiUrl('/api/v1/chat-bot/ask'), payload, { headers }).subscribe({
       next: (res) => {
         // Lấy câu trả lời linh hoạt từ nhiều định dạng response của BE
         const replyText = res?.data?.reply || res?.reply || res?.response || res?.message || (typeof res === 'string' ? res : '');
@@ -160,16 +164,16 @@ export class ChatbotService {
   }
 
   private parseBeResponse(replyText: string): { text: string; type: ChatMessage['type']; metadata?: any } {
-    if ((replyText.includes('Các phim đang chiếu hiện tại:') || replyText.includes('phim đang chiếu')) && replyText.includes('|')) {
+    if (replyText.includes('|') && replyText.split('\n').some(line => line.trim().startsWith('-') && line.includes('|'))) {
       const lines = replyText.split('\n');
-      const intro = lines[0];
+      let intro = '';
       const movies: Array<{ title: string; genre: string; releaseDate: string }> = [];
 
-      for (let i = 1; i < lines.length; i++) {
-        let line = lines[i].trim();
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
         if (line.startsWith('-')) {
-          line = line.substring(1).trim();
-          const parts = line.split('|').map(p => p.trim());
+          const content = line.substring(1).trim();
+          const parts = content.split('|').map(p => p.trim());
           if (parts.length >= 1) {
             const title = parts[0];
             let genre = '';
@@ -180,18 +184,25 @@ export class ChatbotService {
               if (part.toLowerCase().includes('thể loại') || part.toLowerCase().includes('genre')) {
                 genre = part.replace(/thể loại:|genre:/gi, '').trim();
               } else if (part.toLowerCase().includes('khởi chiếu') || part.toLowerCase().includes('release') || part.toLowerCase().includes('premiere')) {
-                releaseDate = part.replace(/khởi chiếu:|release:|premiere:/gi, '').trim();
+                const rawDate = part.replace(/khởi chiếu:|release:|premiere:/gi, '').trim();
+                releaseDate = rawDate.replace(/(\d{4})-(\d{2})-(\d{2})/g, '$3/$2/$1');
               }
             }
 
             movies.push({ title, genre, releaseDate });
+          }
+        } else if (movies.length === 0) {
+          if (intro) {
+            intro += '\n' + line;
+          } else {
+            intro = line;
           }
         }
       }
 
       if (movies.length > 0) {
         return {
-          text: intro,
+          text: intro || 'Danh sách phim:',
           type: 'movie_text_list',
           metadata: { movies }
         };

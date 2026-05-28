@@ -65,4 +65,8 @@ export class ManagementBillService {
   getBillDetail(tradingCode: string): Observable<any> {
     return this.http.get<any>(this.apiService.apiUrl(`/api/v1/bill/detail?tradingCode=${tradingCode}`));
   }
+
+  getTransactionHistory(page: number, size: number): Observable<any> {
+    return this.http.get<any>(this.apiService.apiUrl(`/api/v1/transaction/history?page=${page}&size=${size}`));
+  }
 }
