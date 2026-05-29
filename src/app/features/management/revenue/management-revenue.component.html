@@ -13,41 +13,21 @@
       <!-- From Date -->
       <div class="filter-group">
         <label class="filter-label">{{ t('management.revenueFromDate') }}</label>
-        <div class="date-input-wrapper cursor-pointer" (click)="revenueFromInput.showPicker()">
-          <div class="filter-input-display">
-            <span>{{ formatToShow(fromDate()) }}</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-              class="text-slate-400">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="16" y1="2" x2="16" y2="6"></line>
-              <line x1="8" y1="2" x2="8" y2="6"></line>
-              <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
-          </div>
-          <input #revenueFromInput id="revenue-from-date" type="date" lang="vi" [ngModel]="fromDate()"
-            (ngModelChange)="fromDate.set($event)" />
-        </div>
+        <app-custom-date-picker
+          [value]="fromDate()"
+          (valueChange)="fromDate.set($event)"
+          [placeholder]="t('management.revenueFromDate') || 'Từ ngày'"
+        ></app-custom-date-picker>
       </div>
 
       <!-- To Date -->
       <div class="filter-group">
         <label class="filter-label">{{ t('management.revenueToDate') }}</label>
-        <div class="date-input-wrapper cursor-pointer" (click)="revenueToInput.showPicker()">
-          <div class="filter-input-display">
-            <span>{{ formatToShow(toDate()) }}</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-              class="text-slate-400">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="16" y1="2" x2="16" y2="6"></line>
-              <line x1="8" y1="2" x2="8" y2="6"></line>
-              <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
-          </div>
-          <input #revenueToInput id="revenue-to-date" type="date" lang="vi" [ngModel]="toDate()"
-            (ngModelChange)="toDate.set($event)" />
-        </div>
+        <app-custom-date-picker
+          [value]="toDate()"
+          (valueChange)="toDate.set($event)"
+          [placeholder]="t('management.revenueToDate') || 'Đến ngày'"
+        ></app-custom-date-picker>
       </div>
 
       <!-- Group By -->

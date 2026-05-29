@@ -18,11 +18,12 @@ import { LanguageService } from '../../../core/services/language.service';
 import { ManagementRevenueService, RevenueSummaryItem, RevenueFilter } from '../../../core/services/management-revenue.service';
 import { CinemaService, CinemaDTO } from '../../../core/services/cinema.service';
 import { ManagementMovieService } from '../../../core/services/management-movie.service';
+import { CustomDatePickerComponent } from '../../../shared/components/custom-date-picker/custom-date-picker.component';
 
 @Component({
   selector: 'app-management-revenue',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, CustomDatePickerComponent],
   templateUrl: './management-revenue.component.html',
   styleUrls: ['./management-revenue.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush

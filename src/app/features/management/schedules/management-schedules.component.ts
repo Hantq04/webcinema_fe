@@ -6,11 +6,12 @@ import { ManagementScheduleService, ScheduleResponse } from '../../../core/servi
 import { ManagementMovieService } from '../../../core/services/management-movie.service';
 import { CinemaService } from '../../../core/services/cinema.service';
 import { RoomService } from '../../../core/services/room.service';
+import { CustomDatePickerComponent } from '../../../shared/components/custom-date-picker/custom-date-picker.component';
 
 @Component({
   selector: 'app-management-schedules',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, CustomDatePickerComponent],
   templateUrl: './management-schedules.component.html',
   styleUrls: ['./management-schedules.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
