@@ -92,7 +92,7 @@ export class ManagementBannerComponent implements OnInit {
     formData.append('title', rawValue.title);
     formData.append('titleEn', rawValue.titleEn);
     if (this.selectedFile) {
-      formData.append('image', this.selectedFile);
+      formData.append('file', this.selectedFile);
     }
     
     this.bannerService.saveBanner(formData).subscribe({

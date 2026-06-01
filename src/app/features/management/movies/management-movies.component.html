@@ -80,7 +80,7 @@
             <path stroke-linecap="round" stroke-linejoin="round"
               d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
           </svg>
-          Danh sách phim
+          {{ t('management.movieListTitle') }}
         </h2>
         <span
           class="text-xs font-bold bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-1 rounded-full">{{
@@ -109,7 +109,7 @@
             <path stroke-linecap="round" stroke-linejoin="round"
               d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
           </svg>
-          <p>Không tìm thấy phim nào.</p>
+          <p>{{ t('management.noMoviesFound') }}</p>
         </div>
 
         <!-- Movie Cards -->
@@ -165,7 +165,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <span class="text-xs font-medium text-slate-600 dark:text-slate-400">Trang {{ currentPage() + 1 }} / {{
+        <span class="text-xs font-medium text-slate-600 dark:text-slate-400">{{ t('management.paginationPage') }} {{ currentPage() + 1 }} / {{
           totalPages() }}</span>
         <button
           class="p-1.5 rounded bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-slate-50 disabled:opacity-50"
@@ -331,7 +331,7 @@
           {{ isEditMode() ? t('management.editMovie') : t('management.addMovie') }}
         </h2>
         <button type="button"
-          class="text-slate-400 hover:text-slate-500 bg-white dark:bg-slate-800 rounded-full p-1 border border-slate-200 dark:border-slate-700 shadow-sm"
+          class="text-slate-400 hover:text-slate-600 transition-colors"
           (click)="showFormModal.set(false)">
           <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -345,12 +345,14 @@
             {{ fieldErrors()['_general'] }}
           </div>
 
-          <div *ngIf="isEditMode()"
-            class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
-            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Mã
-              phim (Read-only)</label>
+          <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+              Mã phim <span class="text-rose-500">*</span>
+            </label>
             <input type="text" formControlName="code"
-              class="w-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 text-slate-500 rounded-lg py-2.5 px-3 outline-none font-mono text-sm cursor-not-allowed shadow-inner">
+              placeholder=""
+              class="w-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2.5 px-3 outline-none font-mono text-sm focus:ring-2 focus:ring-rose-500 transition-all"
+              [class.bg-slate-100]="isEditMode()" [class.dark:bg-slate-900]="isEditMode()" [class.text-slate-500]="isEditMode()" [class.cursor-not-allowed]="isEditMode()">
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -395,9 +397,12 @@
                   <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                     {{ t('management.premiereDate') }} <span class="text-rose-500">*</span>
                   </label>
-                  <input type="date" formControlName="premiereDate"
-                    class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow text-sm"
-                    [class.border-red-500]="(movieForm.get('premiereDate')?.invalid && movieForm.get('premiereDate')?.touched) || fieldErrors()['premiereDate']">
+                  <app-custom-date-picker
+                    [value]="movieForm.get('premiereDate')?.value"
+                    (valueChange)="movieForm.get('premiereDate')?.setValue($event); movieForm.get('premiereDate')?.markAsTouched()"
+                    [placeholder]="t('management.premiereDate') || 'Chọn ngày'"
+                    [hasError]="(movieForm.get('premiereDate')?.invalid && movieForm.get('premiereDate')?.touched) || !!fieldErrors()['premiereDate']"
+                  ></app-custom-date-picker>
                   <p *ngIf="fieldErrors()['premiereDate']" class="text-xs text-red-500 mt-1">{{ fieldErrors()['premiereDate'] }}</p>
                 </div>
 
@@ -405,9 +410,12 @@
                   <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                     {{ t('management.endDate') }} <span class="text-rose-500">*</span>
                   </label>
-                  <input type="date" formControlName="endDate"
-                    class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 focus:ring-2 focus:ring-rose-500 outline-none transition-shadow text-sm"
-                    [class.border-red-500]="(movieForm.get('endDate')?.invalid && movieForm.get('endDate')?.touched) || fieldErrors()['endDate']">
+                  <app-custom-date-picker
+                    [value]="movieForm.get('endDate')?.value"
+                    (valueChange)="movieForm.get('endDate')?.setValue($event); movieForm.get('endDate')?.markAsTouched()"
+                    [placeholder]="t('management.endDate') || 'Chọn ngày'"
+                    [hasError]="(movieForm.get('endDate')?.invalid && movieForm.get('endDate')?.touched) || !!fieldErrors()['endDate']"
+                  ></app-custom-date-picker>
                   <p *ngIf="fieldErrors()['endDate']" class="text-xs text-red-500 mt-1">{{ fieldErrors()['endDate'] }}</p>
                 </div>
               </div>

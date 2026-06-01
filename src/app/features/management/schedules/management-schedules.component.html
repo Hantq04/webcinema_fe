@@ -3,7 +3,7 @@
   <header
     class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
     <div class="flex flex-col md:flex-row items-start md:items-center gap-4 w-full xl:w-auto">
-      <h1 class="text-xl font-bold text-slate-800 dark:text-white whitespace-nowrap">Quản lý Suất chiếu</h1>
+      <h1 class="text-xl font-bold text-slate-800 dark:text-white whitespace-nowrap">{{ t('management.scheduleTitle') }}</h1>
       <div class="h-8 w-px bg-slate-200 dark:bg-slate-700 hidden md:block"></div>
 
       <!-- Filters -->
@@ -12,7 +12,7 @@
           <app-custom-date-picker
             [value]="filterDate()"
             (valueChange)="filterDate.set($event)"
-            [placeholder]="'Chọn ngày'"
+            [placeholder]="t('booking.chooseDate') || 'Chọn ngày'"
           ></app-custom-date-picker>
         </div>
 
@@ -94,7 +94,7 @@
       <button
         class="px-4 py-2 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-white rounded-lg text-sm transition-colors whitespace-nowrap"
         (click)="deactivateExpired()">
-        Hủy suất chiếu kết thúc
+        {{ t('management.deactivateExpiredBtn') }}
       </button>
 
       <button
@@ -105,7 +105,7 @@
           <line x1="12" y1="5" x2="12" y2="19"></line>
           <line x1="5" y1="12" x2="19" y2="12"></line>
         </svg>
-        Thêm Suất Chiếu
+        {{ t('management.addShowtimeBtn') }}
       </button>
     </div>
   </header>
@@ -124,7 +124,7 @@
             <circle cx="12" cy="12" r="10" />
             <polyline points="12 6 12 12 16 14" />
           </svg>
-          Danh sách suất chiếu
+          {{ t('management.showtimeListTitle') }}
         </h2>
         <span
           class="text-xs font-bold bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-1 rounded-full">{{
@@ -150,7 +150,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p>Không tìm thấy suất chiếu nào</p>
+            <p>{{ t('management.noShowtimesFound') }}</p>
           </div>
 
           <div *ngFor="let s of filteredSchedules()"
@@ -207,12 +207,12 @@
               <button
                 class="px-4 py-2 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"
                 (click)="openEditModal()">
-                Sửa
+                {{ t('management.editBtn') }}
               </button>
               <button
                 class="px-4 py-2 border border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/50 dark:hover:bg-red-900/20 rounded-lg text-sm font-medium transition-colors"
                 (click)="confirmDelete(detail)">
-                Xóa
+                {{ t('management.deleteBtn') }}
               </button>
             </div>
           </div>
@@ -229,20 +229,20 @@
                   <path d="M7 11V7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4" />
                   <rect width="12" height="4" x="6" y="16" rx="1" />
                 </svg>
-                Thông tin Rạp & Phòng
+                {{ t('management.theaterAndRoomInfo') }}
               </h3>
               <div class="space-y-3 text-sm">
                 <div>
-                  <p class="text-slate-500 dark:text-slate-400 mb-1">Rạp chiếu</p>
+                  <p class="text-slate-500 dark:text-slate-400 mb-1">{{ t('management.theaterLabel') }}</p>
                   <p class="font-medium text-slate-800 dark:text-white">{{ detail.cinema }}</p>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                   <div>
-                    <p class="text-slate-500 dark:text-slate-400 mb-1">Phòng chiếu</p>
+                    <p class="text-slate-500 dark:text-slate-400 mb-1">{{ t('management.roomLabel') }}</p>
                     <p class="font-medium text-slate-800 dark:text-white">{{ detail.roomCode }}</p>
                   </div>
                   <div>
-                    <p class="text-slate-500 dark:text-slate-400 mb-1">Định dạng</p>
+                    <p class="text-slate-500 dark:text-slate-400 mb-1">{{ t('management.formatLabel') }}</p>
                     <p class="font-medium text-slate-800 dark:text-white">{{ detail.roomType }}</p>
                   </div>
                 </div>
@@ -258,21 +258,21 @@
                   <circle cx="12" cy="12" r="10" />
                   <polyline points="12 6 12 12 16 14" />
                 </svg>
-                Thời gian chiếu
+                {{ t('management.showtimeTime') }}
               </h3>
               <div class="space-y-3 text-sm">
                 <div>
-                  <p class="text-slate-500 dark:text-slate-400 mb-1">Ngày chiếu</p>
+                  <p class="text-slate-500 dark:text-slate-400 mb-1">{{ t('management.showtimeDate') }}</p>
                   <p class="font-medium text-slate-800 dark:text-white">{{ formatFullDate(detail.startAt) }}</p>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                   <div>
-                    <p class="text-slate-500 dark:text-slate-400 mb-1">Bắt đầu</p>
+                    <p class="text-slate-500 dark:text-slate-400 mb-1">{{ t('management.startTime') }}</p>
                     <p class="font-medium text-slate-800 dark:text-white text-lg text-rose-600">{{ detail.startAt |
                       date:'h:mm a' }}</p>
                   </div>
                   <div>
-                    <p class="text-slate-500 dark:text-slate-400 mb-1">Kết thúc</p>
+                    <p class="text-slate-500 dark:text-slate-400 mb-1">{{ t('management.endTime') }}</p>
                     <p class="font-medium text-slate-800 dark:text-white text-lg text-slate-600">{{ detail.endAt |
                       date:'h:mm a' }}</p>
                   </div>
@@ -299,7 +299,7 @@
           <circle cx="12" cy="12" r="10" />
           <polyline points="12 6 12 12 16 14" />
         </svg>
-        {{ isEditMode() ? 'Sửa suất chiếu' : 'Thêm suất chiếu mới' }}
+        {{ isEditMode() ? t('management.editShowtimeTitle') : t('management.addShowtimeTitle') }}
       </h3>
       <button class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors"
         (click)="closeFormModal()">
@@ -320,7 +320,7 @@
       <div class="space-y-4">
         <!-- Movie -->
         <div>
-          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Phim <span
+          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.movie') }} <span
               class="text-rose-500">*</span></label>
           <div class="relative w-full">
             <div
@@ -355,7 +355,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Address (Helper) -->
           <div>
-            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Khu vực</label>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.seatArea') }}</label>
             <div class="relative w-full">
               <div
                 class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 text-sm flex justify-between items-center transition-all"
@@ -419,7 +419,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Room -->
           <div>
-            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Phòng chiếu <span
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.roomLabel') }} <span
                 class="text-rose-500">*</span></label>
             <div class="relative w-full">
               <div
@@ -452,14 +452,14 @@
 
           <!-- Start At -->
           <div>
-            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Thời gian bắt đầu <span
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t('management.startTime') }} <span
                 class="text-rose-500">*</span></label>
             <div class="relative w-full cursor-pointer" (click)="dateTimeInput.showPicker()">
               <div
                 class="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 px-3 text-sm flex justify-between items-center pointer-events-none min-h-[38px] transition-all"
                 [class.border-red-500]="(scheduleForm.get('startAt')?.invalid && scheduleForm.get('startAt')?.touched) || fieldErrors()['startAt']">
                 <span class="truncate" [class.text-slate-400]="!scheduleForm.get('startAt')?.value">
-                  {{ formatDateTimeToShow(scheduleForm.get('startAt')?.value) || 'Chọn thời gian bắt đầu' }}
+                  {{ formatDateTimeToShow(scheduleForm.get('startAt')?.value) || t('management.selectStartTime') || 'Chọn thời gian bắt đầu' }}
                 </span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -481,7 +481,7 @@
               <path d="M12 16v-4" />
               <path d="M12 8h.01" />
             </svg>
-            Trong chế độ sửa, bạn chỉ có thể thay đổi Thời gian bắt đầu. Hệ thống sẽ tự kiểm tra trùng lặp.
+            {{ t('management.editShowtimeHint') }}
           </p>
         </div>
       </div>
@@ -492,12 +492,12 @@
       <button type="button"
         class="px-5 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors"
         (click)="closeFormModal()">
-        Hủy
+        {{ t('shared.cancel') }}
       </button>
       <button type="button"
         class="px-5 py-2 text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 rounded-lg transition-colors shadow-sm disabled:opacity-50"
         (click)="submitForm()">
-        {{ isEditMode() ? 'Lưu thay đổi' : 'Tạo suất chiếu' }}
+        {{ isEditMode() ? t('management.invoiceFormSave') : t('management.scheduleCreateBtn') }}
       </button>
     </div>
   </div>
@@ -516,22 +516,24 @@
             d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
         </svg>
       </div>
-      <h3 class="text-xl font-bold text-slate-800 dark:text-white">Xóa suất chiếu?</h3>
-      <p class="text-slate-500 dark:text-slate-400 text-sm">Bạn có chắc chắn muốn xóa suất chiếu <span
-          class="font-bold text-slate-700 dark:text-slate-300">{{ deleteScheduleCode() }}</span>? Hành động này không
-        thể hoàn tác.</p>
+      <h3 class="text-xl font-bold text-slate-800 dark:text-white">{{ t('management.deleteShowtimeTitle') }}</h3>
+      <p class="text-slate-500 dark:text-slate-400 text-sm">
+        {{ isEn() ? 'Are you sure you want to delete showtime' : 'Bạn có chắc chắn muốn xóa suất chiếu' }}
+        <span class="font-bold text-slate-700 dark:text-slate-300">{{ deleteScheduleCode() }}</span>?
+        {{ isEn() ? 'This action cannot be undone.' : 'Hành động này không thể hoàn tác.' }}
+      </p>
     </div>
     <div
       class="p-4 bg-slate-50 dark:bg-slate-800/50 flex justify-center gap-3 border-t border-slate-100 dark:border-slate-800">
       <button
         class="px-5 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
         (click)="closeDeleteModal()">
-        Hủy bỏ
+        {{ t('shared.cancel') }}
       </button>
       <button
         class="px-5 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors shadow-sm"
         (click)="executeDelete()">
-        Xác nhận xóa
+        {{ isEn() ? 'Delete' : 'Xác nhận xóa' }}
       </button>
     </div>
   </div>

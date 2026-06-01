@@ -4,13 +4,14 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } 
 import { LanguageService } from '../../../core/services/language.service';
 import { ManagementMovieService, MovieDTO, MovieDetailResponse, MovieTypeDTO, RateDTO, BannerDTO } from '../../../core/services/management-movie.service';
 import { ApiService } from '../../../core/services/api.service';
+import { CustomDatePickerComponent } from '../../../shared/components/custom-date-picker/custom-date-picker.component';
 
 type FilterTab = 'ALL' | 'NOW_SHOWING' | 'HOT' | 'COMING_SOON' | 'TOP_SALES';
 
 @Component({
   selector: 'app-management-movies',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, CustomDatePickerComponent],
   templateUrl: './management-movies.component.html',
   styleUrls: ['./management-movies.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -255,6 +256,8 @@ export class ManagementMoviesComponent implements OnInit {
       movieTypeIds: []
     });
 
+    this.movieForm.get('code')?.enable();
+
     // No validators needed, backend-driven
     this.movieForm.get('premiereDate')?.clearValidators();
     this.movieForm.get('premiereDate')?.updateValueAndValidity();
@@ -268,6 +271,7 @@ export class ManagementMoviesComponent implements OnInit {
     if (!detail) return;
 
     this.isEditMode.set(true);
+    this.movieForm.get('code')?.disable();
     
     // No validators needed, backend-driven
     this.movieForm.get('premiereDate')?.clearValidators();
@@ -327,6 +331,12 @@ export class ManagementMoviesComponent implements OnInit {
     }
     if (payload.endDate && payload.endDate.length === 10) {
       payload.endDate = `${payload.endDate} 00:00:00`;
+    }
+
+    if (!this.isEditMode() && (!payload.code || payload.code.trim() === '')) {
+      if (payload.nameEn) {
+        payload.code = payload.nameEn.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
+      }
     }
 
     const obs$ = this.isEditMode() 

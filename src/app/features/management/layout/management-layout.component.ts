@@ -261,13 +261,15 @@ export class ManagementLayoutComponent implements OnInit {
   }
 
   getUserRoleName(): string {
-    const role = this.auth.currentUserRole();
-    if (role === 'ADMIN' || role === 'ROLE_ADMIN') {
-      return 'Administrator';
-    } else if (role === 'STAFF' || role === 'ROLE_STAFF') {
-      return 'Staff';
+    const role = (this.auth.currentUserRole() || '').toUpperCase();
+    if (role.includes('ADMIN')) {
+      return this.t('management.roleAdmin');
+    } else if (role.includes('STAFF')) {
+      return this.t('management.roleStaff');
+    } else if (role.includes('USER')) {
+      return this.t('management.roleUser');
     }
-    return role ? role.charAt(0).toUpperCase() + role.slice(1).toLowerCase() : 'Staff';
+    return role ? this.t('management.roleStaff') : '';
   }
 
   showAlert(event: Event) {

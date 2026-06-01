@@ -32,6 +32,7 @@ interface CalendarDay {
       <div
         class="trigger-box border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg py-2 px-3 text-sm flex justify-between items-center cursor-pointer select-none h-[38px] transition-all hover:border-slate-300 dark:hover:border-slate-600"
         [class.focused]="isOpen()"
+        [class.has-error]="hasError"
         (click)="toggleCalendar()"
       >
         <span class="truncate" [class.text-slate-400]="!value">
@@ -133,7 +134,7 @@ interface CalendarDay {
                 [class.border-transparent]="activeTab() !== 'month'"
                 (click)="activeTab.set('month')"
               >
-                {{ isEn() ? 'Months' : 'Tháng' }}
+                {{ t('shared.monthTitle') }}
               </div>
               <div
                 class="flex-1 text-center py-2 cursor-pointer transition-colors border-b-2"
@@ -142,7 +143,7 @@ interface CalendarDay {
                 [class.border-transparent]="activeTab() !== 'year'"
                 (click)="activeTab.set('year')"
               >
-                {{ isEn() ? 'Years' : 'Năm' }}
+                {{ t('shared.yearTitle') }}
               </div>
             </div>
 
@@ -181,14 +182,14 @@ interface CalendarDay {
             (click)="clear()"
             class="text-xs font-bold text-slate-500 hover:text-slate-700 dark:hover:text-white px-2 py-1 rounded transition-colors uppercase"
           >
-            {{ isEn() ? 'Clear' : 'Xóa' }}
+            {{ t('shared.clear') }}
           </button>
           <button
             type="button"
             (click)="goToday()"
             class="text-xs font-bold text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 px-2 py-1 rounded transition-colors uppercase"
           >
-            {{ isEn() ? 'Today' : 'Hôm nay' }}
+            {{ t('shared.today') }}
           </button>
         </div>
       </div>
@@ -206,6 +207,14 @@ interface CalendarDay {
     
     .trigger-box.focused .calendar-icon {
       color: var(--m-brand-color, #e11d48);
+    }
+
+    .trigger-box.has-error {
+      border-color: #ef4444 !important;
+    }
+
+    .trigger-box.has-error.focused {
+      box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15) !important;
     }
     
     .calendar-popover {
@@ -330,6 +339,7 @@ export class CustomDatePickerComponent implements OnInit {
   @Input() disabled: boolean = false;
   @Input() min: string = ''; // YYYY-MM-DD
   @Input() max: string = ''; // YYYY-MM-DD
+  @Input() hasError: boolean = false;
 
   protected isOpen = signal(false);
   protected showSelectorPanel = signal(false);
@@ -344,18 +354,39 @@ export class CustomDatePickerComponent implements OnInit {
 
   protected todayStr = signal<string>(new Date().toISOString().split('T')[0]);
 
+  t(key: string): string {
+    return this.language.t(key);
+  }
+
   // Months
   protected monthNames = computed(() => {
-    return this.isEn()
-      ? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-      : ['Thg 1', 'Thg 2', 'Thg 3', 'Thg 4', 'Thg 5', 'Thg 6', 'Thg 7', 'Thg 8', 'Thg 9', 'Thg 10', 'Thg 11', 'Thg 12'];
+    return [
+      this.t('shared.thg1'),
+      this.t('shared.thg2'),
+      this.t('shared.thg3'),
+      this.t('shared.thg4'),
+      this.t('shared.thg5'),
+      this.t('shared.thg6'),
+      this.t('shared.thg7'),
+      this.t('shared.thg8'),
+      this.t('shared.thg9'),
+      this.t('shared.thg10'),
+      this.t('shared.thg11'),
+      this.t('shared.thg12'),
+    ];
   });
 
   // Weekdays
   protected weekdays = computed(() => {
-    return this.isEn()
-      ? ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
-      : ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+    return [
+      this.t('shared.weekdayCN'),
+      this.t('shared.weekdayT2'),
+      this.t('shared.weekdayT3'),
+      this.t('shared.weekdayT4'),
+      this.t('shared.weekdayT5'),
+      this.t('shared.weekdayT6'),
+      this.t('shared.weekdayT7'),
+    ];
   });
 
   // Year Selection Range (current - 20 to current + 10)
