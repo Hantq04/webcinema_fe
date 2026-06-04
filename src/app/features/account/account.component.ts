@@ -230,10 +230,10 @@ export type AccountView = 'general' | 'details' | 'history' | 'coupon';
               </div>
 
               <div class="history-list">
-                @for (item of historyList(); track item.ticketCode) {
+                @for (item of historyList(); track item.billCode) {
                   <div class="history-item">
                     <div class="item-header">
-                      {{ t('account.bookingCode') }} <strong>{{ item.ticketCode }}</strong>
+                      {{ t('account.bookingCode') }} <strong>{{ item.billCode }}</strong>
                       <span class="status">({{ t('account.statusLabel') }} 
                         <span class="completed" [style.color]="item.status === 'success' ? 'green' : 'red'">
                           {{ item.status === 'success' ? t('account.statusCompleted') : item.status }}
@@ -245,13 +245,13 @@ export type AccountView = 'general' | 'details' | 'history' | 'coupon';
                       <img [src]="item.image || '/movie/default.jpg'" [alt]="item.movieName" class="movie-poster">
                       <div class="item-details">
                         <h4 class="movie-title">{{ item.movieName }}</h4>
-                        <span class="rating-badge">{{ item.rate || 'K' }}</span>
+                        <span [class]="'rating-badge ' + getRateClass(item.rate)">{{ movieRateCode(item.rate) || 'K' }}</span>
                         <p class="movie-date">{{ item.showDate }}</p>
                         <p class="movie-time">Từ {{ item.startAt }} ~ Đến {{ item.endAt }}</p>
                         <p class="cinema-name">{{ item.cinemaName }}</p>
                         <p class="seats-info">{{ item.roomCode }}{{ item.seat ? ' (' + item.seat + ')' : '' }}</p>
                         <p class="total-price">{{ item.totalMoney | number }} đ</p>
-                        <button class="view-item-btn" (click)="onDevelop()">Xem</button>
+                        <button class="view-item-btn" (click)="printTicket(item.billCode)">{{ t('account.printTicketBtn') }}</button>
                       </div>
                     </div>
                   </div>
@@ -862,7 +862,13 @@ export type AccountView = 'general' | 'details' | 'history' | 'coupon';
       border-radius: 3px;
       width: fit-content;
       font-weight: 900;
+      text-transform: uppercase;
     }
+    .rating-badge.rate-g { background-color: #2f9d44 !important; }
+    .rating-badge.rate-pg { background-color: #f39c12 !important; }
+    .rating-badge.rate-pg13 { background-color: #6d5bd0 !important; }
+    .rating-badge.rate-r { background-color: #e03a2f !important; }
+    .rating-badge.rate-nc17 { background-color: #1f8bd6 !important; }
     .total-price {
       font-weight: 900;
       color: #333;
@@ -1676,6 +1682,37 @@ export class AccountComponent {
 
   protected currentPhone(): string {
     return this.profile()?.phoneNumber || this.auth.currentUserPhone() || 'N/A';
+  }
+
+  protected movieRateCode(rate: string | null | undefined): string {
+    const r = (rate || '').toUpperCase();
+    if (r.includes('PG-13')) return 'PG-13';
+    if (r.includes('NC-17')) return 'NC-17';
+    if (r.startsWith('PG')) return 'PG';
+    if (r.startsWith('G')) return 'G';
+    if (r.startsWith('R')) return 'R';
+    if (r.startsWith('P')) return 'P';
+    if (r.startsWith('K')) return 'K';
+    if (r.startsWith('C13') || r.startsWith('T13')) return 'T13';
+    if (r.startsWith('C16') || r.startsWith('T16')) return 'T16';
+    if (r.startsWith('C18') || r.startsWith('T18')) return 'T18';
+    return (r.split(/[\s-]/)[0] || '').trim();
+  }
+
+  protected getRateClass(rate: string | null | undefined): string {
+    const r = this.movieRateCode(rate);
+    if (r === 'G' || r === 'P') return 'rate-g';
+    if (r === 'PG' || r === 'K') return 'rate-pg';
+    if (r === 'PG-13' || r === 'T13') return 'rate-pg13';
+    if (r === 'R' || r === 'T16') return 'rate-r';
+    if (r === 'NC-17' || r === 'T18') return 'rate-nc17';
+    return '';
+  }
+
+  protected printTicket(billCode: string): void {
+    if (!billCode) return;
+    const url = this.billService.getPrintTicketPdfUrl(billCode) + '#print';
+    window.open(url, '_blank');
   }
 
   protected currentPoints(): number {

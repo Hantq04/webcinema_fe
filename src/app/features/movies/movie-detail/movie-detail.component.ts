@@ -302,10 +302,51 @@ export class MovieDetailComponent {
   }
 
   protected getLanguage(m: MovieDetail): string {
-    if (m.language && m.movieSubtitle) {
-      return `${m.language} - Phụ đề ${m.movieSubtitle}`;
+    const isEn = this.isEn();
+    const lang = m.language || '';
+    const sub = m.movieSubtitle || '';
+
+    const translateTerm = (term: string, toEn: boolean): string => {
+      const clean = term.trim().toLowerCase();
+      if (clean.includes('tiếng anh') || clean.includes('english')) {
+        return toEn ? 'English' : (term.trim().toLowerCase() === 'english' ? 'English' : 'Tiếng Anh');
+      }
+      if (clean.includes('tiếng việt') || clean.includes('vietnamese')) {
+        return toEn ? 'Vietnamese' : 'Tiếng Việt';
+      }
+      if (clean.includes('tiếng hàn') || clean.includes('korean')) {
+        return toEn ? 'Korean' : 'Tiếng Hàn';
+      }
+      if (clean.includes('tiếng nhật') || clean.includes('japanese')) {
+        return toEn ? 'Japanese' : 'Tiếng Nhật';
+      }
+      if (clean.includes('tiếng trung') || clean.includes('chinese')) {
+        return toEn ? 'Chinese' : 'Tiếng Trung';
+      }
+      return term.replace(/\b\w/g, c => c.toUpperCase());
+    };
+
+    const cleanSubtitle = (val: string): string => {
+      return val.replace(/phụ đề/gi, '').replace(/subtitle/gi, '').trim();
+    };
+
+    if (lang && sub) {
+      const baseSub = cleanSubtitle(sub);
+      const translatedLang = translateTerm(lang, isEn);
+      const translatedSub = translateTerm(baseSub, isEn);
+      
+      if (isEn) {
+        return `${translatedLang} - ${translatedSub} Subtitle`;
+      } else {
+        return `${translatedLang} - Phụ đề ${translatedSub}`;
+      }
     }
-    return m.language || 'Đang cập nhật';
+
+    if (lang) {
+      return translateTerm(lang, isEn);
+    }
+
+    return isEn ? 'Updating' : 'Đang cập nhật';
   }
 
   protected formatDate(dateString?: string): string {

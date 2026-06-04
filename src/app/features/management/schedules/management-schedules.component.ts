@@ -71,9 +71,9 @@ export class ManagementSchedulesComponent implements OnInit {
     this.scheduleForm = this.fb.group({
       code: [{ value: '', disabled: true }],
       movieName: [''],
-      address: [''], 
-      cinemaName: [''], 
-      roomName: [''], 
+      address: [''],
+      cinemaName: [''],
+      roomName: [''],
       roomCode: [''],
       startAt: ['']
     });
@@ -418,7 +418,7 @@ export class ManagementSchedulesComponent implements OnInit {
 
   getScheduleStatus(s: ScheduleResponse | null): { label: string, class: string } {
     if (!s) return { label: '', class: '' };
-    
+
     const now = new Date().getTime();
     const start = s.startAt ? new Date(s.startAt.replace(' ', 'T')).getTime() : 0;
     const end = s.endAt ? new Date(s.endAt.replace(' ', 'T')).getTime() : 0;

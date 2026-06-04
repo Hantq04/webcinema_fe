@@ -28,17 +28,17 @@ export class ManagementEventComponent implements OnInit {
   // Modal state
   showFormModal = signal(false);
   showDeleteModal = signal(false);
-  
+
   eventForm: FormGroup;
-  selectedFile: File | null = null;
-  imagePreview: string | null = null;
+  selectedFile = signal<File | null>(null);
+  imagePreview = signal<string | null>(null);
   eventToDelete = signal<Event | null>(null);
   fieldErrors = signal<Record<string, string>>({});
 
   filteredEvents = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
     if (!q) return this.events();
-    return this.events().filter(e => 
+    return this.events().filter(e =>
       e.name.toLowerCase().includes(q)
     );
   });
@@ -68,17 +68,32 @@ export class ManagementEventComponent implements OnInit {
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
-      this.selectedFile = file;
+      this.selectedFile.set(file);
       const reader = new FileReader();
-      reader.onload = (e: any) => this.imagePreview = e.target.result;
+      reader.onload = (e: any) => this.imagePreview.set(e.target.result);
+      reader.readAsDataURL(file);
+    }
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    const file = event.dataTransfer?.files[0];
+    if (file && file.type.startsWith('image/')) {
+      this.selectedFile.set(file);
+      const reader = new FileReader();
+      reader.onload = (e: any) => this.imagePreview.set(e.target.result);
       reader.readAsDataURL(file);
     }
   }
 
   openAddModal() {
     this.eventForm.reset();
-    this.selectedFile = null;
-    this.imagePreview = null;
+    this.selectedFile.set(null);
+    this.imagePreview.set(null);
     this.fieldErrors.set({});
     this.showFormModal.set(true);
   }
@@ -86,10 +101,11 @@ export class ManagementEventComponent implements OnInit {
   submitForm() {
     const formData = new FormData();
     formData.append('name', this.eventForm.get('name')?.value || '');
-    if (this.selectedFile) {
-      formData.append('image', this.selectedFile);
+    const file = this.selectedFile();
+    if (file) {
+      formData.append('image', file);
     }
-    
+
     this.eventService.saveEvent(formData).subscribe({
       next: () => {
         this.showFormModal.set(false);

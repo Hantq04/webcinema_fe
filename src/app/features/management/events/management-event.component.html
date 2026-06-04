@@ -102,9 +102,12 @@
           <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Hình ảnh sự kiện</label>
           <div
             class="relative aspect-[4/3] rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 overflow-hidden group cursor-pointer hover:border-rose-400 transition-colors bg-slate-50 dark:bg-slate-800"
-            [class.border-rose-500]="fieldErrors()['image']" (click)="fileInput.click()">
-            <img *ngIf="imagePreview" [src]="imagePreview" class="w-full h-full object-cover">
-            <div *ngIf="!imagePreview"
+            [class.border-rose-500]="fieldErrors()['image']" 
+            (click)="fileInput.click()"
+            (dragover)="onDragOver($event)"
+            (drop)="onDrop($event)">
+            <img *ngIf="imagePreview()" [src]="imagePreview()" class="w-full h-full object-cover">
+            <div *ngIf="!imagePreview()"
               class="absolute inset-0 flex flex-col items-center justify-center text-slate-400">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">

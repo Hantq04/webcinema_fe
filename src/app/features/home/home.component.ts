@@ -1357,7 +1357,7 @@ export class HomeComponent {
     { id: 'n4', imageUrl: '/event/news/75000.jpg', href: '/events' }
   ];
 
-  protected readonly eventTopCards = computed(() => 
+  protected readonly eventTopCards = computed(() =>
     this.selectedEventTab() === 'member' ? this.memberCards : this.newsCards
   );
 
@@ -1411,8 +1411,9 @@ export class HomeComponent {
       .subscribe((events) => {
         const slides = events
           .filter(e => e.isActive && e.imageUrl)
+          .slice(0, 6) // Take the first 6 active events
           .map((e, index) => ({
-            id: e.name || index,
+            id: e.id || e.name || index,
             imageUrl: e.imageUrl,
             title: e.name
           }));

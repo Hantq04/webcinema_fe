@@ -69,4 +69,8 @@ export class ManagementBillService {
   getTransactionHistory(page: number, size: number): Observable<any> {
     return this.http.get<any>(this.apiService.apiUrl(`/api/v1/transaction/history?page=${page}&size=${size}`));
   }
+
+  getPrintTicketPdfUrl(tradingCode: string): string {
+    return this.apiService.apiUrl(`/api/v1/print-ticket/pdf?tradingCode=${tradingCode}`);
+  }
 }

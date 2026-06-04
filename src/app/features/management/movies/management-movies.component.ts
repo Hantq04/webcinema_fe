@@ -147,9 +147,9 @@ export class ManagementMoviesComponent implements OnInit {
           totalP = res.totalPages ?? 1;
         }
 
-        // Apply custom sorting for 'ALL' tab: Now Showing (1) -> Coming Soon (2) -> Ended (3)
-        // Within each category, sort by premiereDate descending
-        if (this.activeTab() === 'ALL') {
+        // Apply custom sorting: Coming Soon (1) -> Now Showing (2) -> Ended (3)
+        // Within each category (and for other tabs except TOP_SALES), sort by date descending
+        if (this.activeTab() !== 'TOP_SALES') {
           dataList.sort((a: any, b: any) => {
             const getPriority = (m: any) => {
               const nowTime = new Date().getTime();
@@ -159,8 +159,8 @@ export class ManagementMoviesComponent implements OnInit {
               const eTime = e ? new Date(e.replace(' ', 'T')).getTime() : 0;
               
               if (eTime && nowTime > eTime) return 3; // Ended
-              if (pTime && nowTime < pTime) return 2; // Coming Soon
-              return 1; // Now Showing
+              if (pTime && nowTime < pTime) return 1; // Coming Soon
+              return 2; // Now Showing
             };
 
             const pA = getPriority(a);
