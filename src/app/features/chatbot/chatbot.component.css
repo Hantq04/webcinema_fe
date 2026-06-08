@@ -563,3 +563,122 @@
   color: #475569;
   font-weight: 600;
 }
+
+/* Premium Styles for Cinemas, Ticket Prices, Date Showtimes and Markdown rendering */
+
+.cinema-card-new {
+  position: relative;
+  overflow: hidden;
+  background: white;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cinema-card-new::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #d62f1f 0%, #ef4444 100%);
+}
+
+.cinema-card-new:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.05), 0 8px 16px -6px rgba(214, 47, 31, 0.05);
+  border-color: #fca5a5;
+}
+
+.copy-addr-btn {
+  border: 1px solid #e2e8f0;
+}
+
+.copy-addr-btn:hover {
+  border-color: #fca5a5;
+  background-color: #fff1f2;
+}
+
+.view-showtimes-btn {
+  box-shadow: 0 2px 4px rgba(214, 47, 31, 0.2);
+}
+
+.view-showtimes-btn:hover {
+  background-color: #b91c1c;
+  box-shadow: 0 4px 8px rgba(214, 47, 31, 0.3);
+}
+
+/* Movie Showtimes Card */
+.movie-showtimes-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.01);
+  transition: all 0.25s ease;
+}
+
+.movie-showtimes-card:hover {
+  transform: translateY(-2px);
+  border-color: #e2e8f0;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.03);
+}
+
+.movie-showtimes-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background-color: #d62f1f;
+}
+
+/* Showtime Pills */
+.showtime-pill {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 80px;
+}
+
+.showtime-pill:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(214, 47, 31, 0.1);
+  border-color: #fecaca;
+  background-color: #fff5f5;
+}
+
+/* Custom Markdown Text Elements */
+.chat-code-badge {
+  background-color: #f1f5f9;
+  color: #d62f1f;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.85em;
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  font-weight: 600;
+}
+
+.chat-bullet-list {
+  margin: 0.5rem 0;
+  padding-left: 1.25rem;
+  list-style-type: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.chat-bullet-item {
+  position: relative;
+  padding-left: 0.25rem;
+  line-height: 1.4;
+  color: #334155;
+}
+
+.chat-bullet-item::before {
+  content: "•";
+  position: absolute;
+  left: -0.75rem;
+  color: #d62f1f;
+  font-weight: bold;
+}

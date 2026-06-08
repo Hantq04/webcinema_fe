@@ -871,7 +871,14 @@ const translations = {
       locationsDesc: 'Hệ thống rạp CineGo hiện đã có mặt tại các vị trí đắc địa ở TP.HCM, Hà Nội và Đà Nẵng. Bạn có thể xem danh sách địa chỉ chi tiết tại mục "Hệ Thống Rạp" trên thanh menu chính của trang web nhé!',
       bookNow: 'Đặt vé ngay',
       bookingId: 'MÃ ĐẶT VÉ',
-      confirmed: 'Đã xác nhận'
+      confirmed: 'Đã xác nhận',
+      copyAddress: 'Sao chép địa chỉ',
+      viewShowtimes: 'Xem lịch chiếu',
+      priceSeatTypeHeader: 'Giá cơ bản theo loại ghế:',
+      priceRoomTypeHeader: 'Hệ số theo loại phòng chiếu:',
+      priceWeekendSurchargeLabel: 'Phụ thu cuối tuần',
+      priceTimeDiscountHeader: 'Giảm giá theo khung giờ:',
+      movieShowtimesLabel: 'Suất chiếu:'
     }
   },
   en: {
@@ -1740,7 +1747,14 @@ const translations = {
       locationsDesc: "CineGo theaters are located in prime spots across HCMC, Hanoi, and Da Nang. You can view the detailed address list in the 'Theaters' section on the main menu of our website!",
       bookNow: 'Book Now',
       bookingId: 'BOOKING ID',
-      confirmed: 'Confirmed'
+      confirmed: 'Confirmed',
+      copyAddress: 'Copy Address',
+      viewShowtimes: 'View Showtimes',
+      priceSeatTypeHeader: 'Base Ticket Prices:',
+      priceRoomTypeHeader: 'Room Type Multipliers:',
+      priceWeekendSurchargeLabel: 'Weekend Surcharge',
+      priceTimeDiscountHeader: 'Hourly Discounts:',
+      movieShowtimesLabel: 'Showtimes:'
     }
   }
 } as const;
